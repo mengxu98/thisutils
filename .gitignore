@@ -1,0 +1,20 @@
+# Binary files
+*.dll
+*.o
+*.so
+
+# Directories
+.vscode
+docs
+pkgdown
+src-i386
+src-x64
+
+# macOS file
+.DS_Store
+
+# R files
+.Rhistory
+.Rproj.user
+.Ruserdata
+.RData

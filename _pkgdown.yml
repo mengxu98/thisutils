@@ -1,0 +1,59 @@
+destination: docs
+
+toc:
+  depth: 3
+
+url: https://mengxu98.github.io/thisutils/
+
+template:
+  bootstrap: 5
+  light-switch: true
+  package: mxtemplate
+
+navbar:
+  structure:
+    left:  [articles, reference, tutorials, news]
+    right: [github, mengxu, lightswitch]
+
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/mengxu98/thisutils
+      title: GitHub
+      aria-label: GitHub repository
+
+    mengxu:
+      icon: fas fa-home fa-lg
+      href: https://github.com/mengxu98
+      title: MengXu
+      aria-label: MengXu's GitHub profile
+
+    reference:
+      text: Reference
+      href: reference/index.html
+
+reference:
+
+- subtitle: "Package overview"
+- contents:
+  - thisutils-package
+  - thisutils_logo
+
+- subtitle: "Correlation functions"
+- contents:
+  - pearson_correlation
+  - sparse_cor
+  - sparse_cov_cor
+
+- subtitle: "Utility functions"
+- contents:
+  - '%ss%'
+  - as_matrix
+  - check_sparsity
+  - log_message
+  - normalization
+  - parallelize_fun
+  - print.logo
+  - split_indices
+  - simulate_sparse_matrix
+  - r_square
