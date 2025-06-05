@@ -39,6 +39,13 @@ reference:
   - thisutils-package
   - thisutils_logo
 
+- subtitle: "Ascii art"
+- contents:
+  - add_pkg_logo
+  - figlet
+  - figlet_font
+  - list_figlet_fonts
+
 - subtitle: "Correlation functions"
 - contents:
   - pearson_correlation

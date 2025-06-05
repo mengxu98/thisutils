@@ -36,24 +36,27 @@ A correlation matrix.
 Safe correlation function which returns a sparse matrix without missing values
 }
 \examples{
-\dontrun{
 m1 <- simulate_sparse_matrix(
-  2000, 2000,
+  500, 500,
   density = 0.01
 )
 m2 <- simulate_sparse_matrix(
-  2000, 1000,
+  500, 100,
   density = 0.05
 )
+a <- as_matrix(sparse_cor(m1))
+b <- as_matrix(sparse_cor(m1, m2))
+all.equal(a, b)
 
 all.equal(
-  as_matrix(sparse_cor(m1)),
-  as_matrix(cor(as_matrix(m1)))
-)
-all.equal(
-  as_matrix(sparse_cor(m1, m2)),
+  b,
   as_matrix(cor(as_matrix(m1), as_matrix(m2)))
 )
+
+m1[sample(1:500, 10)] <- NA
+m2[sample(1:500, 10)] <- NA
+
+sparse_cor(m1, m2)[1:5, 1:5]
 
 system.time(
   sparse_cor(m1)
@@ -67,10 +70,4 @@ system.time(
 system.time(
   cor(as_matrix(m1), as_matrix(m2))
 )
-
-m1[sample(1:500, 10)] <- NA
-m2[sample(1:500, 10)] <- NA
-
-sparse_cor(m1, m2)[1:5, 1:5]
-}
 }

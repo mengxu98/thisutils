@@ -25,3 +25,7 @@ A list of computed results
 \description{
 Parallelize a function
 }
+\examples{
+parallelize_fun(1:3, function(x) x^2)
+parallelize_fun(list(1, 2, 3), function(x) x^2)
+}
