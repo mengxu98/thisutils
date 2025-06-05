@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-#' @title thisutils: inferring cell-type specific gene regulatory network
+#' @title thisutils: An R package for utility functions.
 #'
 #' @useDynLib thisutils
 #'
 #' @description
-#' An R package for inferring cell-type specific gene regulatory network from single-cell RNA-seq data
+#' An R package for utility functions.
 #'
-#' @author Meng xu (Maintainer), \email{mengxu98@qq.com}
+#' @author Meng Xu (Maintainer), \email{mengxu98@qq.com}
 #'
-#' @source \url{https://github.com/mengxu98/thisutils}
+#' @source \url{https://mengxu98.github.io/thisutils/}
 #'
 #' @md
 #' @docType package
@@ -20,7 +20,7 @@
 #'
 #' @description
 #' The thisutils logo, using ASCII or Unicode characters
-#' Use [cli::ansi_strip()] to get rid of the colors.
+#' Use [cli::ansi_strip] to get rid of the colors.
 #' @param unicode Unicode symbols. Default is `TRUE` on UTF-8 platforms.
 #'
 #' @references
@@ -34,22 +34,21 @@ thisutils_logo <- function(
     unicode = cli::is_utf8_output()) {
   logo <- c(
     "       0        1      2           3    4
-        _       ____          ___________ _   __
-       (_)___  / __/__  _____/ ____/ ___// | / /
-      / / __ ./ /_/ _ ./ ___/ /    .__ ./  |/ / 
-     / / / / / __/  __/ /  / /___ ___/ / /|  /  
-    /_/_/ /_/_/  .___/_/   .____//____/_/ |_/
+   __  __    _              __  _  __
+  / /_/ /_  (_)_____ __  __/ /_(_)/ /_____
+ / __/ __ ./ // ___// / / / __/ // // ___/
+/ /_/ / / / /(__  )/ /_/ / /_/ // /(__  )
+.__/_/ /_/_//____/ .__,_/.__/_//_//____/
     5             6      7      8       9   "
   )
 
-  hexa <- c("*", ".", "o", "*", ".", "*", ".", "o", ".", "*")
+  hexa <- c("*", ".", "o", "*", ".", "o", "*", ".", "o", "*")
   if (unicode) {
     hexa <- c("*" = "\u2b22", "o" = "\u2b21", "." = ".")[hexa]
   }
 
   cols <- c(
-    "red", "yellow", "green", "magenta", "cyan",
-    "yellow", "green", "white", "magenta", "cyan"
+    "red", "yellow", "green", "magenta", "cyan", "yellow", "green", "white", "magenta", "cyan"
   )
 
   col_hexa <- purrr::map2(
@@ -66,9 +65,8 @@ thisutils_logo <- function(
 
 #' @title print logo
 #'
-#' @param x Input infromation.
+#' @param x Input information.
 #' @param ... Other parameters.
-#'
 #' @method print logo
 #'
 #' @export
