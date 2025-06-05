@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{r_square}
 \alias{r_square}
-\title{\eqn{R^2} (coefficient of determination)}
+\title{coefficient of determination (\eqn{R^2})}
 \usage{
 r_square(y_true, y_pred)
 }
@@ -11,8 +11,11 @@ r_square(y_true, y_pred)
 
 \item{y_pred}{A numeric vector with predicted values.}
 }
+\value{
+\eqn{R^2} value
+}
 \description{
-\eqn{R^2} (coefficient of determination)
+coefficient of determination (\eqn{R^2})
 }
 \examples{
 y_true <- rnorm(100)

@@ -36,6 +36,9 @@ Level 1 has no indentation, higher levels add more indentation.}
 \item{level_symbol}{Character value, default is \emph{\code{"  "}} (two spaces).
 The symbol used for indentation at each level.}
 }
+\value{
+\code{Formated message} printed to the console.
+}
 \description{
 Integrate the message printing function with the \code{cli} package,
 and the \code{\link[base]{message}} function.

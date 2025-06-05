@@ -21,12 +21,15 @@
 #' @description
 #' The thisutils logo, using ASCII or Unicode characters
 #' Use [cli::ansi_strip] to get rid of the colors.
+#'
+#' @md
 #' @param unicode Unicode symbols. Default is `TRUE` on UTF-8 platforms.
+#'
+#' @return A logo with ASCII formatted text
 #'
 #' @references
 #'  \url{https://github.com/tidyverse/tidyverse/blob/main/R/logo.R}
 #'
-#' @md
 #' @export
 #' @examples
 #' thisutils_logo()
@@ -67,6 +70,9 @@ thisutils_logo <- function(
 #'
 #' @param x Input information.
 #' @param ... Other parameters.
+#'
+#' @return Print the ASCII logo
+#'
 #' @method print logo
 #'
 #' @export

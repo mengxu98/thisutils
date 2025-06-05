@@ -21,6 +21,8 @@
 #' @param level_symbol Character value, default is *`"  "`* (two spaces).
 #' The symbol used for indentation at each level.
 #'
+#' @return \code{Formated message} printed to the console.
+#'
 #' @export
 #' @examples
 #' log_message("Hello, ", "world!")
@@ -50,14 +52,14 @@ log_message <- function(
     return(invisible(NULL))
   }
 
-  if (timestamp) {
-    time_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
-    msg <- paste0("[", time_str, "] ", msg)
-  }
-
   if (level > 1) {
     indentation <- paste(rep(level_symbol, level - 1), collapse = "")
     msg <- paste0(indentation, msg)
+  }
+
+  if (timestamp) {
+    time_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+    msg <- paste0("[", time_str, "] ", msg)
   }
 
   if (cli_model) {
@@ -89,6 +91,7 @@ log_message <- function(
 #' @param a The left side value to check
 #' @param b The right side value to use if a is NULL
 #'
+#' @return a if it is not NULL, otherwise b
 #' @export
 #'
 #' @examples
@@ -116,6 +119,10 @@ log_message <- function(
 #' @return A list of computed results
 #'
 #' @export
+#'
+#' @examples
+#' parallelize_fun(1:3, function(x) x^2)
+#' parallelize_fun(list(1, 2, 3), function(x) x^2)
 parallelize_fun <- function(
     x,
     fun,
@@ -133,7 +140,7 @@ parallelize_fun <- function(
       pb_id <- cli::cli_progress_bar(
         total = length(x),
         format = paste0(
-          "{pb_spin} [{time_str}] Running [{pb_current}/{pb_total}] ETA: {pb_eta}"
+          "{cli::pb_spin} [{time_str}] Running [{cli::pb_current}/{cli::pb_total}] ETA: {cli::pb_eta}"
         )
       )
       fun_progress <- function(...) {
@@ -171,22 +178,28 @@ parallelize_fun <- function(
 
   time_end <- Sys.time()
   elapsed <- as.numeric(time_end - time_start)
-  if (elapsed < 60) {
-    elapsed_str <- sprintf("Elapsed: %.2f sec", elapsed)
-  } else if (elapsed < 3600) {
-    min <- floor(elapsed / 60)
-    sec <- elapsed %% 60
-    elapsed_str <- sprintf("Elapsed: %d min %.2f sec", min, sec)
-  } else {
-    hour <- floor(elapsed / 3600)
-    min <- floor((elapsed %% 3600) / 60)
-    sec <- elapsed %% 60
-    elapsed_str <- sprintf("Elapsed: %d h %d min %.2f sec", hour, min, sec)
-  }
+
   log_message(
-    elapsed_str
+    .elapsed_str(elapsed)
   )
   return(output_list)
+}
+
+.elapsed_str <- function(x) {
+  if (x < 60) {
+    elapsed_str <- sprintf("Elapsed %.2f sec", x)
+  } else if (x < 3600) {
+    min <- floor(x / 60)
+    sec <- x %% 60
+    elapsed_str <- sprintf("Elapsed %d min %.2f sec", min, sec)
+  } else {
+    hour <- floor(x / 3600)
+    min <- floor((x %% 3600) / 60)
+    sec <- x %% 60
+    elapsed_str <- sprintf("Elapsed %d h %d min %.2f sec", hour, min, sec)
+  }
+
+  return(elapsed_str)
 }
 
 .cores_detect <- function(
@@ -328,24 +341,27 @@ simulate_sparse_matrix <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' m1 <- simulate_sparse_matrix(
-#'   2000, 2000,
+#'   500, 500,
 #'   density = 0.01
 #' )
 #' m2 <- simulate_sparse_matrix(
-#'   2000, 1000,
+#'   500, 100,
 #'   density = 0.05
 #' )
+#' a <- as_matrix(sparse_cor(m1))
+#' b <- as_matrix(sparse_cor(m1, m2))
+#' all.equal(a, b)
 #'
 #' all.equal(
-#'   as_matrix(sparse_cor(m1)),
-#'   as_matrix(cor(as_matrix(m1)))
-#' )
-#' all.equal(
-#'   as_matrix(sparse_cor(m1, m2)),
+#'   b,
 #'   as_matrix(cor(as_matrix(m1), as_matrix(m2)))
 #' )
+#'
+#' m1[sample(1:500, 10)] <- NA
+#' m2[sample(1:500, 10)] <- NA
+#'
+#' sparse_cor(m1, m2)[1:5, 1:5]
 #'
 #' system.time(
 #'   sparse_cor(m1)
@@ -359,12 +375,6 @@ simulate_sparse_matrix <- function(
 #' system.time(
 #'   cor(as_matrix(m1), as_matrix(m2))
 #' )
-#'
-#' m1[sample(1:500, 10)] <- NA
-#' m2[sample(1:500, 10)] <- NA
-#'
-#' sparse_cor(m1, m2)[1:5, 1:5]
-#' }
 sparse_cor <- function(
     x,
     y = NULL,
@@ -444,84 +454,6 @@ sparse_cor <- function(
   }
 
   return(corr_mat)
-}
-
-#' @title Convert sparse matrix into dense matrix
-#'
-#' @param x A matrix.
-#' @param parallel Logical value, default is *`FALSE`*.
-#' Setting to parallelize the computation with \code{\link[RcppParallel]{setThreadOptions}}.
-#' @param sparse Logical value, default is *`FALSE`*, whether to output a sparse matrix.
-#'
-#' @md
-#' @export
-#'
-#' @examples
-#' sparse_matrix <- simulate_sparse_matrix(
-#'   2000,
-#'   2000,
-#'   density = 0.01
-#' )
-#'
-#' system.time(as.matrix(sparse_matrix))
-#' system.time(as_matrix(sparse_matrix))
-#' system.time(as_matrix(sparse_matrix, parallel = TRUE))
-#'
-#' identical(
-#'   as.matrix(sparse_matrix),
-#'   as_matrix(sparse_matrix)
-#' )
-#'
-#' identical(
-#'   as.matrix(sparse_matrix),
-#'   as_matrix(sparse_matrix, parallel = TRUE)
-#' )
-#'
-#' identical(
-#'   sparse_matrix,
-#'   as_matrix(as.matrix(sparse_matrix), sparse = TRUE)
-#' )
-as_matrix <- function(
-    x,
-    parallel = FALSE,
-    sparse = FALSE) {
-  if (!methods::is(x, "sparseMatrix")) {
-    if (sparse) {
-      return(
-        Matrix::Matrix(
-          x,
-          sparse = TRUE,
-          dimnames = dimnames(x)
-        )
-      )
-    } else {
-      return(Matrix::as.matrix(x))
-    }
-  } else {
-    row_pos <- x@i
-    col_pos <- findInterval(seq_along(x@x) - 1, x@p[-1])
-    if (parallel) {
-      matrix <- asMatrixParallel(
-        row_pos,
-        col_pos,
-        x@x,
-        x@Dim[1],
-        x@Dim[2]
-      )
-    } else {
-      matrix <- asMatrix(
-        row_pos,
-        col_pos,
-        x@x,
-        x@Dim[1],
-        x@Dim[2]
-      )
-    }
-
-    attr(matrix, "dimnames") <- list(x@Dimnames[[1]], x@Dimnames[[2]])
-
-    return(matrix)
-  }
 }
 
 #' @title Check sparsity of matrix
@@ -645,12 +577,14 @@ normalization <- function(
   )
 }
 
-#' @title \eqn{R^2} (coefficient of determination)
+#' @title coefficient of determination (\eqn{R^2})
 #'
+#' @md
 #' @param y_true A numeric vector with ground truth values.
 #' @param y_pred A numeric vector with predicted values.
 #'
-#' @md
+#' @return \eqn{R^2} value
+#'
 #' @export
 #'
 #' @examples
