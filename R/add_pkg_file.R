@@ -1,83 +1,41 @@
-#' @title Add package logo functionality
+#' @title Add package file
 #'
 #' @description
-#' Automatically generate package logo functions and related code for R package development.
-#' This function creates a complete package logo setup including the logo function,
-#' print method, and \link{.onAttach} function in the package's R directory.
+#' Automatically generate a file containing functions and related code for R package development.
 #'
 #' @md
-#' @param pkg_name Character string, the name of the package. If NULL (default),
-#' will be read from DESCRIPTION file.
+#' @param desc_file The DESCRIPTION file.
+#' Must be provided, it will be used to extract package information.
+#' Using `add_pkg_file("DESCRIPTION")`, will be created <pkg_name>-package.R based on the DESCRIPTION file.
+#' If you want to use some specific information, such as `author_name` or `author_email`, you can provide them manually.
+#' @param pkg_name Character string, the name of the package.
+#' Default is NULL, which will be read from DESCRIPTION file.
 #' @param pkg_description Character string, short description of the package.
-#' If NULL (default), will be read from DESCRIPTION file.
+#' Default is NULL, which will be read from DESCRIPTION file.
 #' @param author_name Character string, name of the package author.
-#' If NULL (default), will be read from DESCRIPTION file.
+#' Default is NULL, which will be read from DESCRIPTION file.
 #' @param author_email Character string, email of the package author.
-#' If NULL (default), will be read from DESCRIPTION file.
+#' Default is NULL, which will be read from DESCRIPTION file.
 #' @param github_url Character string, GitHub URL of the package.
-#' If NULL (default), will be read from DESCRIPTION file or constructed based on package name.
+#' Default is NULL, which will be read from DESCRIPTION file or constructed based on package name.
 #' @param output_dir Character string, directory where to save the package file.
-#' Default is NULL, which will use tempdir() for temporary storage.
+#' Default is NULL, you should specify it, such as 'R/'.
 #' @param use_figlet Logical, whether to use figlet for ASCII art generation.
 #' Default is TRUE.
-#' @param figlet_font Character string, figlet font to use. Default is "Slant".
+#' @param figlet_font Character string, figlet font to use.
+#' Default is "Slant".
 #' @param colors Character vector, colors to use for the logo elements.
-#' @param unicode Logical, whether to use Unicode symbols. Default is TRUE.
-#' @param verbose Logical, whether to print progress messages. Default is TRUE.
-#' @param desc_file Character string, path to the DESCRIPTION file.
-#' If NULL (default), package information must be provided manually via other parameters.
+#' @param unicode Logical, whether to use Unicode symbols.
+#' Default is TRUE.
+#' @param verbose Logical, whether to print progress messages.
+#' Default is TRUE.
 #'
-#' @return creates a file in specified output directory
+#' @return Creates a file in specified output directory
 #'
 #' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Create logo with manual parameters (recommended for portability)
-#' add_pkg_file(
-#'   pkg_name = "mypackage",
-#'   pkg_description = "My awesome R package for data analysis",
-#'   author_name = "Your Name",
-#'   author_email = "your.email@example.com",
-#'   github_url = "https://github.com/username/mypackage",
-#'   output_dir = tempdir()
-#' )
-#'
-#' # Create logo reading from DESCRIPTION file (if available)
-#' if (file.exists("DESCRIPTION")) {
-#'   add_pkg_file(
-#'     desc_file = "DESCRIPTION",
-#'     output_dir = tempdir()
-#'   )
-#' }
-#'
-#' # Create simple logo without figlet
-#' add_pkg_file(
-#'   pkg_name = "mypackage",
-#'   pkg_description = "Simple package",
-#'   author_name = "Author",
-#'   author_email = "author@example.com",
-#'   use_figlet = FALSE,
-#'   output_dir = tempdir()
-#' )
-#'
-#' # Customize colors and fonts
-#' add_pkg_file(
-#'   pkg_name = "mypackage",
-#'   pkg_description = "Colorful package",
-#'   author_name = "Author",
-#'   author_email = "author@example.com",
-#'   figlet_font = "Big",
-#'   colors = c(
-#'     "blue", "cyan", "green", "yellow", "red",
-#'     "magenta", "white", "blue", "cyan", "green"
-#'   ),
-#'   output_dir = tempdir()
-#' )
-#' }
 add_pkg_file <- function(
+    desc_file,
     pkg_name = NULL,
-    desc_file = NULL,
     pkg_description = NULL,
     author_name = NULL,
     author_email = NULL,
@@ -91,10 +49,6 @@ add_pkg_file <- function(
     ),
     unicode = TRUE,
     verbose = TRUE) {
-  if (is.null(output_dir)) {
-    output_dir <- tempdir()
-  }
-
   desc_info <- if (!is.null(desc_file)) {
     .read_description(desc_file, verbose)
   } else {
@@ -111,7 +65,7 @@ add_pkg_file <- function(
     pkg_name <- desc_info$Package
     if (is.null(pkg_name)) {
       log_message(
-        "Package name not provided and not found in DESCRIPTION file",
+        "Package name not provided and not found in 'DESCRIPTION' file",
         message_type = "error"
       )
     }
@@ -140,12 +94,16 @@ add_pkg_file <- function(
         ascii_art <- figlet(pkg_name, font = figlet_font)
         ascii_lines <- as.character(ascii_art)
         if (verbose) {
-          log_message("Generated figlet ASCII art successfully")
+          log_message(
+            "Generated figlet ASCII art successfully",
+            message_type = "success"
+          )
         }
       },
       error = function(e) {
         if (verbose) {
-          log_message("Figlet generation failed, using simple ASCII art",
+          log_message(
+            "Figlet generation failed, using simple ASCII art",
             message_type = "warning"
           )
         }
@@ -172,19 +130,26 @@ add_pkg_file <- function(
     unicode = unicode
   )
 
-  output_file <- file.path(
-    output_dir,
-    paste0(pkg_name, "-package.R")
-  )
-
-  writeLines(file_content, output_file)
-  if (verbose) {
-    log_message("Package file created successfully: ", output_file,
+  if (!is.null(output_dir)) {
+    output_file <- file.path(
+      output_dir,
+      paste0(pkg_name, "-package.R")
+    )
+    writeLines(file_content, output_file)
+    log_message(
+      "Package file written to: ", output_file,
       message_type = "success"
     )
+    invisible(file_content)
   }
 
-  invisible(output_file)
+  if (verbose) {
+    log_message(
+      "Not provided 'output_dir', please specify it, such as 'R/'.",
+      message_type = "warning"
+    )
+    invisible(file_content)
+  }
 }
 
 .generate_content <- function(
