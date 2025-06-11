@@ -2,11 +2,11 @@
 % Please edit documentation in R/add_pkg_file.R
 \name{add_pkg_file}
 \alias{add_pkg_file}
-\title{Add package logo functionality}
+\title{Add package file}
 \usage{
 add_pkg_file(
+  desc_file,
   pkg_name = NULL,
-  desc_file = NULL,
   pkg_description = NULL,
   author_name = NULL,
   author_email = NULL,
@@ -21,88 +21,46 @@ add_pkg_file(
 )
 }
 \arguments{
-\item{pkg_name}{Character string, the name of the package. If NULL (default),
-will be read from DESCRIPTION file.}
+\item{desc_file}{The DESCRIPTION file.
+Must be provided, it will be used to extract package information.
+Using \code{add_pkg_file("DESCRIPTION")}, will be created <pkg_name>-package.R based on the DESCRIPTION file.
+If you want to use some specific information, such as \code{author_name} or \code{author_email}, you can provide them manually.}
 
-\item{desc_file}{Character string, path to the DESCRIPTION file.
-If NULL (default), package information must be provided manually via other parameters.}
+\item{pkg_name}{Character string, the name of the package.
+Default is NULL, which will be read from DESCRIPTION file.}
 
 \item{pkg_description}{Character string, short description of the package.
-If NULL (default), will be read from DESCRIPTION file.}
+Default is NULL, which will be read from DESCRIPTION file.}
 
 \item{author_name}{Character string, name of the package author.
-If NULL (default), will be read from DESCRIPTION file.}
+Default is NULL, which will be read from DESCRIPTION file.}
 
 \item{author_email}{Character string, email of the package author.
-If NULL (default), will be read from DESCRIPTION file.}
+Default is NULL, which will be read from DESCRIPTION file.}
 
 \item{github_url}{Character string, GitHub URL of the package.
-If NULL (default), will be read from DESCRIPTION file or constructed based on package name.}
+Default is NULL, which will be read from DESCRIPTION file or constructed based on package name.}
 
 \item{output_dir}{Character string, directory where to save the package file.
-Default is NULL, which will use tempdir() for temporary storage.}
+Default is NULL, you should specify it, such as 'R/'.}
 
 \item{use_figlet}{Logical, whether to use figlet for ASCII art generation.
 Default is TRUE.}
 
-\item{figlet_font}{Character string, figlet font to use. Default is "Slant".}
+\item{figlet_font}{Character string, figlet font to use.
+Default is "Slant".}
 
 \item{colors}{Character vector, colors to use for the logo elements.}
 
-\item{unicode}{Logical, whether to use Unicode symbols. Default is TRUE.}
+\item{unicode}{Logical, whether to use Unicode symbols.
+Default is TRUE.}
 
-\item{verbose}{Logical, whether to print progress messages. Default is TRUE.}
+\item{verbose}{Logical, whether to print progress messages.
+Default is TRUE.}
 }
 \value{
-creates a file in specified output directory
+Creates a file in specified output directory
 }
 \description{
-Automatically generate package logo functions and related code for R package development.
-This function creates a complete package logo setup including the logo function,
-print method, and \link{.onAttach} function in the package's R directory.
-}
-\examples{
-\dontrun{
-# Create logo with manual parameters (recommended for portability)
-add_pkg_file(
-  pkg_name = "mypackage",
-  pkg_description = "My awesome R package for data analysis",
-  author_name = "Your Name",
-  author_email = "your.email@example.com",
-  github_url = "https://github.com/username/mypackage",
-  output_dir = tempdir()
-)
-
-# Create logo reading from DESCRIPTION file (if available)
-if (file.exists("DESCRIPTION")) {
-  add_pkg_file(
-    desc_file = "DESCRIPTION",
-    output_dir = tempdir()
-  )
-}
-
-# Create simple logo without figlet
-add_pkg_file(
-  pkg_name = "mypackage",
-  pkg_description = "Simple package",
-  author_name = "Author",
-  author_email = "author@example.com",
-  use_figlet = FALSE,
-  output_dir = tempdir()
-)
-
-# Customize colors and fonts
-add_pkg_file(
-  pkg_name = "mypackage",
-  pkg_description = "Colorful package",
-  author_name = "Author",
-  author_email = "author@example.com",
-  figlet_font = "Big",
-  colors = c(
-    "blue", "cyan", "green", "yellow", "red",
-    "magenta", "white", "blue", "cyan", "green"
-  ),
-  output_dir = tempdir()
-)
-}
+Automatically generate a file containing functions and related code for R package development.
 }

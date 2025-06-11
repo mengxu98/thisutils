@@ -41,7 +41,7 @@ reference:
 
 - subtitle: "Ascii art"
 - contents:
-  - add_pkg_logo
+  - add_pkg_file
   - figlet
   - figlet_font
   - list_figlet_fonts
