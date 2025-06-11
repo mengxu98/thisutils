@@ -4,28 +4,14 @@
 \alias{list_figlet_fonts}
 \title{List available figlet fonts}
 \usage{
-list_figlet_fonts(show_preview = FALSE, test_text = "ABC")
-}
-\arguments{
-\item{show_preview}{Logical, whether to show a preview of each font.
-Default is FALSE for performance reasons.}
-
-\item{test_text}{Character string, text to use for font preview.
-Default is "ABC".}
+list_figlet_fonts()
 }
 \value{
 Character vector of available font names.
 }
 \description{
 List all figlet font files available in the package or system.
-This function helps users choose appropriate fonts for their package logos.
 }
 \examples{
-\dontrun{
-# List available fonts
 list_figlet_fonts()
-
-# Show font previews
-list_figlet_fonts(show_preview = TRUE, test_text = "Hi")
-}
 }

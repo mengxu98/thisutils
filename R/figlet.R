@@ -19,6 +19,7 @@
 #' \url{https://github.com/jbkunst/figletr}
 #'
 #' @export
+#'
 #' @examples
 #' figlet("thisutils")
 figlet <- function(
@@ -29,39 +30,33 @@ figlet <- function(
     absolute = FALSE,
     strip = TRUE) {
   font <- figlet_font(font)
-  str <- figlet_render(text, font, width, justify, absolute, strip)
+  str <- .figlet_render(
+    text,
+    font,
+    width,
+    justify,
+    absolute,
+    strip
+  )
   class(str) <- "figlet_text"
   attr(str, "font") <- font$name
   attr(str, "text") <- text
-  str
+
+  return(str)
 }
 
 #' @title List available figlet fonts
 #'
 #' @description
 #' List all figlet font files available in the package or system.
-#' This function helps users choose appropriate fonts for their package logos.
-#'
-#' @param show_preview Logical, whether to show a preview of each font.
-#' Default is FALSE for performance reasons.
-#' @param test_text Character string, text to use for font preview.
-#' Default is "ABC".
 #'
 #' @return Character vector of available font names.
 #'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # List available fonts
 #' list_figlet_fonts()
-#'
-#' # Show font previews
-#' list_figlet_fonts(show_preview = TRUE, test_text = "Hi")
-#' }
-list_figlet_fonts <- function(
-    show_preview = FALSE,
-    test_text = "ABC") {
+list_figlet_fonts <- function() {
   inst_fonts_dir <- system.file("fonts", package = "thisutils")
   available_fonts <- character(0)
 
@@ -78,33 +73,17 @@ list_figlet_fonts <- function(
     available_fonts <- c("Slant", available_fonts)
   }
 
-  if (show_preview && length(available_fonts) > 0) {
-    log_message("Available figlet fonts with previews:")
+  if (length(available_fonts) > 0) {
+    log_message("Available figlet fonts:")
     for (font in available_fonts) {
-      tryCatch(
-        {
-          preview <- figlet(test_text, font = font)
-          cat("\n--- Font:", font, "---\n")
-          print(preview)
-          cat("\n")
-        },
-        error = function(e) {
-          log_message("Font '", font, "' preview failed: ", e$message,
-            message_type = "warning"
-          )
-        }
-      )
+      log_message("Font: ", font, level = 2)
     }
-  } else {
-    log_message(
-      "Available figlet fonts: ", paste(available_fonts, collapse = ", ")
-    )
   }
 
   invisible(available_fonts)
 }
 
-figlet_render <- function(
+.figlet_render <- function(
     text,
     font,
     width = getOption("width", 80),
@@ -115,19 +94,19 @@ figlet_render <- function(
     text <- unlist(strsplit(text, "\n", fixed = TRUE))
   }
   if (length(text) == 1L) {
-    dat <- figlet_render_horizontal(text, font)
+    dat <- .figlet_render_horizontal(text, font)
   } else {
-    dat <- lapply(text, figlet_render_horizontal, font)
+    dat <- lapply(text, .figlet_render_horizontal, font)
   }
-  lines <- figlet_render_layout(
+  lines <- .figlet_render_layout(
     dat, font$options$hard_blank, width, justify,
     absolute
   )
-  mat <- figlet_render_vertical(lines, font)
-  matrix_to_text(mat, strip = strip)
+  mat <- .figlet_render_vertical(lines, font)
+  .matrix_to_text(mat, strip = strip)
 }
 
-figlet_render_horizontal <- function(text, font) {
+.figlet_render_horizontal <- function(text, font) {
   state <- list(
     curr_char_width = 0L,
     prev_char_width = 0L
@@ -136,7 +115,7 @@ figlet_render_horizontal <- function(text, font) {
   height <- font$options$height
   buffer <- matrix(character(), height, 0)
 
-  char_index <- asc(text)
+  char_index <- .asc(text)
   for (char in seq_along(char_index)) {
     cur_char <- font$chars[[char_index[[char]]]]
     if (is.null(cur_char)) {
@@ -147,7 +126,12 @@ figlet_render_horizontal <- function(text, font) {
     }
 
     state$curr_char_width <- cur_char$width
-    max_smush <- smush_amount(buffer, cur_char$data, font$options, state)
+    max_smush <- .smush_amount(
+      buffer,
+      cur_char$data,
+      font$options,
+      state
+    )
 
     if (font$options$right_to_left) {
       add_left <- cur_char$data
@@ -169,9 +153,14 @@ figlet_render_horizontal <- function(text, font) {
       }
       right <- add_right[, i]
 
-      smushed <- vcapply(
+      smushed <- .vcapply(
         seq_len(height), function(row) {
-          smush_chars(left[row], right[row], font$options, state)
+          .smush_chars(
+            left[row],
+            right[row],
+            font$options,
+            state
+          )
         }
       )
 
@@ -192,7 +181,7 @@ figlet_render_horizontal <- function(text, font) {
   buffer
 }
 
-figlet_render_vertical <- function(lines, font) {
+.figlet_render_vertical <- function(lines, font) {
   if (length(lines) == 1L) {
     return(lines[[1]])
   }
@@ -201,7 +190,11 @@ figlet_render_vertical <- function(lines, font) {
   width <- ncol(buffer)
   for (line in 2:length(lines)) {
     cur_line <- lines[[line]]
-    max_smush <- vsmush_amount(buffer, cur_line, font$options)
+    max_smush <- .vsmush_amount(
+      buffer,
+      cur_line,
+      font$options
+    )
     add_above <- buffer
     add_below <- cur_line
     n_above <- nrow(add_above)
@@ -212,8 +205,8 @@ figlet_render_vertical <- function(lines, font) {
       above <- add_above[idx, ]
       below <- add_below[i, ]
 
-      smushed <- vcapply(seq_len(width), function(col) {
-        vsmush_chars(above[col], below[col], font$options)
+      smushed <- .vcapply(seq_len(width), function(col) {
+        .vsmush_chars(above[col], below[col], font$options)
       })
 
       idx <- n_above - max_smush + i
@@ -230,7 +223,7 @@ figlet_render_vertical <- function(lines, font) {
   buffer
 }
 
-figlet_render_layout <- function(
+.figlet_render_layout <- function(
     buffer,
     hard_blank,
     width,
@@ -243,7 +236,7 @@ figlet_render_layout <- function(
       end = integer()
     )
     for (line in buffer) {
-      tmp <- figlet_render_layout_template(
+      tmp <- .figlet_render_layout_template(
         line, hard_blank,
         length(template$start),
         sum(nchar(template$template))
@@ -252,7 +245,7 @@ figlet_render_layout <- function(
     }
     buffer <- do.call(cbind, buffer)
   } else {
-    template <- figlet_render_layout_template(buffer, hard_blank)
+    template <- .figlet_render_layout_template(buffer, hard_blank)
   }
 
   template$template <- gsub("(?<= ) ", "-", template$template, perl = TRUE)
@@ -287,7 +280,7 @@ figlet_render_layout <- function(
   lapply(seq_along(words), line)
 }
 
-figlet_render_layout_template <- function(
+.figlet_render_layout_template <- function(
     text, hard_blank,
     offset_char = 0,
     offset_text = 0) {
@@ -324,26 +317,26 @@ figlet_font <- function(font) {
     if (!file.exists(font_path)) {
       stop("Slant.flf font not found in package")
     }
-    return(figlet_font_read(font_path))
+    return(.figlet_font_read(font_path))
   }
 
   if (file.exists(font)) {
-    return(figlet_font_read(font))
+    return(.figlet_font_read(font))
   }
 
   stop(sprintf("Font '%s' not found", font))
 }
 
-figlet_font_read <- function(filename) {
+.figlet_font_read <- function(filename) {
   name <- tools::file_path_sans_ext(basename(filename))
   if (!file.exists(filename)) {
     stop(sprintf("'%s' (%s) does not exist", name, filename))
   }
   data <- readLines(filename, warn = FALSE)
-  options <- figlet_font_options(data, filename, name)
+  options <- .figlet_font_options(data, filename, name)
 
   is_comment <- seq_len(options$comment_lines) + 1L
-  chars <- figlet_font_characters(
+  chars <- .figlet_font_characters(
     data[-c(1L, is_comment)], options,
     filename, name
   )
@@ -357,7 +350,7 @@ figlet_font_read <- function(filename) {
   ret
 }
 
-figlet_font_options <- function(data, filename, name) {
+.figlet_font_options <- function(data, filename, name) {
   if (length(data) == 0) {
     stop(sprintf("'%s' (%s) is empty", name, filename))
   }
@@ -391,7 +384,11 @@ figlet_font_options <- function(data, filename, name) {
     } else if (options$old_layout < 0L) {
       options$full_layout <- 0L
     } else {
-      options$full_layout <- as.integer((options$old_layout %&% 31L) %|% 128L)
+      options$full_layout <- as.integer(
+        bitwOr(
+          bitwAnd(options$old_layout, 31L), 128L
+        )
+      )
     }
   }
 
@@ -400,13 +397,13 @@ figlet_font_options <- function(data, filename, name) {
   options
 }
 
-figlet_font_characters <- function(data, options, filename, name) {
+.figlet_font_characters <- function(data, options, filename, name) {
   code_standard <- 32:126
   code_extra <- c(196, 214, 220, 228, 246, 252, 223)
   code_req <- c(code_standard, code_extra)
 
   get_character <- function(i, d) {
-    figlet_font_character(d[, i], options)
+    .figlet_font_character(d[, i], options)
   }
 
   i_req <- seq_len(length(code_req) * options$height)
@@ -416,7 +413,7 @@ figlet_font_characters <- function(data, options, filename, name) {
   chars
 }
 
-figlet_font_character <- function(x, options) {
+.figlet_font_character <- function(x, options) {
   if (any(is.na(iconv(x)))) {
     return(NULL)
   }
@@ -443,23 +440,17 @@ figlet_font_character <- function(x, options) {
   )
 }
 
-`%&%` <- function(a, b) {
-  bitwAnd(a, b)
-}
 
-`%|%` <- function(a, b) {
-  bitwOr(a, b)
-}
 
-asc <- function(x) {
+.asc <- function(x) {
   strtoi(charToRaw(x), 16L)
 }
 
-vcapply <- function(X, FUN, ...) {
+.vcapply <- function(X, FUN, ...) {
   vapply(X, FUN, character(1), ...)
 }
 
-matrix_to_text <- function(m, strip) {
+.matrix_to_text <- function(m, strip) {
   ret <- apply(m, 1, paste, collapse = "")
   if (strip) {
     ret <- sub(" +$", "", ret)
@@ -469,10 +460,10 @@ matrix_to_text <- function(m, strip) {
   ret
 }
 
-smush_chars <- function(left, right, options, state) {
-  if (is_space(left)) {
+.smush_chars <- function(left, right, options, state) {
+  if (.is_space(left)) {
     return(right)
-  } else if (is_space(right)) {
+  } else if (.is_space(right)) {
     return(left)
   }
 
@@ -481,12 +472,12 @@ smush_chars <- function(left, right, options, state) {
   }
 
   smush_mode <- options$smush_mode
-  if ((smush_mode %&% 128) == 0) {
+  if (bitwAnd(smush_mode, 128) == 0) {
     return(NULL)
   }
 
   hard_blank <- options$hard_blank
-  if ((smush_mode %&% 63) == 0) {
+  if (bitwAnd(smush_mode, 63) == 0) {
     if (left == hard_blank) {
       return(right)
     }
@@ -496,14 +487,14 @@ smush_chars <- function(left, right, options, state) {
   }
 
   if (left == hard_blank && right == hard_blank) {
-    if (smush_mode %&% 32 > 0) {
+    if (bitwAnd(smush_mode, 32) > 0) {
       return(left)
     } else {
       return(NULL)
     }
   }
 
-  if (smush_mode %&% 1) {
+  if (bitwAnd(smush_mode, 1)) {
     if (left == right) {
       return(left)
     }
@@ -512,8 +503,8 @@ smush_chars <- function(left, right, options, state) {
   NULL
 }
 
-smush_amount <- function(buffer, cur_char, options, state) {
-  if ((options$smush_mode %&% (128 %|% 64)) == 0) {
+.smush_amount <- function(buffer, cur_char, options, state) {
+  if (bitwAnd(options$smush_mode, bitwOr(128, 64)) == 0) {
     return(0L)
   }
 
@@ -528,7 +519,7 @@ smush_amount <- function(buffer, cur_char, options, state) {
       line_right <- ll
     }
 
-    linebd <- length_rstrip(line_left)
+    linebd <- .length_rstrip(line_left)
     if (linebd < 1L) {
       linebd <- 1L
     }
@@ -540,7 +531,7 @@ smush_amount <- function(buffer, cur_char, options, state) {
       ch1 <- ""
     }
 
-    charbd <- length(line_right) - length_lstrip(line_right) + 1L
+    charbd <- length(line_right) - .length_lstrip(line_right) + 1L
     if (charbd <= length(line_right)) {
       ch2 <- line_right[charbd]
     } else {
@@ -552,7 +543,7 @@ smush_amount <- function(buffer, cur_char, options, state) {
 
     if (ch1 == "" || ch1 == " ") {
       amt <- amt + 1L
-    } else if (ch2 != "" && !is.null(smush_chars(ch1, ch2, options, state))) {
+    } else if (ch2 != "" && !is.null(.smush_chars(ch1, ch2, options, state))) {
       amt <- amt + 1L
     }
 
@@ -564,19 +555,19 @@ smush_amount <- function(buffer, cur_char, options, state) {
   max_smush
 }
 
-vsmush_amount <- function(buffer, cur_line, options) {
+.vsmush_amount <- function(buffer, cur_line, options) {
   max_smush <- options$height
   for (col in seq_len(min(ncol(buffer), ncol(cur_line)))) {
     line_above <- buffer[, col]
     line_below <- cur_line[, col]
 
-    linebd <- length_rstrip(line_above)
+    linebd <- .length_rstrip(line_above)
     if (linebd < 1L) {
       linebd <- 1L
     }
     ch1 <- line_above[linebd]
 
-    charbd <- length(line_below) - length_lstrip(line_below) + 1L
+    charbd <- length(line_below) - .length_lstrip(line_below) + 1L
     if (charbd <= length(line_below)) {
       ch2 <- line_below[charbd]
     } else {
@@ -588,7 +579,7 @@ vsmush_amount <- function(buffer, cur_line, options) {
 
     if (ch1 == "" || ch1 == " ") {
       amt <- amt + 1L
-    } else if (ch2 != "" && !is.null(vsmush_chars(ch1, ch2, options))) {
+    } else if (ch2 != "" && !is.null(.vsmush_chars(ch1, ch2, options))) {
       amt <- amt + 1L
     }
 
@@ -600,19 +591,19 @@ vsmush_amount <- function(buffer, cur_line, options) {
   max_smush
 }
 
-vsmush_chars <- function(above, below, options) {
-  if (is_space(above)) {
+.vsmush_chars <- function(above, below, options) {
+  if (.is_space(above)) {
     return(below)
-  } else if (is_space(below)) {
+  } else if (.is_space(below)) {
     return(above)
   }
 
   smush_mode <- options$smush_mode
-  if ((smush_mode %&% 16384) == 0) {
+  if (bitwAnd(smush_mode, 16384) == 0) {
     return(NULL)
   }
 
-  if (smush_mode %&% 256) {
+  if (bitwAnd(smush_mode, 256)) {
     if (above == below) {
       return(above)
     }
@@ -621,11 +612,11 @@ vsmush_chars <- function(above, below, options) {
   NULL
 }
 
-is_space <- function(x) {
+.is_space <- function(x) {
   grepl("\\s", x, perl = TRUE)
 }
 
-length_lstrip <- function(x) {
+.length_lstrip <- function(x) {
   if (length(x) == 0) {
     return(0L)
   }
@@ -639,7 +630,7 @@ length_lstrip <- function(x) {
   length(i) - which(i)[[1]] + 1L
 }
 
-length_rstrip <- function(x) {
+.length_rstrip <- function(x) {
   if (length(x) == 0) {
     return(0L)
   }

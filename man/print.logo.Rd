@@ -11,6 +11,9 @@
 
 \item{...}{Other parameters.}
 }
+\value{
+Print the ASCII logo
+}
 \description{
 print logo
 }

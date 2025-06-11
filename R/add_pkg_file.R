@@ -6,65 +6,83 @@
 #' print method, and \link{.onAttach} function in the package's R directory.
 #'
 #' @md
-#' @param pkg_name Character string, the name of the package. If NULL (default), 
+#' @param pkg_name Character string, the name of the package. If NULL (default),
 #' will be read from DESCRIPTION file.
-#' @param pkg_description Character string, short description of the package. 
+#' @param pkg_description Character string, short description of the package.
 #' If NULL (default), will be read from DESCRIPTION file.
-#' @param author_name Character string, name of the package author. 
+#' @param author_name Character string, name of the package author.
 #' If NULL (default), will be read from DESCRIPTION file.
-#' @param author_email Character string, email of the package author. 
+#' @param author_email Character string, email of the package author.
 #' If NULL (default), will be read from DESCRIPTION file.
-#' @param github_url Character string, GitHub URL of the package. 
+#' @param github_url Character string, GitHub URL of the package.
 #' If NULL (default), will be read from DESCRIPTION file or constructed based on package name.
 #' @param output_dir Character string, directory where to save the package file.
-#' Default is the "R" subdirectory of the current working directory.
+#' Default is NULL, which will use tempdir() for temporary storage.
 #' @param use_figlet Logical, whether to use figlet for ASCII art generation.
 #' Default is TRUE.
 #' @param figlet_font Character string, figlet font to use. Default is "Slant".
 #' @param colors Character vector, colors to use for the logo elements.
 #' @param unicode Logical, whether to use Unicode symbols. Default is TRUE.
 #' @param verbose Logical, whether to print progress messages. Default is TRUE.
-#' @param desc_file Character string, path to the DESCRIPTION file. Default is "DESCRIPTION".
+#' @param desc_file Character string, path to the DESCRIPTION file.
+#' If NULL (default), package information must be provided manually via other parameters.
 #'
-#' @return Character string, path to the created package file.
+#' @return creates a file in specified output directory
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Create logo automatically reading from DESCRIPTION file
-#' add_pkg_logo()
-#' 
-#' # Create logo for a new package with figlet (manual parameters)
-#' add_pkg_logo(
+#' # Create logo with manual parameters (recommended for portability)
+#' add_pkg_file(
 #'   pkg_name = "mypackage",
 #'   pkg_description = "My awesome R package for data analysis",
 #'   author_name = "Your Name",
 #'   author_email = "your.email@example.com",
-#'   github_url = "https://github.com/username/mypackage"
+#'   github_url = "https://github.com/username/mypackage",
+#'   output_dir = tempdir()
 #' )
+#'
+#' # Create logo reading from DESCRIPTION file (if available)
+#' if (file.exists("DESCRIPTION")) {
+#'   add_pkg_file(
+#'     desc_file = "DESCRIPTION",
+#'     output_dir = tempdir()
+#'   )
+#' }
 #'
 #' # Create simple logo without figlet
-#' add_pkg_logo(
-#'   use_figlet = FALSE
+#' add_pkg_file(
+#'   pkg_name = "mypackage",
+#'   pkg_description = "Simple package",
+#'   author_name = "Author",
+#'   author_email = "author@example.com",
+#'   use_figlet = FALSE,
+#'   output_dir = tempdir()
 #' )
 #'
-#' # Customize colors and fonts while using DESCRIPTION file info
-#' add_pkg_logo(
+#' # Customize colors and fonts
+#' add_pkg_file(
+#'   pkg_name = "mypackage",
+#'   pkg_description = "Colorful package",
+#'   author_name = "Author",
+#'   author_email = "author@example.com",
 #'   figlet_font = "Big",
 #'   colors = c(
 #'     "blue", "cyan", "green", "yellow", "red",
 #'     "magenta", "white", "blue", "cyan", "green"
-#'   )
+#'   ),
+#'   output_dir = tempdir()
 #' )
 #' }
-add_pkg_logo <- function(
+add_pkg_file <- function(
     pkg_name = NULL,
+    desc_file = NULL,
     pkg_description = NULL,
     author_name = NULL,
     author_email = NULL,
     github_url = NULL,
-    output_dir = paste0(getwd(), "/R"),
+    output_dir = NULL,
     use_figlet = TRUE,
     figlet_font = "Slant",
     colors = c(
@@ -72,15 +90,31 @@ add_pkg_logo <- function(
       "yellow", "green", "white", "magenta", "cyan"
     ),
     unicode = TRUE,
-    verbose = TRUE,
-    desc_file = "DESCRIPTION") {
-  
-  # 读取 DESCRIPTION 文件
-  desc_info <- .read_description_file(desc_file, verbose)
-  
-  # 如果参数未提供，则从 DESCRIPTION 文件中获取
+    verbose = TRUE) {
+  if (is.null(output_dir)) {
+    output_dir <- tempdir()
+  }
+
+  desc_info <- if (!is.null(desc_file)) {
+    .read_description(desc_file, verbose)
+  } else {
+    list(
+      Package = NULL,
+      Description = NULL,
+      Author = NULL,
+      Email = NULL,
+      GitHub_URL = NULL
+    )
+  }
+
   if (is.null(pkg_name)) {
     pkg_name <- desc_info$Package
+    if (is.null(pkg_name)) {
+      log_message(
+        "Package name not provided and not found in DESCRIPTION file",
+        message_type = "error"
+      )
+    }
   }
   if (is.null(pkg_description)) {
     pkg_description <- desc_info$Description
@@ -93,11 +127,6 @@ add_pkg_logo <- function(
   }
   if (is.null(github_url)) {
     github_url <- desc_info$GitHub_URL
-  }
-  
-  # 验证必要参数
-  if (is.null(pkg_name) || !is.character(pkg_name) || length(pkg_name) != 1) {
-    stop("pkg_name must be a single character string")
   }
 
   if (verbose) {
@@ -125,15 +154,14 @@ add_pkg_logo <- function(
   }
 
   if (is.null(ascii_lines)) {
-    pkg_upper <- toupper(pkg_name)
     ascii_lines <- c(
-      paste0("  ", paste(rep("*", nchar(pkg_upper) + 4), collapse = "")),
-      paste0("  * ", pkg_upper, " *"),
-      paste0("  ", paste(rep("*", nchar(pkg_upper) + 4), collapse = ""))
+      paste0("  ", paste(rep("*", nchar(pkg_name) + 4), collapse = "")),
+      paste0("  * ", pkg_name, " *"),
+      paste0("  ", paste(rep("*", nchar(pkg_name) + 4), collapse = ""))
     )
   }
 
-  file_content <- .generate_package_file_content(
+  file_content <- .generate_content(
     pkg_name = pkg_name,
     pkg_description = pkg_description,
     author_name = author_name,
@@ -144,27 +172,22 @@ add_pkg_logo <- function(
     unicode = unicode
   )
 
-  output_file <- file.path(output_dir, paste0(pkg_name, "-package.R"))
-
-  tryCatch(
-    {
-      writeLines(file_content, output_file)
-      if (verbose) {
-        log_message("Package file created successfully: ", output_file,
-          message_type = "success"
-        )
-      }
-    },
-    error = function(e) {
-      stop("Failed to write package file: ", e$message)
-    }
+  output_file <- file.path(
+    output_dir,
+    paste0(pkg_name, "-package.R")
   )
 
-  # Return the file path
+  writeLines(file_content, output_file)
+  if (verbose) {
+    log_message("Package file created successfully: ", output_file,
+      message_type = "success"
+    )
+  }
+
   invisible(output_file)
 }
 
-.generate_package_file_content <- function(
+.generate_content <- function(
     pkg_name,
     pkg_description,
     author_name,
@@ -217,7 +240,7 @@ add_pkg_logo <- function(
     paste0("    \"", ascii_with_numbers, "\""),
     "  )",
     "",
-    .generate_hexa_and_colors_code(length(colors), colors, unicode),
+    .generate_hexa(length(colors), colors, unicode),
     "",
     "  col_hexa <- purrr::map2(",
     "    hexa, cols, ~ cli::make_ansi_style(.y)(.x)",
@@ -272,7 +295,6 @@ add_pkg_logo <- function(
   }
 
   top_numbers <- "       0        1      2           3    4"
-
   bottom_numbers <- "    5             6      7      8       9   "
 
   all_lines <- c(top_numbers, ascii_lines, bottom_numbers)
@@ -281,7 +303,7 @@ add_pkg_logo <- function(
   return(result)
 }
 
-.generate_hexa_and_colors_code <- function(
+.generate_hexa <- function(
     num_colors,
     colors,
     unicode) {
@@ -301,108 +323,184 @@ add_pkg_logo <- function(
   return(code)
 }
 
-.read_description_file <- function(desc_file, verbose = TRUE) {
+.read_description <- function(
+    desc_file,
+    verbose = TRUE) {
   if (!file.exists(desc_file)) {
-    stop("DESCRIPTION file not found: ", desc_file)
+    log_message(
+      "DESCRIPTION file not found",
+      message_type = "error"
+    )
   }
-  
+
   if (verbose) {
-    log_message("Reading package information from: ", desc_file)
+    log_message(
+      "Reading package information from file: ",
+      desc_file
+    )
   }
-  
-  # 读取 DESCRIPTION 文件
+
   desc_lines <- readLines(desc_file, warn = FALSE)
   desc_content <- paste(desc_lines, collapse = "\n")
-  
-  # 解析包名
-  package_match <- regexpr("Package:\\s*([^\\n]+)", desc_content, perl = TRUE)
+
+  package_match <- regexpr(
+    "Package:\\s*([^\\n]+)",
+    desc_content,
+    perl = TRUE
+  )
   package_name <- if (package_match != -1) {
-    trimws(regmatches(desc_content, package_match))
-    trimws(sub("Package:\\s*", "", regmatches(desc_content, package_match)))
+    trimws(
+      regmatches(
+        desc_content, package_match
+      )
+    )
+    trimws(
+      sub(
+        "Package:\\s*", "",
+        regmatches(desc_content, package_match)
+      )
+    )
   } else {
-    NULL
+    log_message(
+      "Package name not found in DESCRIPTION file",
+      message_type = "warning"
+    )
+    return(NULL)
   }
-  
-  # 解析标题
-  title_match <- regexpr("Title:\\s*([^\\n]+)", desc_content, perl = TRUE)
+
+  title_match <- regexpr(
+    "Title:\\s*([^\\n]+)",
+    desc_content,
+    perl = TRUE
+  )
   title <- if (title_match != -1) {
-    trimws(sub("Title:\\s*", "", regmatches(desc_content, title_match)))
+    trimws(
+      sub(
+        "Title:\\s*", "", regmatches(desc_content, title_match)
+      )
+    )
   } else {
-    "An R package"
+    log_message(
+      "Title not found in DESCRIPTION file",
+      message_type = "warning"
+    )
+    return(
+      NULL
+    )
   }
-  
-  # 解析描述
-  desc_match <- regexpr("Description:\\s*([^\\n]+)", desc_content, perl = TRUE)
+
+  desc_match <- regexpr(
+    "Description:\\s*([^\\n]+)",
+    desc_content,
+    perl = TRUE
+  )
   description <- if (desc_match != -1) {
-    trimws(sub("Description:\\s*", "", regmatches(desc_content, desc_match)))
+    trimws(
+      sub(
+        "Description:\\s*", "",
+        regmatches(desc_content, desc_match)
+      )
+    )
   } else {
     title
   }
-  
-  # 解析作者信息 - 处理 Authors@R 格式
-  authors_r_pattern <- "Authors@R:\\s*\\n?\\s*person\\([^)]*name\\s*=\\s*[\"']([^\"']+)[\"'][^)]*email\\s*=\\s*[\"']([^\"']+)[\"']"
-  authors_r_match <- regexpr(authors_r_pattern, desc_content, perl = TRUE)
-  
-  if (authors_r_match != -1) {
-    # 提取 Authors@R 中的姓名和邮箱
-    authors_text <- regmatches(desc_content, authors_r_match)
-    
-    # 提取姓名
+
+  authors_pattern <- "Authors@R:\\s*\\n?\\s*person\\([^)]*name\\s*=\\s*[\"']([^\"']+)[\"'][^)]*email\\s*=\\s*[\"']([^\"']+)[\"']"
+  authors_match <- regexpr(
+    authors_pattern,
+    desc_content,
+    perl = TRUE
+  )
+
+  if (authors_match != -1) {
+    authors_text <- regmatches(
+      desc_content,
+      authors_match
+    )
+
     name_pattern <- "name\\s*=\\s*[\"']([^\"']+)[\"']"
-    name_match <- regexpr(name_pattern, authors_text, perl = TRUE)
+    name_match <- regexpr(
+      name_pattern,
+      authors_text,
+      perl = TRUE
+    )
     author_name <- if (name_match != -1) {
       sub(".*name\\s*=\\s*[\"']([^\"']+)[\"'].*", "\\1", authors_text)
     } else {
       "Author"
     }
-    
-    # 提取邮箱
-    email_pattern <- "email\\s*=\\s*[\"']([^\"']+)[\"']"
-    email_match <- regexpr(email_pattern, authors_text, perl = TRUE)
+
+    email_match <- regexpr(
+      "email\\s*=\\s*[\"']([^\"']+)[\"']",
+      authors_text,
+      perl = TRUE
+    )
     author_email <- if (email_match != -1) {
       sub(".*email\\s*=\\s*[\"']([^\"']+)[\"'].*", "\\1", authors_text)
     } else {
       "author@example.com"
     }
   } else {
-    # 备用方案：尝试解析 Maintainer 字段
-    maintainer_pattern <- "Maintainer:\\s*([^<]+)<([^>]+)>"
-    maintainer_match <- regexpr(maintainer_pattern, desc_content, perl = TRUE)
-    
+    maintainer_match <- regexpr(
+      "Maintainer:\\s*([^<]+)<([^>]+)>",
+      desc_content,
+      perl = TRUE
+    )
+
     if (maintainer_match != -1) {
-      maintainer_text <- regmatches(desc_content, maintainer_match)
-      author_name <- trimws(sub("Maintainer:\\s*([^<]+)<.*", "\\1", maintainer_text))
-      author_email <- sub(".*<([^>]+)>.*", "\\1", maintainer_text)
+      maintainer_text <- regmatches(
+        desc_content, maintainer_match
+      )
+      author_name <- trimws(
+        sub(
+          "Maintainer:\\s*([^<]+)<.*", "\\1",
+          maintainer_text
+        )
+      )
+      author_email <- sub(
+        ".*<([^>]+)>.*", "\\1",
+        maintainer_text
+      )
     } else {
       author_name <- "Author"
       author_email <- "author@example.com"
     }
   }
-  
-  # 解析 GitHub URL - 从 URL 或 BugReports 字段推断
-  url_match <- regexpr("URL:\\s*([^\\n]+)", desc_content, perl = TRUE)
-  bug_reports_match <- regexpr("BugReports:\\s*([^\\n]+)", desc_content, perl = TRUE)
-  
+
+  url_match <- regexpr(
+    "URL:\\s*([^\\n]+)",
+    desc_content,
+    perl = TRUE
+  )
+  bug_reports_match <- regexpr(
+    "BugReports:\\s*([^\\n]+)",
+    desc_content,
+    perl = TRUE
+  )
+
   github_url <- NULL
   if (url_match != -1) {
     url <- trimws(sub("URL:\\s*", "", regmatches(desc_content, url_match)))
     github_url <- url
   } else if (bug_reports_match != -1) {
-    bug_url <- trimws(sub("BugReports:\\s*", "", regmatches(desc_content, bug_reports_match)))
-    # 从 issues URL 推断主仓库 URL
+    bug_url <- trimws(
+      sub("BugReports:\\s*", "", regmatches(desc_content, bug_reports_match))
+    )
     github_url <- sub("/issues$", "", bug_url)
   }
-  
-  # 如果没有找到 URL，则基于包名构建默认 URL
+
   if (is.null(github_url) && !is.null(package_name)) {
     github_url <- paste0("https://github.com/username/", package_name)
   }
-  
+
   if (verbose) {
-    log_message("Package info extracted - Name: ", package_name, 
-                ", Author: ", author_name, message_type = "success")
+    log_message(
+      "Information extracted for: '", package_name,
+      "', Author: ", author_name,
+      message_type = "success"
+    )
   }
-  
+
   list(
     Package = package_name,
     Description = description,
