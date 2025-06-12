@@ -21,7 +21,7 @@
 #' )
 #' m2 <- simulate_sparse_matrix(
 #'   500, 100,
-#'   sparsity = 0.05
+#'   seed = 2025
 #' )
 #' a <- sparse_cor(m1)
 #' b <- sparse_cor(m1, m2)
@@ -157,53 +157,23 @@ sparse_cor <- function(
 #'   100, 100,
 #'   sparsity = 0.05
 #' )
-#' a <- sparse_cov_cor(m1, m2)
+#' a <- pearson_correlation(m1, m2)
 #' a$cov[1:5, 1:5]
 #' a$cor[1:5, 1:5]
 pearson_correlation <- function(x, y = NULL) {
-  if (!methods::is(x, "sparseMatrix")) {
-    stop("x should be a sparse matrix.")
-  }
-  if (!is.null(y) && !methods::is(y, "sparseMatrix")) {
-    stop("y should be a sparse matrix.")
-  }
-
-  result <- sparse_cov_cor(x, y)
-
-  return(
-    list(
-      cov = result$cov,
-      cor = result$cor
-    )
-  )
-}
-
-#' @title Fast correlation and covariance calculation for sparse matrices
-#'
-#' @inheritParams sparse_cor
-#'
-#' @return A list with covariance and correlation matrices.
-#'
-#' @export
-#'
-#' @examples
-#' m1 <- simulate_sparse_matrix(
-#'   100, 100
-#' )
-#' m2 <- simulate_sparse_matrix(
-#'   100, 100,
-#'   sparsity = 0.05
-#' )
-#' a <- sparse_cov_cor(m1, m2)
-#' a$cov[1:5, 1:5]
-#' a$cor[1:5, 1:5]
-sparse_cov_cor <- function(x, y = NULL) {
   if (!methods::is(x, "sparseMatrix")) {
     log_message(
       "x should be a sparse matrix",
       message_type = "error"
     )
   }
+  if (!is.null(y) && !methods::is(y, "sparseMatrix")) {
+    log_message(
+      "y should be a sparse matrix",
+      message_type = "error"
+    )
+  }
+
   n <- nrow(x)
   mu_x <- Matrix::colMeans(x)
   if (is.null(y)) {
@@ -234,6 +204,7 @@ sparse_cov_cor <- function(x, y = NULL) {
     sdvecY <- sqrt((Matrix::colSums(y^2) - n * mu_y^2) / (n - 1))
     cormat <- covmat / Matrix::tcrossprod(sdvecX, sdvecY)
   }
+
   return(
     list(
       cov = covmat,
