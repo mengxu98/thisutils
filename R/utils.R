@@ -216,103 +216,57 @@ parallelize_fun <- function(
   }
 }
 
-#' @title Correlation and covariance calculation for sparse matrix
-#'
-#' @inheritParams sparse_cor
-pearson_correlation <- function(x, y = NULL) {
-  if (!methods::is(x, "sparseMatrix")) {
-    stop("x should be a sparse matrix.")
-  }
-  if (!is.null(y) && !methods::is(y, "sparseMatrix")) {
-    stop("y should be a sparse matrix.")
-  }
-
-  result <- sparse_cov_cor(x, y)
-
-  return(
-    list(
-      cov = result$cov,
-      cor = result$cor
-    )
-  )
-}
-
-
-#' @title Fast correlation and covariance calcualtion for sparse matrices
-#'
-#' @inheritParams sparse_cor
-sparse_cov_cor <- function(x, y = NULL) {
-  if (!methods::is(x, "sparseMatrix")) {
-    log_message(
-      "x should be a sparse matrix",
-      message_type = "error"
-    )
-  }
-  n <- nrow(x)
-  mu_x <- Matrix::colMeans(x)
-  if (is.null(y)) {
-    covmat <- (
-      (as.matrix(Matrix::crossprod(x)) - n * Matrix::tcrossprod(mu_x)) / (n - 1)
-    )
-    sdvec <- sqrt(diag(covmat))
-    cormat <- covmat / tcrossprod(sdvec)
-  } else {
-    if (!methods::is(y, "sparseMatrix")) {
-      log_message(
-        "y should be a sparse matrix",
-        message_type = "error"
-      )
-    }
-    if (nrow(x) != nrow(y)) {
-      log_message(
-        "x and y should have the same number of rows",
-        message_type = "error"
-      )
-    }
-
-    mu_y <- Matrix::colMeans(y)
-    covmat <- (
-      (as.matrix(Matrix::crossprod(x, y)) - n * Matrix::tcrossprod(mu_x, mu_y)) / (n - 1)
-    )
-    sdvecX <- sqrt((Matrix::colSums(x^2) - n * mu_x^2) / (n - 1))
-    sdvecY <- sqrt((Matrix::colSums(y^2) - n * mu_y^2) / (n - 1))
-    cormat <- covmat / Matrix::tcrossprod(sdvecX, sdvecY)
-  }
-  return(
-    list(
-      cov = covmat,
-      cor = cormat
-    )
-  )
-}
-
 #' @title Generate a simulated sparse matrix
 #'
 #' @param nrow Number of rows (genes) in the matrix.
 #' @param ncol Number of columns (cells) in the matrix.
-#' @param density Density of non-zero elements (default: 0.1, representing 90 sparsity).
+#' @param sparsity Proportion of zero elements (sparsity level).
+#' Default is 0.95, meaning 95% of elements are zero (5% are non-zero).
 #' @param distribution_fun Function to generate non-zero values.
+#' @param decimal Numeric value, default is *`0`*.
+#' Controls the number of decimal places in the generated values.
+#' If set to *`0`*, values will be integers.
+#' When decimal > 0, random decimal parts are uniformly distributed across the full range.
 #' @param seed Random seed for reproducibility.
 #'
 #' @return A sparse matrix of class "dgCMatrix"
 #' @export
 #'
 #' @examples
-#' simulate_sparse_matrix(2000, 500) |>
+#' simulate_sparse_matrix(1000, 500) |>
 #'   check_sparsity()
+#'
+#' simulate_sparse_matrix(10, 10, decimal = 1)
+#' simulate_sparse_matrix(10, 10, decimal = 5)
 simulate_sparse_matrix <- function(
     nrow,
     ncol,
-    density = 0.1,
+    sparsity = 0.95,
     distribution_fun = function(n) stats::rpois(n, lambda = 0.5) + 1,
+    decimal = 0,
     seed = 1) {
   set.seed(seed)
 
-  nnz <- round(nrow * ncol * density)
+  nnz <- round(nrow * ncol * (1 - sparsity))
 
-  i <- sample(1:nrow, nnz, replace = TRUE)
-  j <- sample(1:ncol, nnz, replace = TRUE)
+  total_positions <- nrow * ncol
+  if (nnz > total_positions) {
+    nnz <- total_positions
+  }
+
+  positions <- sample(total_positions, nnz, replace = FALSE)
+
+  i <- ((positions - 1) %% nrow) + 1
+  j <- ((positions - 1) %/% nrow) + 1
+
   x <- distribution_fun(nnz)
+
+  if (decimal > 0) {
+    decimal_part <- stats::runif(nnz, min = 0, max = 1)
+    x <- x + decimal_part
+  }
+
+  x <- round(x, decimal)
 
   Matrix::sparseMatrix(
     i = i,
@@ -320,140 +274,10 @@ simulate_sparse_matrix <- function(
     x = x,
     dims = c(nrow, ncol),
     dimnames = list(
-      paste0("cell_", 1:nrow),
-      paste0("gene_", 1:ncol)
+      paste0("row_", 1:nrow),
+      paste0("col_", 1:ncol)
     )
   )
-}
-
-#' @title Safe correlation function which returns a sparse matrix without missing values
-#'
-#' @param x Sparse matrix or character vector.
-#' @param y Sparse matrix or character vector.
-#' @param method Method to use for calculating the correlation coefficient.
-#' @param allow_neg Logical. Whether to allow negative values or set them to 0.
-#' @param remove_na Logical. Whether to replace NA values with 0.
-#' @param remove_inf Logical. Whether to replace infinite values with 1.
-#' @param ... Other arguments passed to \code{\link[stats]{cor}} function.
-#'
-#' @return A correlation matrix.
-#'
-#' @export
-#'
-#' @examples
-#' m1 <- simulate_sparse_matrix(
-#'   500, 500,
-#'   density = 0.01
-#' )
-#' m2 <- simulate_sparse_matrix(
-#'   500, 100,
-#'   density = 0.05
-#' )
-#' a <- as_matrix(sparse_cor(m1))
-#' b <- as_matrix(sparse_cor(m1, m2))
-#' all.equal(a, b)
-#'
-#' all.equal(
-#'   b,
-#'   as_matrix(cor(as_matrix(m1), as_matrix(m2)))
-#' )
-#'
-#' m1[sample(1:500, 10)] <- NA
-#' m2[sample(1:500, 10)] <- NA
-#'
-#' sparse_cor(m1, m2)[1:5, 1:5]
-#'
-#' system.time(
-#'   sparse_cor(m1)
-#' )
-#' system.time(
-#'   cor(as_matrix(m1))
-#' )
-#' system.time(
-#'   sparse_cor(m1, m2)
-#' )
-#' system.time(
-#'   cor(as_matrix(m1), as_matrix(m2))
-#' )
-sparse_cor <- function(
-    x,
-    y = NULL,
-    method = "pearson",
-    allow_neg = TRUE,
-    remove_na = TRUE,
-    remove_inf = TRUE,
-    ...) {
-  if (!methods::is(x, "sparseMatrix")) {
-    x <- as_matrix(x, sparse = TRUE)
-  }
-
-  if (!is.null(y)) {
-    if (!methods::is(y, "sparseMatrix")) {
-      y <- as_matrix(y, sparse = TRUE)
-    }
-    if (nrow(x) != nrow(y)) {
-      stop("x and y must have the same number of rows.")
-    }
-  }
-
-  corr_mat <- switch(
-    EXPR = method,
-    "pearson" = pearson_correlation(x, y)$cor,
-    "spearman" = {
-      if (is.null(y)) {
-        stats::cor(
-          as_matrix(x),
-          method = "spearman",
-          ...
-        )
-      } else {
-        stats::cor(
-          as_matrix(x),
-          as_matrix(y),
-          method = "spearman",
-          ...
-        )
-      }
-    },
-    "kendall" = {
-      if (is.null(y)) {
-        stats::cor(
-          as_matrix(x),
-          method = "kendall",
-          ...
-        )
-      } else {
-        stats::cor(
-          as_matrix(x),
-          as_matrix(y),
-          method = "kendall",
-          ...
-        )
-      }
-    }
-  )
-
-  if (is.null(y)) {
-    colnames(corr_mat) <- colnames(x)
-  } else {
-    colnames(corr_mat) <- colnames(y)
-  }
-  rownames(corr_mat) <- colnames(x)
-
-  if (remove_na) {
-    corr_mat[is.na(corr_mat)] <- 0
-  }
-  if (remove_inf) {
-    corr_mat[is.infinite(corr_mat)] <- 1
-  }
-
-  corr_mat <- as_matrix(corr_mat, sparse = TRUE)
-
-  if (!allow_neg) {
-    corr_mat[corr_mat < 0] <- 0
-  }
-
-  return(corr_mat)
 }
 
 #' @title Check sparsity of matrix
@@ -555,10 +379,6 @@ normalization <- function(
   return(x)
 }
 
-.is_scalar <- function(x) {
-  is.atomic(x) && length(x) == 1L && !is.character(x) && Im(x) == 0 && !is.nan(x) && !is.na(x)
-}
-
 .rmse <- function(true, pred) {
   return(
     sqrt(mean((true - pred)^2))
@@ -588,9 +408,7 @@ normalization <- function(
 #' @export
 #'
 #' @examples
-#' y_true <- rnorm(100)
-#' y_pred <- rnorm(100)
-#' r_square(y_true, y_pred)
+#' r_square(rnorm(100), rnorm(100))
 r_square <- function(y_true, y_pred) {
   return(
     1 - .rse(y_true, y_pred)
