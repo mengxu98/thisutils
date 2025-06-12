@@ -7,8 +7,9 @@
 simulate_sparse_matrix(
   nrow,
   ncol,
-  density = 0.1,
+  sparsity = 0.95,
   distribution_fun = function(n) stats::rpois(n, lambda = 0.5) + 1,
+  decimal = 0,
   seed = 1
 )
 }
@@ -17,9 +18,15 @@ simulate_sparse_matrix(
 
 \item{ncol}{Number of columns (cells) in the matrix.}
 
-\item{density}{Density of non-zero elements (default: 0.1, representing 90 sparsity).}
+\item{sparsity}{Proportion of zero elements (sparsity level).
+Default is 0.95, meaning 95% of elements are zero (5% are non-zero).}
 
 \item{distribution_fun}{Function to generate non-zero values.}
+
+\item{decimal}{Numeric value, default is *`0`*.
+Controls the number of decimal places in the generated values.
+If set to *`0`*, values will be integers.
+When decimal > 0, random decimal parts are uniformly distributed across the full range.}
 
 \item{seed}{Random seed for reproducibility.}
 }
@@ -30,6 +37,9 @@ A sparse matrix of class "dgCMatrix"
 Generate a simulated sparse matrix
 }
 \examples{
-simulate_sparse_matrix(2000, 500) |>
+simulate_sparse_matrix(1000, 500) |>
   check_sparsity()
+
+simulate_sparse_matrix(10, 10, decimal = 1)
+simulate_sparse_matrix(10, 10, decimal = 5)
 }
