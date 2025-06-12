@@ -50,7 +50,6 @@ reference:
 - contents:
   - pearson_correlation
   - sparse_cor
-  - sparse_cov_cor
 
 - subtitle: "Utility functions"
 - contents:
