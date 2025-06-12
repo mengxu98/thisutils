@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Correlation and covariance calculation for sparse matrix</h1>
-      <small class="dont-index">Source: <a href="https://github.com/mengxu98/thisutils/blob/main/R/utils.R" class="external-link"><code>R/utils.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mengxu98/thisutils/blob/main/R/sparse_cor.R" class="external-link"><code>R/sparse_cor.R</code></a></small>
       <div class="d-none name"><code>pearson_correlation.Rd</code></div>
     </div>
 
@@ -58,7 +58,37 @@
 <dd><p>Sparse matrix or character vector.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A list with covariance and correlation matrices.</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_sparse_matrix.html">simulate_sparse_matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">100</span>, <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_sparse_matrix.html">simulate_sparse_matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fl">100</span>, <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>  sparsity <span class="op">=</span> <span class="fl">0.05</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="sparse_cov_cor.html">sparse_cov_cor</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">a</span><span class="op">$</span><span class="va">cov</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              col_1        col_2        col_3        col_4        col_5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_1 -0.005050505  0.016161616  0.002020202 -0.014646465 -0.009595960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_2  0.000000000 -0.028282828 -0.056565657  0.001010101  0.061616162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_3 -0.003030303 -0.002828283 -0.005656566  0.015252525 -0.003939394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_4  0.004040404  0.006464646 -0.007272727  0.071919192  0.084040404</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_5  0.024242424  0.036767677  0.023030303 -0.049292929 -0.027070707</span>
+<span class="r-in"><span><span class="va">a</span><span class="op">$</span><span class="va">cor</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             col_1       col_2       col_3        col_4       col_5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_1 -0.03673592  0.10578642  0.01076701 -0.085190640 -0.06910187</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_2  0.00000000 -0.08413000 -0.13700493  0.002669972  0.20164105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_3 -0.04828045 -0.04055059 -0.06603627  0.194325607 -0.06213840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_4  0.01292449  0.01860898 -0.01704631  0.183965547  0.26614737</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> col_5  0.08475540  0.11567689  0.05899774 -0.137809434 -0.09369928</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
