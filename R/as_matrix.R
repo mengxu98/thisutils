@@ -11,25 +11,34 @@
 #' @export
 #'
 #' @examples
-#' sparse_matrix <- simulate_sparse_matrix(
-#'   1000,
-#'   1000,
-#'   density = 0.01
+#' m <- simulate_sparse_matrix(
+#'   1000, 1000,
+#'   decimal = 3
 #' )
 #'
 #' system.time(
-#'   a <- as.matrix(sparse_matrix)
+#'   a <- as.matrix(m)
 #' )
 #' system.time(
-#'   b <- as_matrix(sparse_matrix)
+#'   b <- as_matrix(m)
 #' )
 #' system.time(
-#'   c <- as_matrix(sparse_matrix, parallel = TRUE)
+#'   c <- as_matrix(m, parallel = TRUE)
 #' )
+#' system.time(
+#'   d <- as_matrix(m, sparse = TRUE)
+#' )
+#'
+#' m[1:5, 1:5]
+#' a[1:5, 1:5]
+#' b[1:5, 1:5]
+#' c[1:5, 1:5]
 #'
 #' identical(a, b)
 #' identical(a, c)
 #' identical(b, c)
+#' identical(a, d)
+#' identical(b, d)
 as_matrix <- function(
     x,
     parallel = FALSE,
