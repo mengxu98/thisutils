@@ -25,7 +25,7 @@ m2 <- simulate_sparse_matrix(
   100, 100,
   sparsity = 0.05
 )
-a <- sparse_cov_cor(m1, m2)
+a <- pearson_correlation(m1, m2)
 a$cov[1:5, 1:5]
 a$cor[1:5, 1:5]
 }

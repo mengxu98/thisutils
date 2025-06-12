@@ -412,7 +412,9 @@ normalization <- function(
 #' @export
 #'
 #' @examples
-#' r_square(rnorm(100), rnorm(100))
+#' y <- rnorm(100)
+#' y_pred <- y + rnorm(100, sd = 0.5)
+#' r_square(y, y_pred)
 r_square <- function(y_true, y_pred) {
   return(
     1 - .rse(y_true, y_pred)

@@ -41,7 +41,7 @@ m1 <- simulate_sparse_matrix(
 )
 m2 <- simulate_sparse_matrix(
   500, 100,
-  sparsity = 0.05
+  seed = 2025
 )
 a <- sparse_cor(m1)
 b <- sparse_cor(m1, m2)
