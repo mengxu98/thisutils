@@ -14,18 +14,18 @@ simulate_sparse_matrix(
 )
 }
 \arguments{
-\item{nrow}{Number of rows (genes) in the matrix.}
+\item{nrow}{Number of rows in the matrix.}
 
-\item{ncol}{Number of columns (cells) in the matrix.}
+\item{ncol}{Number of columns in the matrix.}
 
 \item{sparsity}{Proportion of zero elements (sparsity level).
-Default is 0.95, meaning 95% of elements are zero (5% are non-zero).}
+Default is 0.95, meaning 95\% of elements are zero (5\% are non-zero).}
 
 \item{distribution_fun}{Function to generate non-zero values.}
 
-\item{decimal}{Numeric value, default is *`0`*.
+\item{decimal}{Numeric value, default is \emph{\code{0}}.
 Controls the number of decimal places in the generated values.
-If set to *`0`*, values will be integers.
+If set to \emph{\code{0}}, values will be integers.
 When decimal > 0, random decimal parts are uniformly distributed across the full range.}
 
 \item{seed}{Random seed for reproducibility.}
@@ -34,7 +34,8 @@ When decimal > 0, random decimal parts are uniformly distributed across the full
 A sparse matrix of class "dgCMatrix"
 }
 \description{
-Generate a simulated sparse matrix
+This function generates a sparse matrix with a specified number of rows and columns,
+a given sparsity level, and a distribution function for the non-zero values.
 }
 \examples{
 simulate_sparse_matrix(1000, 500) |>

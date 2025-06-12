@@ -218,8 +218,12 @@ parallelize_fun <- function(
 
 #' @title Generate a simulated sparse matrix
 #'
-#' @param nrow Number of rows (genes) in the matrix.
-#' @param ncol Number of columns (cells) in the matrix.
+#' @description This function generates a sparse matrix with a specified number of rows and columns,
+#' a given sparsity level, and a distribution function for the non-zero values.
+#'
+#' @md
+#' @param nrow Number of rows in the matrix.
+#' @param ncol Number of columns in the matrix.
 #' @param sparsity Proportion of zero elements (sparsity level).
 #' Default is 0.95, meaning 95% of elements are zero (5% are non-zero).
 #' @param distribution_fun Function to generate non-zero values.
