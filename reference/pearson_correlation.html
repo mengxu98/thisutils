@@ -72,7 +72,7 @@
 <span class="r-in"><span>  <span class="fl">100</span>, <span class="fl">100</span>,</span></span>
 <span class="r-in"><span>  sparsity <span class="op">=</span> <span class="fl">0.05</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="sparse_cov_cor.html">sparse_cov_cor</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">pearson_correlation</span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">a</span><span class="op">$</span><span class="va">cov</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              col_1        col_2        col_3        col_4        col_5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> col_1 -0.005050505  0.016161616  0.002020202 -0.014646465 -0.009595960</span>
