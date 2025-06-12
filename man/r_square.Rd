@@ -18,7 +18,7 @@ r_square(y_true, y_pred)
 coefficient of determination (\eqn{R^2})
 }
 \examples{
-y_true <- rnorm(100)
-y_pred <- rnorm(100)
-r_square(y_true, y_pred)
+y <- rnorm(100)
+y_pred <- y + rnorm(100, sd = 0.5)
+r_square(y, y_pred)
 }
