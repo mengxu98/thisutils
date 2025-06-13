@@ -24,5 +24,5 @@ split_indices(sample(10, 100, rep = TRUE))
 split_indices(sample(10, 100, rep = TRUE), 10)
 }
 \references{
-https://github.com/hadley/plyr/blob/d57f9377eb5d56107ba3136775f2f0f005f33aa3/src/split-numeric.cpp#L20
+\url{https://github.com/hadley/plyr/blob/d57f9377eb5d56107ba3136775f2f0f005f33aa3/src/split-numeric.cpp#L20}
 }

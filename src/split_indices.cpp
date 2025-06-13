@@ -13,7 +13,7 @@ using namespace Rcpp;
 //' @return A list of vectors of indices.
 //'
 //' @references
-//' https://github.com/hadley/plyr/blob/d57f9377eb5d56107ba3136775f2f0f005f33aa3/src/split-numeric.cpp#L20
+//' \url{https://github.com/hadley/plyr/blob/d57f9377eb5d56107ba3136775f2f0f005f33aa3/src/split-numeric.cpp#L20}
 //'
 //' @export
 //' @examples
