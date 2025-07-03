@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Normalize numeric vector</h1>
-      <small class="dont-index">Source: <a href="https://github.com/mengxu98/thisutils/blob/main/R/utils.R" class="external-link"><code>R/utils.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mengxu98/thisutils/blob/main/R/computation.R" class="external-link"><code>R/computation.R</code></a></small>
       <div class="d-none name"><code>normalization.Rd</code></div>
     </div>
 
@@ -74,25 +74,25 @@ and if setting TRUE, using <code>0</code> instead.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nums</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, <span class="cn">NA</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">nums</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.7689241  0.3299883         NA -0.1344190 -0.5893607</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"max_min"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.0000000 0.6768455 0.4339007 0.3349384 0.0000000</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"maximum"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1.0000000  0.4291559  0.0000000 -0.1748144 -0.7664744</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.42186177  0.18104446  0.00000000 -0.07374751 -0.32334626</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"softmax"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.53122745 0.22436873 0.11736890 0.09014101 0.03689391</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"z_score"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1.3625453  0.5006459 -0.1473230 -0.4112697 -1.3045985</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"mad"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1.5716685  0.6744908  0.0000000 -0.2747503 -1.2046437</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"unit_vector"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.7448972  0.3196770  0.0000000 -0.1302188 -0.5709447</span>
-<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">nums</span>, method <span class="op">=</span> <span class="st">"unit_vector"</span>, na_rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.7448972  0.3196770         NA -0.1302188 -0.5709447</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, <span class="cn">NA</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.04134503  0.89385863          NA -0.51114883 -0.67691351</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"max_min"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4572646 1.0000000 0.4309432 0.1055307 0.0000000</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"maximum"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.04625455  1.00000000  0.00000000 -0.57184527 -0.75729370</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.01947237  0.42098288  0.00000000 -0.24073707 -0.31880768</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"softmax"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.15011510 0.60192594 0.14033773 0.06103198 0.04658925</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"z_score"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.14973106  1.53846314  0.08238061 -0.75027330 -1.02030151</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"mad"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.05455718  1.17949870  0.00000000 -0.67449076 -0.89322694</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"unit_vector"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.03353329  0.72497271  0.00000000 -0.41457222 -0.54901727</span>
+<span class="r-in"><span><span class="fu">normalization</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"unit_vector"</span>, na_rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.03353329  0.72497271          NA -0.41457222 -0.54901727</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
