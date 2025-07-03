@@ -14,7 +14,7 @@ An R package for utility functions.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/mengxu98/thisutils}
+  \item \url{https://mengxu98.github.io/thisutils/}
   \item Report bugs at \url{https://github.com/mengxu98/thisutils/issues}
 }
 
