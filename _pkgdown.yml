@@ -55,11 +55,19 @@ reference:
 - contents:
   - '%ss%'
   - as_matrix
+  - capitalize
   - check_sparsity
+  - download
+  - invoke_fun
   - log_message
   - normalization
   - parallelize_fun
   - print.logo
+  - r_square
+  - remove_space
+  - rescale
   - split_indices
   - simulate_sparse_matrix
-  - r_square
+  - str_wrap
+  - try_get
+  - unnest_fun
