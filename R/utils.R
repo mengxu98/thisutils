@@ -1,87 +1,3 @@
-#' @title Print diagnostic message
-#'
-#' @description
-#' Integrate the message printing function with the `cli` package,
-#' and the \code{\link[base]{message}} function.
-#' The message could be suppressed by \code{\link[base]{suppressMessages}}.
-#'
-#' @md
-#' @param ... Text to print.
-#' @param verbose Logical value, default is *`TRUE`*.
-#' Whether to print the message.
-#' @param message_type Type of message, default is *`info`*.
-#' Could be choose one of *`info`*, *`success`*, *`warning`*, and *`error`*.
-#' @param cli_model Logical value, default is *`TRUE`*.
-#' Whether to use the `cli` package to print the message.
-#' @param timestamp Logical value, default is *`TRUE`*.
-#' Whether to show the current time in the message.
-#' @param level Integer value, default is *`1`*.
-#' The level of the message, which affects the indentation.
-#' Level 1 has no indentation, higher levels add more indentation.
-#' @param level_symbol Character value, default is *`"  "`* (two spaces).
-#' The symbol used for indentation at each level.
-#'
-#' @return \code{Formated message} printed to the console.
-#'
-#' @export
-#' @examples
-#' log_message("Hello, ", "world!")
-#' log_message("Hello, world!", timestamp = FALSE)
-#' log_message("Hello, ", "world!", message_type = "success")
-#' log_message("Hello, world!", message_type = "warning")
-#' suppressMessages(log_message("Hello, ", "world!"))
-#' log_message("Hello, world!", verbose = FALSE)
-#' log_message("Hello, world!", level = 2)
-#' log_message("Hello, world!", level = 3, level_symbol = "->")
-log_message <- function(
-    ...,
-    verbose = TRUE,
-    message_type = c("info", "success", "warning", "error"),
-    cli_model = TRUE,
-    timestamp = TRUE,
-    level = 1,
-    level_symbol = "  ") {
-  message_type <- match.arg(message_type)
-  msg <- paste0(...)
-
-  if (message_type == "error") {
-    stop(msg, call. = FALSE)
-  }
-
-  if (!verbose) {
-    return(invisible(NULL))
-  }
-
-  if (level > 1) {
-    indentation <- paste(rep(level_symbol, level - 1), collapse = "")
-    msg <- paste0(indentation, msg)
-  }
-
-  if (timestamp) {
-    time_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
-    msg <- paste0("[", time_str, "] ", msg)
-  }
-
-  if (cli_model) {
-    switch(
-      EXPR = message_type,
-      "info" = cli::cli_alert_info(msg),
-      "success" = cli::cli_alert_success(msg),
-      "warning" = cli::cli_alert_warning(msg)
-    )
-  } else {
-    prefix <- switch(
-      EXPR = message_type,
-      "info" = "",
-      "success" = "",
-      "warning" = "WARNING: "
-    )
-    message(prefix, msg)
-  }
-
-  invisible(NULL)
-}
-
 #' @title Value selection operator
 #'
 #' @description
@@ -121,15 +37,20 @@ log_message <- function(
 #' @export
 #'
 #' @examples
-#' parallelize_fun(1:3, function(x) x^2)
-#' parallelize_fun(list(1, 2, 3), function(x) x^2)
+#' parallelize_fun(1:3, function(x) {
+#'   Sys.sleep(0.2)
+#'   x^2
+#' })
+#' parallelize_fun(list(1, 2, 3), function(x) {
+#'   Sys.sleep(0.2)
+#'   x^2
+#' })
 parallelize_fun <- function(
     x,
     fun,
     cores = 1,
     export_fun = NULL,
     verbose = TRUE) {
-  time_start <- Sys.time()
   if (cores == 1) {
     log_message(
       "Using 1 core",
@@ -137,17 +58,28 @@ parallelize_fun <- function(
     )
     time_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
     if (verbose) {
+      options(cli.progress_show_after = 0)
+      options(cli.progress_clear = FALSE)
       pb_id <- cli::cli_progress_bar(
-        total = length(x),
         format = paste0(
-          "{cli::pb_spin} [{time_str}] Running [{cli::pb_current}/{cli::pb_total}] ETA: {cli::pb_eta}"
-        )
+          "{cli::pb_spin} [{time_str}] ",
+          "Running [{cli::pb_current}/{cli::pb_total}] ",
+          "ETA: {cli::pb_eta}"
+        ),
+        format_done = paste0(
+          "{cli::col_green(cli::symbol$tick)} [{time_str}] ",
+          "Completed {cli::pb_total} tasks ",
+          "in {cli::pb_elapsed}"
+        ),
+        total = length(x)
       )
       fun_progress <- function(...) {
         on.exit(cli::cli_progress_update(id = pb_id), add = TRUE)
         fun(...)
       }
       output_list <- purrr::map(x, fun_progress)
+      options(cli.progress_show_after = NULL)
+      options(cli.progress_clear = NULL)
     }
     if (!verbose) {
       output_list <- base::lapply(X = x, FUN = fun)
@@ -176,30 +108,7 @@ parallelize_fun <- function(
 
   names(output_list) <- x
 
-  time_end <- Sys.time()
-  elapsed <- as.numeric(time_end - time_start)
-
-  log_message(
-    .elapsed_str(elapsed)
-  )
   return(output_list)
-}
-
-.elapsed_str <- function(x) {
-  if (x < 60) {
-    elapsed_str <- sprintf("Elapsed %.2f sec", x)
-  } else if (x < 3600) {
-    min <- floor(x / 60)
-    sec <- x %% 60
-    elapsed_str <- sprintf("Elapsed %d min %.2f sec", min, sec)
-  } else {
-    hour <- floor(x / 3600)
-    min <- floor((x %% 3600) / 60)
-    sec <- x %% 60
-    elapsed_str <- sprintf("Elapsed %d h %d min %.2f sec", hour, min, sec)
-  }
-
-  return(elapsed_str)
 }
 
 .cores_detect <- function(
@@ -216,207 +125,437 @@ parallelize_fun <- function(
   }
 }
 
-#' @title Generate a simulated sparse matrix
+#' Invoke a function with a list of arguments
+#' @param .fn A function, or function name as a string.
+#' @param .args A list of arguments.
+#' @param ... Other arguments passed to the function.
+#' @param .env Environment in which to evaluate the call.
+#' This will be most useful if .fn is a string, or the function has side-effects.
 #'
-#' @description This function generates a sparse matrix with a specified number of rows and columns,
-#' a given sparsity level, and a distribution function for the non-zero values.
-#'
-#' @md
-#' @param nrow Number of rows in the matrix.
-#' @param ncol Number of columns in the matrix.
-#' @param sparsity Proportion of zero elements (sparsity level).
-#' Default is 0.95, meaning 95% of elements are zero (5% are non-zero).
-#' @param distribution_fun Function to generate non-zero values.
-#' @param decimal Numeric value, default is *`0`*.
-#' Controls the number of decimal places in the generated values.
-#' If set to *`0`*, values will be integers.
-#' When decimal > 0, random decimal parts are uniformly distributed across the full range.
-#' @param seed Random seed for reproducibility.
-#'
-#' @return A sparse matrix of class "dgCMatrix"
 #' @export
 #'
 #' @examples
-#' simulate_sparse_matrix(1000, 500) |>
-#'   check_sparsity()
-#'
-#' simulate_sparse_matrix(10, 10, decimal = 1)
-#' simulate_sparse_matrix(10, 10, decimal = 5)
-simulate_sparse_matrix <- function(
-    nrow,
-    ncol,
-    sparsity = 0.95,
-    distribution_fun = function(n) stats::rpois(n, lambda = 0.5) + 1,
-    decimal = 0,
-    seed = 1) {
-  set.seed(seed)
-
-  nnz <- round(nrow * ncol * (1 - sparsity))
-
-  total_positions <- nrow * ncol
-  if (nnz > total_positions) {
-    nnz <- total_positions
-  }
-
-  positions <- sample(total_positions, nnz, replace = FALSE)
-
-  i <- ((positions - 1) %% nrow) + 1
-  j <- ((positions - 1) %/% nrow) + 1
-
-  x <- distribution_fun(nnz)
-
-  if (decimal > 0) {
-    decimal_part <- stats::runif(nnz, min = 0, max = 1)
-    x <- x + decimal_part
-  }
-
-  x <- round(x, decimal)
-
-  Matrix::sparseMatrix(
-    i = i,
-    j = j,
-    x = x,
-    dims = c(nrow, ncol),
-    dimnames = list(
-      paste0("row_", 1:nrow),
-      paste0("col_", 1:ncol)
-    )
-  )
-}
-
-#' @title Check sparsity of matrix
-#'
-#' @param x A matrix.
-#'
-#' @return Sparsity of matrix
-#' @export
-check_sparsity <- function(x) {
-  if (methods::is(x, "sparseMatrix")) {
-    non_zero_count <- Matrix::nnzero(x)
-    total_counts <- prod(dim(x))
-  } else {
-    non_zero_count <- sum(x != 0)
-    total_counts <- length(x)
-  }
-
-  sparsity_ratio <- non_zero_count / total_counts
-
-  sparsity <- 1 - sparsity_ratio
-
-  return(sparsity)
-}
-
-#' @title Normalize numeric vector
-#'
-#' @param x Input numeric vector.
-#' @param method Method used for normalization.
-#' @param na_rm Whether to remove `NA` values,
-#' and if setting TRUE, using `0` instead.
-#' @param ... Parameters for other methods.
-#'
-#' @md
-#' @return Normalized numeric vector
-#' @export
-#'
-#' @examples
-#' nums <- c(runif(2), NA, -runif(2))
-#' nums
-#' normalization(nums, method = "max_min")
-#' normalization(nums, method = "maximum")
-#' normalization(nums, method = "sum")
-#' normalization(nums, method = "softmax")
-#' normalization(nums, method = "z_score")
-#' normalization(nums, method = "mad")
-#' normalization(nums, method = "unit_vector")
-#' normalization(nums, method = "unit_vector", na_rm = FALSE)
-normalization <- function(
-    x,
-    method = "max_min",
-    na_rm = TRUE,
-    ...) {
-  method <- match.arg(
-    method,
-    c(
-      "max_min",
-      "maximum",
-      "sum",
-      "softmax",
-      "z_score",
-      "mad",
-      "unit_vector",
-      "robust_scale"
-    )
-  )
-  na_index <- which(is.na(x))
-  x[na_index] <- 0
-  x <- switch(
-    EXPR = method,
-    "max_min" = {
-      (x - min(x)) / (max(x) - min(x))
-    },
-    "maximum" = {
-      x / max(abs(x))
-    },
-    "sum" = {
-      x / sum(abs(x))
-    },
-    "softmax" = {
-      # exp(x - max(x)) / sum(exp(x - max(x)))
-      temp <- (x - mean(x)) / stats::sd(x)
-      exp(temp) / sum(exp(temp))
-    },
-    "z_score" = {
-      (x - mean(x)) / stats::sd(x)
-    },
-    "mad" = {
-      (x - stats::median(x)) / stats::mad(x)
-    },
-    "unit_vector" = {
-      x / sqrt(sum(x^2))
+#' f <- function(x, y) {
+#'   x + y
+#' }
+#' invoke_fun(f, list(x = 1, y = 2))
+#' invoke_fun("f", list(x = 1, y = 2))
+#' invoke_fun("f", x = 1, y = 2)
+invoke_fun <- function(
+    .fn,
+    .args = list(),
+    ...,
+    .env = rlang::caller_env()) {
+  args <- c(.args, list(...))
+  .bury <- c(".fn", "")
+  if (rlang::is_null(.bury) || !length(args)) {
+    if (rlang::is_scalar_character(.fn)) {
+      .fn <- rlang::env_get(.env, .fn, inherit = TRUE)
     }
-  )
-
-  if (!na_rm) {
-    x[na_index] <- NA
+    call <- rlang::call2(.fn, !!!args)
+    return(rlang::eval_bare(call, .env))
   }
+  if (!rlang::is_character(.bury, 2L)) {
+    log_message(
+      "{.arg .bury} must be a {.field character vector} of length 2",
+      message_type = "error"
+    )
+  }
+  arg_prefix <- .bury[[2]]
+  fn_nm <- .bury[[1]]
+  buried_nms <- paste0(arg_prefix, seq_along(args))
+  buried_args <- rlang::set_names(args, buried_nms)
+  .env <- rlang::env(.env, !!!buried_args)
+  args <- rlang::set_names(buried_nms, names(args))
+  args <- rlang::syms(args)
+  if (rlang::is_function(.fn)) {
+    `:=` <- rlang::`:=`
+    rlang::env_bind(.env, `:=`(!!fn_nm, .fn))
+    .fn <- fn_nm
+  }
+  call <- rlang::call2(.fn, !!!args)
+  rlang::eval_bare(call, .env)
+}
 
+#' Capitalizes the characters
+#' Making the first letter uppercase
+#'
+#' @param x A vector of character strings to be capitalized.
+#' @param force_tolower Whether to force the remaining letters to be lowercase.
+#' @export
+#'
+#' @examples
+#' x <- c(
+#'   "hello world",
+#'   "Hello world",
+#'   "hello World"
+#' )
+#' capitalize(x)
+capitalize <- function(x, force_tolower = FALSE) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+  if (inherits(x, "factor")) {
+    x <- as.character(x)
+  }
+  if (!inherits(x, "character")) {
+    log_message(
+      "x must be the type of character.",
+      message_type = "error"
+    )
+  }
+  if (isTRUE(force_tolower)) {
+    x <- paste(
+      toupper(substr(x, 1, 1)),
+      tolower(substr(x, 2, nchar(x))),
+      sep = ""
+    )
+  } else {
+    first_word <- sapply(strsplit(x, "\\s|-"), function(s) s[1])
+    index <- which(first_word == tolower(first_word))
+    x[index] <- paste(
+      toupper(substr(x[index], 1, 1)),
+      substr(x[index], 2, nchar(x[index])),
+      sep = ""
+    )
+  }
   return(x)
 }
 
-.rmse <- function(true, pred) {
-  return(
-    sqrt(mean((true - pred)^2))
+#' @title Wrap text
+#'
+#' @param x A character vector to wrap.
+#' @param width The maximum width of the lines.
+#'
+#' @return A character vector with wrapped text.
+#' @export
+#' @examples
+#' str_wrap(rep("Hello, world!", 10))
+#' str_wrap(rep("Hello, world!", 10), width = 10)
+str_wrap <- function(x, width = 80) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+  if (inherits(x, "factor")) {
+    x <- as.character(x)
+  }
+  x_wrap <- unlist(
+    lapply(
+      x,
+      function(i) {
+        paste0(strwrap(i, width = width), collapse = "\n")
+      }
+    )
   )
+  return(x_wrap)
 }
 
-.sse <- function(y_true, y_pred) {
-  return(
-    sum((y_true - y_pred)**2)
-  )
-}
-
-.rse <- function(y_true, y_pred) {
-  return(
-    .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
-  )
-}
-
-#' @title coefficient of determination (\eqn{R^2})
+#' @title Unnest a list-column
+#'
+#' @description
+#' Implement similar functions to the [tidyr::unnest] function.
 #'
 #' @md
-#' @param y_true A numeric vector with ground truth values.
-#' @param y_pred A numeric vector with predicted values.
+#' @param data A data frame.
+#' @param cols Columns to unnest.
+#' @param keep_empty By default, you get one row of output for each element of the list your unchopping/unnesting.
+#' This means that if there's a size-0 element (like `NULL` or an empty data frame),
+#' that entire row will be dropped from the output.
+#' If you want to preserve all rows,
+#' use `keep_empty = TRUE` to replace size-0 elements with a single row of missing values.
+#' @export
+#' @examples
+#' data <- data.frame(
+#'   id = 1:3,
+#'   x = c("a", "b", "c"),
+#'   stringsAsFactors = FALSE
+#' )
+#' data$data <- list(
+#'   c(1, 2),
+#'   c(3, 4, 5),
+#'   c(6)
+#' )
+#' unnest_fun(data, cols = "data")
 #'
-#' @return \eqn{R^2} value
+#' data2 <- data.frame(
+#'   id = 1:3,
+#'   x = c("a", "b", "c"),
+#'   stringsAsFactors = FALSE
+#' )
+#' data2$data <- list(
+#'   c(1, 2),
+#'   numeric(0),
+#'   c(6)
+#' )
+#' unnest_fun(data2, cols = "data")
+#' unnest_fun(data2, cols = "data", keep_empty = TRUE)
+unnest_fun <- function(
+    data,
+    cols,
+    keep_empty = FALSE) {
+  if (nrow(data) == 0 || length(cols) == 0) {
+    return(data)
+  }
+  for (col in cols) {
+    col_expand <- unlist(data[[col]])
+    expand_times <- sapply(data[[col]], length)
+    if (isTRUE(keep_empty)) {
+      data[[col]][expand_times == 0] <- NA
+      col_expand <- unlist(data[[col]])
+      expand_times[expand_times == 0] <- 1
+    }
+    data <- data[rep(seq_len(nrow(data)), times = expand_times), ]
+    data[, col] <- col_expand
+  }
+  rownames(data) <- NULL
+  return(data)
+}
+
+#' @title Remove and normalize spaces
 #'
+#' @description
+#' Remove leading/trailing spaces and normalize multiple spaces between words in character strings.
+#'
+#' @param x A vector of character strings.
+#' @param trim_start Logical value, default is `TRUE`.
+#' Whether to remove leading spaces before the first word.
+#' @param trim_end Logical value, default is `FALSE`.
+#' Whether to remove trailing spaces after the last word.
+#' @param collapse_multiple Logical value, default is `TRUE`.
+#' Whether to collapse multiple consecutive spaces between words into a single space.
+#' @param preserve_newlines Logical value, default is `TRUE`.
+#' Whether to preserve newline characters when collapsing spaces.
+#'
+#' @return A character vector with spaces normalized according to the specified parameters.
 #' @export
 #'
 #' @examples
-#' y <- rnorm(100)
-#' y_pred <- y + rnorm(100, sd = 0.5)
-#' r_square(y, y_pred)
-r_square <- function(y_true, y_pred) {
-  return(
-    1 - .rse(y_true, y_pred)
-  )
+#' x <- c(
+#'   " hello  world ",
+#'   "  test   case  ",
+#'   "no space",
+#'   "   multiple   spaces   "
+#' )
+#' remove_space(x)
+#' remove_space(x, trim_start = FALSE)
+#' remove_space(x, trim_end = TRUE)
+#' remove_space(x, collapse_multiple = FALSE)
+#' remove_space(
+#'   x,
+#'   trim_start = FALSE,
+#'   trim_end = FALSE,
+#'   collapse_multiple = FALSE
+#' )
+#'
+#' # with newlines
+#' multiline <- c(
+#'   "hello\n\n  world  ",
+#'   "  first  \n  second  "
+#' )
+#' remove_space(multiline)
+#' remove_space(multiline, preserve_newlines = FALSE)
+remove_space <- function(
+    x,
+    trim_start = TRUE,
+    trim_end = FALSE,
+    collapse_multiple = TRUE,
+    preserve_newlines = TRUE) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+  if (inherits(x, "factor")) {
+    x <- as.character(x)
+  }
+  if (!inherits(x, "character")) {
+    log_message(
+      "x must be the type of character.",
+      message_type = "error"
+    )
+  }
+
+  if (!is.logical(trim_start) || length(trim_start) != 1) {
+    log_message(
+      "trim_start must be a single logical value.",
+      message_type = "error"
+    )
+  }
+  if (!is.logical(trim_end) || length(trim_end) != 1) {
+    log_message(
+      "trim_end must be a single logical value.",
+      message_type = "error"
+    )
+  }
+  if (!is.logical(collapse_multiple) || length(collapse_multiple) != 1) {
+    log_message(
+      "collapse_multiple must be a single logical value.",
+      message_type = "error"
+    )
+  }
+  if (!is.logical(preserve_newlines) || length(preserve_newlines) != 1) {
+    log_message(
+      "preserve_newlines must be a single logical value.",
+      message_type = "error"
+    )
+  }
+
+  result <- x
+
+  if (trim_start) {
+    result <- gsub("^\\s+", "", result)
+  }
+
+  if (trim_end) {
+    result <- gsub("\\s+$", "", result)
+  }
+
+  if (collapse_multiple) {
+    if (preserve_newlines) {
+      result <- gsub("[ \t\r\f\v]+", " ", result)
+      result <- gsub("\\s*\n\\s*", "\n", result)
+    } else {
+      result <- gsub("\\s+", " ", result)
+    }
+  }
+
+  return(result)
+}
+
+#' Try to evaluate an expression a set number of times before failing
+#'
+#' The function is used as a fail-safe if your R code sometimes works and sometimes
+#' doesn't, usually because it depends on a resource that may be temporarily
+#' unavailable. It tries to evaluate the expression `max_tries` times. If all the
+#' attempts fail, it throws an error; if not, the evaluated expression is returned.
+#'
+#' @param expr The expression to be evaluated.
+#' @param max_tries The maximum number of attempts to evaluate the expression before giving up. Default is set to 5.
+#' @param error_message a string, additional custom error message you would like to be displayed when an error occurs.
+#' @param retry_message a string, a message displayed when a new try to evaluate the expression would be attempted.
+#'
+#' @return This function returns the evaluated expression if successful,
+#' otherwise it throws an error if all attempts are unsuccessful.
+#' @export
+#'
+#' @examples
+#' f <- function() {
+#'   value <- runif(1, min = 0, max = 1)
+#'   if (value > 0.5) {
+#'     log_message("value is larger than 0.5")
+#'     return(value)
+#'   } else {
+#'     log_message(
+#'       "value is smaller than 0.5",
+#'       message_type = "error"
+#'     )
+#'   }
+#' }
+#' f_evaluated <- try_get(expr = f())
+#' print(f_evaluated)
+try_get <- function(
+    expr,
+    max_tries = 5,
+    error_message = "",
+    retry_message = "Retrying...") {
+  out <- simpleError("start")
+  ntry <- 0
+  while (inherits(out, "error")) {
+    ntry <- ntry + 1
+    out <- tryCatch(
+      expr = eval.parent(substitute(expr)),
+      error = function(error) {
+        log_message(error)
+        log_message("")
+        log_message(error_message)
+        Sys.sleep(1)
+        return(error)
+      }
+    )
+    if (inherits(out, "error") && ntry >= max_tries) {
+      log_message(
+        out,
+        message_type = "error"
+      )
+    } else {
+      if (!inherits(out, "error")) {
+        break
+      } else {
+        log_message(retry_message)
+      }
+    }
+  }
+  return(out)
+}
+
+#' Download File from the Internet
+#'
+#' @md
+#' @inheritParams utils::download.file
+#' @param methods Methods to be used for downloading files.
+#' The default is to try different download methods in turn until the download is successfully completed.
+#' @param max_tries Number of tries for each download method.
+#' @param verbose Logical value, default is `TRUE`.
+#' Whether to print progress messages.
+#' @param ... Other arguments passed to [utils::download.file]
+#'
+#' @export
+download <- function(
+    url,
+    destfile,
+    methods = c("auto", "wget", "libcurl", "curl", "wininet", "internal"),
+    verbose = TRUE,
+    ...,
+    max_tries = 2) {
+  if (missing(url) || missing(destfile)) {
+    log_message(
+      "'url' and 'destfile' must be both provided.",
+      message_type = "error"
+    )
+  }
+  ntry <- 0
+  status <- NULL
+  while (is.null(status)) {
+    for (method in methods) {
+      status <- tryCatch(
+        expr = {
+          suppressWarnings(
+            utils::download.file(
+              url = url,
+              destfile = destfile,
+              method = method,
+              quiet = !verbose,
+              ...
+            )
+          )
+          status <- 1
+        },
+        error = function(error) {
+          log_message(
+            error,
+            message_type = "warning"
+          )
+          log_message(
+            "Cannot download from the url: ", url,
+            message_type = "warning"
+          )
+          log_message(
+            "Failed to download using {.val method}. Retry...",
+            message_type = "warning"
+          )
+          Sys.sleep(1)
+          return(NULL)
+        }
+      )
+      if (!is.null(status)) {
+        break
+      }
+    }
+    ntry <- ntry + 1
+    if (is.null(status) && ntry >= max_tries) {
+      log_message(
+        "Download failed.",
+        message_type = "error"
+      )
+    }
+  }
+  return(invisible(NULL))
 }
