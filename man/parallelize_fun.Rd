@@ -26,6 +26,12 @@ A list of computed results
 Parallelize a function
 }
 \examples{
-parallelize_fun(1:3, function(x) x^2)
-parallelize_fun(list(1, 2, 3), function(x) x^2)
+parallelize_fun(1:3, function(x) {
+  Sys.sleep(0.2)
+  x^2
+})
+parallelize_fun(list(1, 2, 3), function(x) {
+  Sys.sleep(0.2)
+  x^2
+})
 }
