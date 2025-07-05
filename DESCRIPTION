@@ -25,6 +25,8 @@ Imports:
     RcppParallel,
     rlang,
     stats
+Suggests:
+    httr2
 LinkingTo:
     Rcpp,
     RcppArmadillo,
