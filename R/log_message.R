@@ -487,7 +487,29 @@ log_message <- function(
             "\\{\\.(val|code|emph|pkg|field|file|email|url|kbd|arg)\\s+\\{([^}]+)\\}\\}",
             "{\\2}", line
           )
-          processed <- glue::glue(processed, .envir = parent.frame(3))
+
+          if (grepl("\\{[^}]+\\}", processed)) {
+            matches <- regmatches(
+              processed, gregexpr("\\{[^}]+\\}", processed)
+            )[[1]]
+            for (match in matches) {
+              var_expr <- gsub("\\{|\\}", "", match)
+              var_value <- tryCatch(
+                as.character(
+                  eval(
+                    parse(text = var_expr),
+                    envir = parent.frame(6)
+                  )
+                ),
+                error = function(e) match
+              )
+              processed <- gsub(
+                match, var_value, processed,
+                fixed = TRUE
+              )
+            }
+          }
+
           as.character(processed)
         },
         error = function(e) line
