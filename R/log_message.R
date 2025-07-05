@@ -151,27 +151,41 @@ log_message <- function(
     back_color = back_color
   )
 
-  msg <- .message_formatting(
-    msg = msg,
-    timestamp = timestamp,
-    timestamp_format = timestamp_format,
-    level = level,
-    symbol = symbol,
-    multiline_indent = multiline_indent
-  )
+  if (cli_model && grepl("\n", msg)) {
+    .output_multiline_message(
+      msg = msg,
+      message_type = message_type,
+      text_color = text_color,
+      back_color = back_color,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent
+    )
+  } else {
+    msg <- .message_formatting(
+      msg = msg,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent
+    )
 
-  .output_message(
-    msg = msg,
-    message_type = message_type,
-    cli_model = cli_model,
-    text_color = text_color,
-    back_color = back_color,
-    timestamp = timestamp,
-    timestamp_format = timestamp_format,
-    level = level,
-    symbol = symbol,
-    multiline_indent = multiline_indent
-  )
+    .output_message(
+      msg = msg,
+      message_type = message_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent
+    )
+  }
 
   invisible(NULL)
 }
@@ -361,22 +375,6 @@ log_message <- function(
   message_type <- match.arg(message_type)
 
   if (cli_model) {
-    if (grepl("\n", msg)) {
-      .output_cli_message(
-        msg = msg,
-        message_type = message_type,
-        text_color = text_color,
-        back_color = back_color,
-        cli_model = cli_model,
-        timestamp = timestamp,
-        timestamp_format = timestamp_format,
-        level = level,
-        symbol = symbol,
-        multiline_indent = multiline_indent
-      )
-      return(invisible(NULL))
-    }
-
     if (!is.null(text_color) || !is.null(back_color)) {
       msg <- .color_formatting(
         msg = msg,
@@ -412,12 +410,11 @@ log_message <- function(
   }
 }
 
-.output_cli_message <- function(
+.output_multiline_message <- function(
     msg,
     message_type = c("info", "success", "warning"),
     text_color = NULL,
     back_color = NULL,
-    cli_model = TRUE,
     timestamp = TRUE,
     timestamp_format = "%Y-%m-%d %H:%M:%S",
     level = 1,
@@ -427,74 +424,76 @@ log_message <- function(
 
   lines <- strsplit(msg, "\n", fixed = TRUE)[[1]]
 
-  if (length(lines) <= 1) {
+  for (i in seq_along(lines)) {
+    line <- lines[i]
+
     if (!is.null(text_color) || !is.null(back_color)) {
-      msg <- .color_formatting(
-        msg = msg,
-        text_color = text_color,
-        back_color = back_color,
-        cli_model = cli_model
-      )
-    }
-
-    switch(
-      EXPR = message_type,
-      "info" = cli::cli_alert_info(msg),
-      "success" = cli::cli_alert_success(msg),
-      "warning" = cli::cli_alert_warning(msg)
-    )
-    return(invisible(NULL))
-  }
-
-  if (!is.null(text_color) || !is.null(back_color)) {
-    lines <- sapply(lines, function(line) {
-      .color_formatting(
+      line <- .color_formatting(
         msg = line,
         text_color = text_color,
         back_color = back_color,
-        cli_model = cli_model
+        cli_model = TRUE
       )
-    }, USE.NAMES = FALSE)
-  }
+    }
 
-  first_line <- lines[1]
-  switch(
-    EXPR = message_type,
-    "info" = cli::cli_alert_info(first_line),
-    "success" = cli::cli_alert_success(first_line),
-    "warning" = cli::cli_alert_warning(first_line)
-  )
+    if (i == 1 || multiline_indent) {
+      if (timestamp) {
+        time_str <- format(Sys.time(), timestamp_format)
+        timestamp_part <- paste0("[", time_str, "] ")
+      } else {
+        timestamp_part <- ""
+      }
 
-  if (length(lines) > 1) {
-    remaining_lines <- lines[-1]
+      if (symbol != "  ") {
+        indent_part <- paste0(symbol, " ")
+      } else if (level > 1) {
+        indent_part <- paste(rep("  ", level - 1), collapse = "")
+      } else {
+        indent_part <- ""
+      }
 
-    if (multiline_indent) {
-      icon_space <- "  "
+      formatted_line <- paste0(timestamp_part, indent_part, line)
+
+      switch(
+        EXPR = message_type,
+        "info" = cli::cli_alert_info(formatted_line),
+        "success" = cli::cli_alert_success(formatted_line),
+        "warning" = cli::cli_alert_warning(formatted_line)
+      )
     } else {
       icon_width <- 2
 
-      timestamp_width <- if (timestamp) {
-        sample_time <- format(Sys.time(), timestamp_format)
-        nchar(paste0("[", sample_time, "] "))
+      if (timestamp) {
+        time_str <- format(Sys.time(), timestamp_format)
+        timestamp_width <- nchar(paste0("[", time_str, "] "))
       } else {
-        0
+        timestamp_width <- 0
       }
 
       level_indent_width <- if (symbol != "  ") {
         nchar(paste0(symbol, " "))
       } else if (level > 1) {
-        nchar(paste(rep(symbol, level - 1), collapse = ""))
+        nchar(paste(rep("  ", level - 1), collapse = ""))
       } else {
         0
       }
 
       total_prefix_width <- icon_width + timestamp_width + level_indent_width
-      icon_space <- paste(rep(" ", total_prefix_width), collapse = "")
-    }
+      alignment_space <- paste(rep(" ", total_prefix_width), collapse = "")
 
-    for (line in remaining_lines) {
-      aligned_line <- paste0(icon_space, line)
-      cli::cli_verbatim(aligned_line)
+      processed_line <- tryCatch(
+        {
+          processed <- gsub(
+            "\\{\\.(val|code|emph|pkg|field|file|email|url|kbd|arg)\\s+\\{([^}]+)\\}\\}",
+            "{\\2}", line
+          )
+          processed <- glue::glue(processed, .envir = parent.frame(3))
+          as.character(processed)
+        },
+        error = function(e) line
+      )
+
+      cli::cli_verbatim(paste0(alignment_space, processed_line))
     }
   }
 }
