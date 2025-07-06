@@ -13,10 +13,11 @@ log_message(
   timestamp_format = "\%Y-\%m-\%d \%H:\%M:\%S",
   level = 1,
   symbol = "  ",
-  format = FALSE,
   text_color = NULL,
   back_color = NULL,
-  multiline_indent = TRUE
+  multiline_indent = TRUE,
+  .envir = parent.frame(),
+  .frame = .envir
 )
 }
 \arguments{
@@ -44,9 +45,6 @@ Level 1 has no indentation, higher levels add more indentation.}
 \item{symbol}{Character value, default is \emph{\code{"  "}} (two spaces).
 The symbol used for indentation. When specified, it ignores the level parameter and uses the symbol directly.}
 
-\item{format}{Logical value, default is \emph{\code{FALSE}}.
-Whether to use sprintf-style formatting for the message.}
-
 \item{text_color}{Character value, default is \emph{\code{NULL}}.
 Color for the message text.
 Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", "black".}
@@ -58,6 +56,10 @@ Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", 
 \item{multiline_indent}{Logical value, default is \emph{\code{TRUE}}.
 Whether to apply consistent formatting (timestamp and indentation) to each line in multiline messages.
 When TRUE, each line gets the full formatting; when FALSE, only the first line gets the timestamp.}
+
+\item{.envir}{The environment to evaluate calls in. Default is \emph{\code{parent.frame()}}.}
+
+\item{.frame}{The frame to use for error reporting. Default is \emph{\code{.envir}}.}
 }
 \value{
 \code{Formated message} printed to the console.
@@ -97,8 +99,6 @@ log_message("Hello, {.val world}!")
 # set indentation
 log_message("Hello, world!", level = 2)
 log_message("Hello, world!", symbol = "->")
-log_message("Hello, \%s", "world!", format = TRUE)
-log_message("Processing \%d items", 42, format = TRUE)
 
 # multiline message
 log_message("Line 1\nLine 2\nLine 3", multiline_indent = TRUE)
@@ -145,6 +145,15 @@ log_message(
   back_color = "cyan",
   cli_model = FALSE
 )
+
+# cli variables
+fun <- function() {
+  a <- 1
+  log_message("{.val a}")
+  log_message("{.val {a}}")
+  log_message("{.val {a + 1}}")
+}
+fun()
 }
 \references{
 \url{https://cli.r-lib.org/articles/index.html}
