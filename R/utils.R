@@ -382,92 +382,30 @@ try_get <- function(
   return(out)
 }
 
-#' Download File from the Internet
+#' @title Download file from the Internet
 #'
 #' @md
 #' @inheritParams utils::download.file
 #' @param methods Methods to be used for downloading files.
 #' The default is to try different download methods in turn until the download is successfully completed.
 #' @param max_tries Number of tries for each download method.
-#' @param verbose Logical value, default is `TRUE`.
-#' Whether to print progress messages.
-#' @param use_httr Logical value, default is `FALSE`.
-#' Whether to use [httr2::request] to download the file.
-#' @param ... Other arguments passed to [utils::download.file]
+#' @param ... Other arguments passed to [utils::download.file].
 #'
 #' @export
 download <- function(
     url,
     destfile,
-    methods = c("auto", "wget", "libcurl", "curl", "wininet", "internal"),
-    max_tries = 2,
-    use_httr = FALSE,
-    verbose = TRUE,
-    ...) {
+    methods = c(
+      "auto", "wget", "libcurl", "curl", "wininet", "internal"
+    ),
+    quiet = FALSE,
+    ...,
+    max_tries = 2) {
   if (missing(url) || missing(destfile)) {
-    log_message(
-      "'url' and 'destfile' must be both provided.",
-      message_type = "error"
-    )
+    stop("'url' and 'destfile' must be both provided.")
   }
   ntry <- 0
   status <- NULL
-
-  if (isTRUE(use_httr)) {
-    tryCatch(
-      {
-        log_message(
-          "Attempting download with {.val httr2}...",
-          message_type = "info"
-        )
-
-        req <- httr2::request(url) |>
-          httr2::req_headers(
-            "Accept" = "text/plain,application/json;q=0.9,*/*;q=0.8",
-            "Accept-Language" = "zh-CN,zh;q=0.9,en;q=0.8",
-            "Cache-Control" = "no-cache",
-            "Connection" = "keep-alive",
-            "Host" = "guolab.wchscu.cn",
-            "Pragma" = "no-cache",
-            "Referer" = dirname(url),
-            "User-Agent" = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-          ) |>
-          httr2::req_retry(max_tries = max_tries) |>
-          httr2::req_timeout(seconds = 30)
-
-        resp <- req |> httr2::req_perform(path = destfile)
-
-        if (httr2::resp_status(resp) == 200) {
-          if (file.exists(destfile)) {
-            content <- readLines(destfile, n = 1, warn = FALSE)
-            if (!grepl("^<!doctype|^<html", tolower(content))) {
-              log_message(
-                "Download completed successfully using {.val httr2}",
-                message_type = "success"
-              )
-              return(invisible(NULL))
-            }
-          }
-          log_message(
-            "Downloaded file appears to be HTML instead of expected data",
-            message_type = "warning"
-          )
-        } else {
-          log_message(
-            paste0("HTTP error: ", httr2::resp_status(resp)),
-            message_type = "warning"
-          )
-        }
-      },
-      error = function(e) {
-        log_message(
-          paste0("httr2 request failed: ", conditionMessage(e)),
-          message_type = "warning"
-        )
-      }
-    )
-  }
-
   while (is.null(status)) {
     for (method in methods) {
       status <- tryCatch(
@@ -477,25 +415,15 @@ download <- function(
               url = url,
               destfile = destfile,
               method = method,
-              quiet = !verbose,
+              quiet = quiet,
               ...
             )
           )
           status <- 1
-        },
-        error = function(error) {
-          log_message(
-            error,
-            message_type = "warning"
-          )
-          log_message(
-            "Cannot download from the url: ", url,
-            message_type = "warning"
-          )
-          log_message(
-            "Failed to download using {.val method}. Retry...",
-            message_type = "warning"
-          )
+        }, error = function(error) {
+          log_message(error)
+          log_message("Cannot download from the url: ", url)
+          log_message("Failed to download using \"", method, "\". Retry...\n")
           Sys.sleep(1)
           return(NULL)
         }
@@ -506,10 +434,7 @@ download <- function(
     }
     ntry <- ntry + 1
     if (is.null(status) && ntry >= max_tries) {
-      log_message(
-        "Download failed.",
-        message_type = "error"
-      )
+      log_message("Download failed.", message_type = "error")
     }
   }
   return(invisible(NULL))
