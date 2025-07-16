@@ -118,13 +118,12 @@
 #' )
 #'
 #' # cli variables
-#' fun <- function() {
-#'   a <- 1
-#'   log_message("{.val a}")
-#'   log_message("{.val {a}}")
-#'   log_message("{.val {a + 1}}")
+#' fun <- function(x) {
+#'   log_message("{.val x}")
+#'   log_message("{.val {x}}")
+#'   log_message("{.val {x + 1}}")
 #' }
-#' fun()
+#' fun(1)
 log_message <- function(
     ...,
     verbose = TRUE,
@@ -204,6 +203,18 @@ log_message <- function(
   invisible(NULL)
 }
 
+.build_message <- function(...) {
+  args <- list(...)
+
+  if (length(args) == 0) {
+    return("")
+  }
+
+  msg <- paste0(...)
+
+  capitalize(msg)
+}
+
 .validate_params <- function(
     level,
     symbol,
@@ -263,18 +274,6 @@ log_message <- function(
       call = caller_call
     )
   }
-}
-
-.build_message <- function(...) {
-  args <- list(...)
-
-  if (length(args) == 0) {
-    return("")
-  }
-
-  msg <- paste0(...)
-
-  capitalize(msg)
 }
 
 .message_formatting <- function(

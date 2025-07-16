@@ -147,13 +147,12 @@ log_message(
 )
 
 # cli variables
-fun <- function() {
-  a <- 1
-  log_message("{.val a}")
-  log_message("{.val {a}}")
-  log_message("{.val {a + 1}}")
+fun <- function(x) {
+  log_message("{.val x}")
+  log_message("{.val {x}}")
+  log_message("{.val {x + 1}}")
 }
-fun()
+fun(1)
 }
 \references{
 \url{https://cli.r-lib.org/articles/index.html}
