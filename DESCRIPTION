@@ -1,8 +1,8 @@
 Type: Package
 Package: thisutils
 Title: Collection of Utility Functions for Data Analysis and Computing
-Version: 0.0.5
-Date: 2025-07-03
+Version: 0.0.6
+Date: 2025-07-16
 Authors@R:
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054"))
 Maintainer: Meng Xu <mengxu98@qq.com>
@@ -31,7 +31,7 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     RcppParallel
-Config/Needs/website: mengxu98/mxtemplate
+Config/Needs/website: mengxu98/thistemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.2
