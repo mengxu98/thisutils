@@ -24,8 +24,10 @@ add_pkg_file(
 \arguments{
 \item{desc_file}{The DESCRIPTION file.
 Must be provided, it will be used to extract package information.
-Using \code{add_pkg_file("DESCRIPTION")}, will be created <pkg_name>-package.R based on the DESCRIPTION file.
-If you want to use some specific information, such as \code{author_name} or \code{author_email}, you can provide them manually.}
+Using \code{add_pkg_file("DESCRIPTION", output_dir = "R")},
+will be created <pkg_name>-package.R based on the DESCRIPTION file in \code{R} dir.
+If you want to use some specific information,
+such as \code{author_name} or \code{author_email}, you can provide them manually.}
 
 \item{pkg_name}{Character string, the name of the package.
 Default is NULL, which will be read from DESCRIPTION file.}
@@ -49,7 +51,7 @@ Default is NULL, which will be read from DESCRIPTION file or constructed based o
 Default is NULL, you should specify it, such as 'R'.}
 
 \item{use_figlet}{Logical, whether to use figlet for ASCII art generation.
-Default is TRUE.}
+Default is TRUE. Details see \link{figlet}.}
 
 \item{figlet_font}{Character string, figlet font to use.
 Default is "Slant".}

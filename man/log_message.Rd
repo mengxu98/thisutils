@@ -43,7 +43,8 @@ The level of the message, which affects the indentation.
 Level 1 has no indentation, higher levels add more indentation.}
 
 \item{symbol}{Character value, default is \emph{\code{"  "}} (two spaces).
-The symbol used for indentation. When specified, it ignores the level parameter and uses the symbol directly.}
+The symbol used for indentation.
+When specified, it ignores the level parameter and uses the symbol directly.}
 
 \item{text_color}{Character value, default is \emph{\code{NULL}}.
 Color for the message text.
@@ -81,6 +82,9 @@ log_message("Hello, ", "world!", cli_model = FALSE)
 # suppress messages
 suppressMessages(log_message("Hello, world!"))
 log_message("Hello, world!", verbose = FALSE)
+options(log_message.verbose = FALSE)
+log_message("Hello, world!")
+options(log_message.verbose = TRUE)
 
 # cli formatting
 log_message("hello, {.arg world}!")

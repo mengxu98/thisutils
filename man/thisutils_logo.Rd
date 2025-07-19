@@ -2,7 +2,7 @@
 % Please edit documentation in R/thisutils-package.R
 \name{thisutils_logo}
 \alias{thisutils_logo}
-\title{thisutils logo}
+\title{The logo of thisutils}
 \usage{
 thisutils_logo(unicode = cli::is_utf8_output())
 }

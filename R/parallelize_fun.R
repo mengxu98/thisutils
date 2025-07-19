@@ -37,12 +37,12 @@ parallelize_fun <- function(
     pb <- cli::cli_progress_bar(
       format = paste0(
         "{cli::pb_spin} [{time_str}] ",
-        "Running [{cli::pb_current}/{cli::pb_total}] ",
+        "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
         "ETA: {cli::pb_eta}"
       ),
       format_done = paste0(
         "{cli::col_green(cli::symbol$tick)} [{time_str}] ",
-        "Completed {cli::pb_total} tasks ",
+        "Completed {.pkg {cli::pb_total}} tasks ",
         "in {cli::pb_elapsed}"
       ),
       total = total,
@@ -52,7 +52,7 @@ parallelize_fun <- function(
 
   if (cores == 1) {
     log_message(
-      "Using {.val {1}} core",
+      "Using {.pkg {1}} core",
       verbose = verbose
     )
 
@@ -76,7 +76,7 @@ parallelize_fun <- function(
     doParallel::registerDoParallel(cores = cores)
 
     log_message(
-      "Using {.val {foreach::getDoParWorkers()}} cores",
+      "Using {.pkg {foreach::getDoParWorkers()}} cores",
       verbose = verbose
     )
 

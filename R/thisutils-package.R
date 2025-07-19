@@ -16,7 +16,7 @@
 #' @name thisutils-package
 "_PACKAGE"
 
-#' @title thisutils logo
+#' @title The logo of thisutils
 #'
 #' @description
 #' The thisutils logo, using ASCII or Unicode characters
