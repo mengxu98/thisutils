@@ -7,6 +7,7 @@
 add_pkg_file(
   desc_file,
   pkg_name = NULL,
+  title = NULL,
   pkg_description = NULL,
   author_name = NULL,
   author_email = NULL,
@@ -29,6 +30,9 @@ If you want to use some specific information, such as \code{author_name} or \cod
 \item{pkg_name}{Character string, the name of the package.
 Default is NULL, which will be read from DESCRIPTION file.}
 
+\item{title}{Character string, title of the package.
+Default is NULL, which will be read from DESCRIPTION file.}
+
 \item{pkg_description}{Character string, short description of the package.
 Default is NULL, which will be read from DESCRIPTION file.}
 
@@ -42,7 +46,7 @@ Default is NULL, which will be read from DESCRIPTION file.}
 Default is NULL, which will be read from DESCRIPTION file or constructed based on package name.}
 
 \item{output_dir}{Character string, directory where to save the package file.
-Default is NULL, you should specify it, such as 'R/'.}
+Default is NULL, you should specify it, such as 'R'.}
 
 \item{use_figlet}{Logical, whether to use figlet for ASCII art generation.
 Default is TRUE.}

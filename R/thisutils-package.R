@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-#' @title thisutils: An R package for utility functions.
+#' @title Collection of Utility Functions for Data Analysis and Computing
 #'
 #' @useDynLib thisutils
 #'
 #' @description
-#' An R package for utility functions.
+#' Provides utility functions for data analysis and scientific computing. Includes functions for parallel processing, and other computational tasks to streamline workflows.
 #'
 #' @author Meng Xu (Maintainer), \email{mengxu98@qq.com}
 #'
@@ -23,12 +23,11 @@
 #' Use [cli::ansi_strip] to get rid of the colors.
 #'
 #' @md
-#' @param unicode Unicode symbols. Default is `TRUE` on UTF-8 platforms.
-#'
-#' @return A logo with ASCII formatted text
+#' @param unicode Unicode symbols on UTF-8 platforms.
+#' Default is [cli::is_utf8_output].
 #'
 #' @references
-#'  \url{https://github.com/tidyverse/tidyverse/blob/main/R/logo.R}
+#' \url{https://github.com/tidyverse/tidyverse/blob/main/R/logo.R}
 #'
 #' @export
 #' @examples
@@ -36,13 +35,13 @@
 thisutils_logo <- function(
     unicode = cli::is_utf8_output()) {
   logo <- c(
-    "       0        1      2           3    4
+    "    0        1      2           3    4
    __  __    _              __  _  __
   / /_/ /_  (_)_____ __  __/ /_(_)/ /_____
  / __/ __ ./ // ___// / / / __/ // // ___/
 / /_/ / / / /(__  )/ /_/ / /_/ // /(__  )
 .__/_/ /_/_//____/ .__,_/.__/_//_//____/
-    5             6      7      8       9   "
+  5             6      7      8       9"
   )
 
   hexa <- c("*", ".", "o", "*", ".", "o", "*", ".", "o", "*")
@@ -51,7 +50,8 @@ thisutils_logo <- function(
   }
 
   cols <- c(
-    "red", "yellow", "green", "magenta", "cyan", "yellow", "green", "white", "magenta", "cyan"
+    "red", "yellow", "green", "magenta", "cyan",
+    "yellow", "green", "white", "magenta", "cyan"
   )
 
   col_hexa <- purrr::map2(
@@ -63,20 +63,24 @@ thisutils_logo <- function(
     logo <- sub(pat, col_hexa[[i + 1]], logo)
   }
 
-  structure(cli::col_blue(logo), class = "logo")
+  structure(
+    cli::col_blue(logo),
+    class = "thisutils_logo"
+  )
 }
 
-#' @title print logo
+#' @title Print logo
 #'
 #' @param x Input information.
 #' @param ... Other parameters.
 #'
 #' @return Print the ASCII logo
 #'
-#' @method print logo
+#' @method print thisutils_logo
 #'
 #' @export
-print.logo <- function(x, ...) {
+#'
+print.thisutils_logo <- function(x, ...) {
   cat(x, ..., sep = "\n")
   invisible(x)
 }
@@ -85,13 +89,15 @@ print.logo <- function(x, ...) {
   version <- utils::packageDescription(pkgname, fields = "Version")
 
   msg <- paste0(
-    "-------------------------------------------------------
-",
-    cli::col_blue(" ", pkgname, " version ", version),
-    "
-   This message can be suppressed by:
-     suppressPackageStartupMessages(library(thisutils))
--------------------------------------------------------"
+    strrep("-", 60),
+    "\n",
+    cli::col_blue(pkgname, " version ", version),
+    "\n",
+    cli::col_grey("This message can be suppressed by:"),
+    "\n",
+    cli::col_grey("  suppressPackageStartupMessages(library(thisutils))"),
+    "\n",
+    strrep("-", 60)
   )
 
   packageStartupMessage(thisutils_logo())
