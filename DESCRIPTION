@@ -1,12 +1,12 @@
 Type: Package
 Package: thisutils
 Title: Collection of Utility Functions for Data Analysis and Computing
-Version: 0.0.6
-Date: 2025-07-16
+Version: 0.0.7
+Date: 2025-07-19
 Authors@R:
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054"))
 Maintainer: Meng Xu <mengxu98@qq.com>
-Description: Provides a collection of utility functions commonly used in data analysis and scientific computing. Includes functions for parallel processing, matrix operations, correlation calculations, and other computational tasks to streamline R workflows.
+Description: Provides utility functions for data analysis and scientific computing. Includes functions for parallel processing, and other computational tasks to streamline workflows.
 License: MIT+ file LICENSE
 URL: https://mengxu98.github.io/thisutils/
 BugReports: https://github.com/mengxu98/thisutils/issues
