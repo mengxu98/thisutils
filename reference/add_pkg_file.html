@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_pkg_file</span><span class="op">(</span></span>
 <span>  <span class="va">desc_file</span>,</span>
 <span>  pkg_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pkg_description <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  author_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  author_email <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -76,6 +77,11 @@ If you want to use some specific information, such as <code>author_name</code> o
 Default is NULL, which will be read from DESCRIPTION file.</p></dd>
 
 
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
+<dd><p>Character string, title of the package.
+Default is NULL, which will be read from DESCRIPTION file.</p></dd>
+
+
 <dt id="arg-pkg-description">pkg_description<a class="anchor" aria-label="anchor" href="#arg-pkg-description"></a></dt>
 <dd><p>Character string, short description of the package.
 Default is NULL, which will be read from DESCRIPTION file.</p></dd>
@@ -98,7 +104,7 @@ Default is NULL, which will be read from DESCRIPTION file or constructed based o
 
 <dt id="arg-output-dir">output_dir<a class="anchor" aria-label="anchor" href="#arg-output-dir"></a></dt>
 <dd><p>Character string, directory where to save the package file.
-Default is NULL, you should specify it, such as 'R/'.</p></dd>
+Default is NULL, you should specify it, such as 'R'.</p></dd>
 
 
 <dt id="arg-use-figlet">use_figlet<a class="anchor" aria-label="anchor" href="#arg-use-figlet"></a></dt>

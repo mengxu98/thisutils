@@ -9,7 +9,7 @@ Use cli::ansi_strip to get rid of the colors."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,13 +54,10 @@ Use <a href="https://cli.r-lib.org/reference/ansi_strip.html" class="external-li
 
 
 <dl><dt id="arg-unicode">unicode<a class="anchor" aria-label="anchor" href="#arg-unicode"></a></dt>
-<dd><p>Unicode symbols. Default is <code>TRUE</code> on UTF-8 platforms.</p></dd>
+<dd><p>Unicode symbols on UTF-8 platforms.
+Default is <a href="https://cli.r-lib.org/reference/is_utf8_output.html" class="external-link">cli::is_utf8_output</a>.</p></dd>
 
 </dl></div>
-    <div class="section level2">
-    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A logo with ASCII formatted text</p>
-    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p><a href="https://github.com/tidyverse/tidyverse/blob/main/R/logo.R" class="external-link">https://github.com/tidyverse/tidyverse/blob/main/R/logo.R</a></p>
@@ -69,13 +66,13 @@ Use <a href="https://cli.r-lib.org/reference/ansi_strip.html" class="external-li
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">thisutils_logo</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">       </span><span style="color: #BB0000;">⬢</span><span style="color: #0000BB;">        </span><span style="color: #BBBB00;">.</span><span style="color: #0000BB;">      </span><span style="color: #00BB00;">⬡</span><span style="color: #0000BB;">           </span><span style="color: #BB00BB;">⬢</span><span style="color: #0000BB;">    </span><span style="color: #00BBBB;">.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">    </span><span style="color: #BB0000;">⬢</span><span style="color: #0000BB;">        </span><span style="color: #BBBB00;">.</span><span style="color: #0000BB;">      </span><span style="color: #00BB00;">⬡</span><span style="color: #0000BB;">           </span><span style="color: #BB00BB;">⬢</span><span style="color: #0000BB;">    </span><span style="color: #00BBBB;">.</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">   __  __    _              __  _  __</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">  / /_/ /_  (_)_____ __  __/ /_(_)/ /_____</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;"> / __/ __ ./ // ___// / / / __/ // // ___/</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">/ /_/ / / / /(__  )/ /_/ / /_/ // /(__  )</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">.__/_/ /_/_//____/ .__,_/.__/_//_//____/</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">    </span><span style="color: #BBBB00;">⬡</span><span style="color: #0000BB;">             </span><span style="color: #00BB00;">⬢</span><span style="color: #0000BB;">      </span><span style="color: #BBBBBB;">.</span><span style="color: #0000BB;">      </span><span style="color: #BB00BB;">⬡</span><span style="color: #0000BB;">       </span><span style="color: #00BBBB;">⬢</span><span style="color: #0000BB;">   </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">  </span><span style="color: #BBBB00;">⬡</span><span style="color: #0000BB;">             </span><span style="color: #00BB00;">⬢</span><span style="color: #0000BB;">      </span><span style="color: #BBBBBB;">.</span><span style="color: #0000BB;">      </span><span style="color: #BB00BB;">⬡</span><span style="color: #0000BB;">       </span><span style="color: #00BBBB;">⬢</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
