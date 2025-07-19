@@ -3,7 +3,7 @@
 S3method(as.character,figlet_text)
 S3method(print,figlet_font)
 S3method(print,figlet_text)
-S3method(print,logo)
+S3method(print,thisutils_logo)
 export("%ss%")
 export(add_pkg_file)
 export(as_matrix)
