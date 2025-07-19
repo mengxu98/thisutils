@@ -39,7 +39,15 @@ reference:
   - thisutils-package
   - thisutils_logo
 
-- subtitle: "Ascii art"
+- subtitle: "Parallel processing"
+- contents:
+  - parallelize_fun
+
+- subtitle: "Logging"
+- contents:
+  - log_message
+
+- subtitle: "ASCII art"
 - contents:
   - add_pkg_file
   - figlet
@@ -59,10 +67,8 @@ reference:
   - check_sparsity
   - download
   - invoke_fun
-  - log_message
   - normalization
-  - parallelize_fun
-  - print.logo
+  - print.thisutils_logo
   - r_square
   - remove_space
   - rescale

@@ -4,12 +4,12 @@
 \name{thisutils-package}
 \alias{thisutils}
 \alias{thisutils-package}
-\title{thisutils: An R package for utility functions.}
+\title{Collection of Utility Functions for Data Analysis and Computing}
 \source{
 \url{https://mengxu98.github.io/thisutils/}
 }
 \description{
-An R package for utility functions.
+Provides utility functions for data analysis and scientific computing. Includes functions for parallel processing, and other computational tasks to streamline workflows.
 }
 \seealso{
 Useful links:
