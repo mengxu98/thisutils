@@ -21,7 +21,8 @@
 #' The level of the message, which affects the indentation.
 #' Level 1 has no indentation, higher levels add more indentation.
 #' @param symbol Character value, default is *`"  "`* (two spaces).
-#' The symbol used for indentation. When specified, it ignores the level parameter and uses the symbol directly.
+#' The symbol used for indentation.
+#' When specified, it ignores the level parameter and uses the symbol directly.
 #' @param text_color Character value, default is *`NULL`*.
 #' Color for the message text.
 #' Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", "black".
@@ -52,6 +53,9 @@
 #' # suppress messages
 #' suppressMessages(log_message("Hello, world!"))
 #' log_message("Hello, world!", verbose = FALSE)
+#' options(log_message.verbose = FALSE)
+#' log_message("Hello, world!")
+#' options(log_message.verbose = TRUE)
 #'
 #' # cli formatting
 #' log_message("hello, {.arg world}!")
@@ -138,13 +142,14 @@ log_message <- function(
     multiline_indent = TRUE,
     .envir = parent.frame(),
     .frame = .envir) {
+  verbose <- .get_verbose(verbose)
   message_type <- match.arg(message_type)
   msg <- .build_message(...)
 
   .envir <- .get_caller_env(.envir, .frame)
+  caller_call <- .get_caller_call(.frame)
 
   if (message_type == "error") {
-    caller_call <- .get_caller_call(.frame)
     cli::cli_abort(msg, call = caller_call)
   }
 
@@ -201,6 +206,32 @@ log_message <- function(
   }
 
   invisible(NULL)
+}
+
+.get_verbose <- function(verbose) {
+  verbose_option <- getOption("log_message.verbose", NULL)
+
+  if (is.null(verbose_option)) {
+    return(verbose)
+  }
+
+  if (!is.logical(verbose_option) || length(verbose_option) != 1) {
+    cli::cli_alert_warning(
+      "{.arg log_message.verbose} must be a logical value, set to {.val {verbose}}"
+    )
+    options(log_message.verbose = verbose)
+    verbose <- FALSE
+  }
+
+  if (isTRUE(verbose_option) && isTRUE(verbose)) {
+    verbose <- TRUE
+  }
+
+  if (isFALSE(verbose_option)) {
+    verbose <- FALSE
+  }
+
+  verbose
 }
 
 .build_message <- function(...) {
