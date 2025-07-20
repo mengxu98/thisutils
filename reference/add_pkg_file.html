@@ -68,8 +68,10 @@
 <dl><dt id="arg-desc-file">desc_file<a class="anchor" aria-label="anchor" href="#arg-desc-file"></a></dt>
 <dd><p>The DESCRIPTION file.
 Must be provided, it will be used to extract package information.
-Using <code>add_pkg_file("DESCRIPTION")</code>, will be created &lt;pkg_name&gt;-package.R based on the DESCRIPTION file.
-If you want to use some specific information, such as <code>author_name</code> or <code>author_email</code>, you can provide them manually.</p></dd>
+Using <code>add_pkg_file("DESCRIPTION", output_dir = "R")</code>,
+will be created &lt;pkg_name&gt;-package.R based on the DESCRIPTION file in <code>R</code> dir.
+If you want to use some specific information,
+such as <code>author_name</code> or <code>author_email</code>, you can provide them manually.</p></dd>
 
 
 <dt id="arg-pkg-name">pkg_name<a class="anchor" aria-label="anchor" href="#arg-pkg-name"></a></dt>
@@ -109,7 +111,7 @@ Default is NULL, you should specify it, such as 'R'.</p></dd>
 
 <dt id="arg-use-figlet">use_figlet<a class="anchor" aria-label="anchor" href="#arg-use-figlet"></a></dt>
 <dd><p>Logical, whether to use figlet for ASCII art generation.
-Default is TRUE.</p></dd>
+Default is TRUE. Details see <a href="figlet.html">figlet</a>.</p></dd>
 
 
 <dt id="arg-figlet-font">figlet_font<a class="anchor" aria-label="anchor" href="#arg-figlet-font"></a></dt>
