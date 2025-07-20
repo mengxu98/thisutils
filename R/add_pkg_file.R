@@ -6,8 +6,10 @@
 #' @md
 #' @param desc_file The DESCRIPTION file.
 #' Must be provided, it will be used to extract package information.
-#' Using `add_pkg_file("DESCRIPTION")`, will be created <pkg_name>-package.R based on the DESCRIPTION file.
-#' If you want to use some specific information, such as `author_name` or `author_email`, you can provide them manually.
+#' Using `add_pkg_file("DESCRIPTION", output_dir = "R")`,
+#' will be created <pkg_name>-package.R based on the DESCRIPTION file in `R` dir.
+#' If you want to use some specific information,
+#' such as `author_name` or `author_email`, you can provide them manually.
 #' @param pkg_name Character string, the name of the package.
 #' Default is NULL, which will be read from DESCRIPTION file.
 #' @param title Character string, title of the package.
@@ -23,7 +25,7 @@
 #' @param output_dir Character string, directory where to save the package file.
 #' Default is NULL, you should specify it, such as 'R'.
 #' @param use_figlet Logical, whether to use figlet for ASCII art generation.
-#' Default is TRUE.
+#' Default is TRUE. Details see [figlet].
 #' @param figlet_font Character string, figlet font to use.
 #' Default is "Slant".
 #' @param colors Character vector, colors to use for the logo elements.
@@ -118,9 +120,15 @@ add_pkg_file <- function(
 
   if (is.null(ascii_lines)) {
     ascii_lines <- c(
-      paste0("  ", paste(rep("*", nchar(pkg_name) + 4), collapse = "")),
-      paste0("  * ", pkg_name, " *"),
-      paste0("  ", paste(rep("*", nchar(pkg_name) + 4), collapse = ""))
+      paste0(
+        "  ", paste(rep("*", nchar(pkg_name) + 4), collapse = "")
+      ),
+      paste0(
+        "  * ", pkg_name, " *"
+      ),
+      paste0(
+        "  ", paste(rep("*", nchar(pkg_name) + 4), collapse = "")
+      )
     )
   }
 
@@ -143,14 +151,14 @@ add_pkg_file <- function(
     )
     writeLines(file_content, output_file)
     log_message(
-      "Package file written to: ", output_file,
+      "Package file written to: {.file {output_file}}",
       message_type = "success",
       verbose = verbose
     )
     invisible(file_content)
   } else {
     log_message(
-      "Not provided 'output_dir', please specify it, such as 'R'.",
+      "Not provided {.arg output_dir}, please specify it, such as {.val R}",
       message_type = "warning",
       verbose = verbose
     )
@@ -168,7 +176,7 @@ add_pkg_file <- function(
     ascii_lines,
     colors,
     unicode) {
-  ascii_with_numbers <- .add_color_numbers_to_ascii(
+  ascii_with_numbers <- .add_color_numbers(
     ascii_lines,
     length(colors)
   )
@@ -183,7 +191,9 @@ add_pkg_file <- function(
     "#' @description",
     paste0("#' ", pkg_description),
     "#'",
-    paste0("#' @author ", author_name, " (Maintainer), \\email{", author_email, "}"),
+    paste0(
+      "#' @author ", author_name, " (Maintainer), \\email{", author_email, "}"
+    ),
     "#'",
     paste0("#' @source \\url{", github_url, "}"),
     "#'",
@@ -192,10 +202,12 @@ add_pkg_file <- function(
     paste0("#' @name ", pkg_name, "-package"),
     "\"_PACKAGE\"",
     "",
-    paste0("#' @title ", pkg_name, " logo"),
+    paste0("#' @title The logo of ", pkg_name),
     "#'",
     "#' @description",
-    paste0("#' The ", pkg_name, " logo, using ASCII or Unicode characters"),
+    paste0(
+      "#' The ", pkg_name, " logo, using ASCII or Unicode characters"
+    ),
     "#' Use [cli::ansi_strip] to get rid of the colors.",
     "#'",
     "#' @md",
@@ -269,10 +281,10 @@ add_pkg_file <- function(
     "}"
   )
 
-  return(content)
+  content
 }
 
-.add_color_numbers_to_ascii <- function(
+.add_color_numbers <- function(
     ascii_lines,
     num_colors) {
   if (length(ascii_lines) == 0) {
@@ -285,7 +297,7 @@ add_pkg_file <- function(
   all_lines <- c(top_numbers, ascii_lines, bottom_numbers)
   result <- paste(all_lines, collapse = "\n")
 
-  return(result)
+  result
 }
 
 .generate_hexa <- function(
@@ -295,7 +307,9 @@ add_pkg_file <- function(
   symbols <- rep(c("*", ".", "o"), length.out = num_colors)
 
   code <- c(
-    paste0("  hexa <- c(", paste0("\"", symbols, "\"", collapse = ", "), ")"),
+    paste0(
+      "  hexa <- c(", paste0("\"", symbols, "\"", collapse = ", "), ")"
+    ),
     "  if (unicode) {",
     "    hexa <- c(\"*\" = \"\\u2b22\", \"o\" = \"\\u2b21\", \".\" = \".\")[hexa]",
     "  }",
@@ -318,7 +332,7 @@ add_pkg_file <- function(
     "  )"
   )
 
-  return(code)
+  code
 }
 
 .read_description <- function(
@@ -478,7 +492,9 @@ add_pkg_file <- function(
 
   github_url <- NULL
   if (url_match != -1) {
-    url <- trimws(sub("URL:\\s*", "", regmatches(desc_content, url_match)))
+    url <- trimws(
+      sub("URL:\\s*", "", regmatches(desc_content, url_match))
+    )
     github_url <- url
   } else if (bug_reports_match != -1) {
     bug_url <- trimws(
@@ -491,13 +507,12 @@ add_pkg_file <- function(
     github_url <- paste0("https://github.com/username/", package_name)
   }
 
-  if (verbose) {
-    log_message(
-      "Information extracted for: {.pkg {package_name}}, ",
-      "Author: {.pkg {author_name}}, {.email {author_email}}",
-      message_type = "success"
-    )
-  }
+  log_message(
+    "Information extracted for: {.pkg {package_name}}, ",
+    "Author: {.pkg {author_name}}, {.email {author_email}}",
+    message_type = "success",
+    verbose = verbose
+  )
 
   list(
     Package = package_name,

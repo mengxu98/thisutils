@@ -1,4 +1,3 @@
-
 #' @title Generate a simulated sparse matrix
 #'
 #' @description This function generates a sparse matrix with a specified number of rows and columns,
@@ -84,27 +83,19 @@ check_sparsity <- function(x) {
 
   sparsity_ratio <- non_zero_count / total_counts
 
-  sparsity <- 1 - sparsity_ratio
-
-  return(sparsity)
+  1 - sparsity_ratio
 }
 
 .rmse <- function(true, pred) {
-  return(
-    sqrt(mean((true - pred)^2))
-  )
+  sqrt(mean((true - pred)^2))
 }
 
 .sse <- function(y_true, y_pred) {
-  return(
-    sum((y_true - y_pred)**2)
-  )
+  sum((y_true - y_pred)**2)
 }
 
 .rse <- function(y_true, y_pred) {
-  return(
-    .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
-  )
+  .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
 }
 
 #' @title coefficient of determination (\eqn{R^2})
@@ -122,9 +113,7 @@ check_sparsity <- function(x) {
 #' y_pred <- y + rnorm(100, sd = 0.5)
 #' r_square(y, y_pred)
 r_square <- function(y_true, y_pred) {
-  return(
-    1 - .rse(y_true, y_pred)
-  )
+  1 - .rse(y_true, y_pred)
 }
 
 #' @title Normalize numeric vector
@@ -182,7 +171,6 @@ normalization <- function(
       x / sum(abs(x))
     },
     "softmax" = {
-      # exp(x - max(x)) / sum(exp(x - max(x)))
       temp <- (x - mean(x)) / stats::sd(x)
       exp(temp) / sum(exp(temp))
     },
@@ -201,7 +189,7 @@ normalization <- function(
     x[na_index] <- NA
   }
 
-  return(x)
+  x
 }
 
 #' @title Rescale numeric vector

@@ -658,7 +658,7 @@ log_message <- function(
       return(NULL)
     },
     error = function(e) {
-      return(NULL)
+      NULL
     }
   )
 }
@@ -676,14 +676,14 @@ log_message <- function(
     return(.envir)
   }
 
-  return(parent.frame(2))
+  parent.frame(2)
 }
 
 .search_var_in_frames <- function(var_name) {
   tryCatch(
     {
       frames <- sys.frames()
-      for (i in length(frames):1) {
+      for (i in rev(seq_along(frames))) {
         frame <- frames[[i]]
         if (is.environment(frame) && exists(var_name, envir = frame, inherits = FALSE)) {
           return(get(var_name, envir = frame))
@@ -697,7 +697,7 @@ log_message <- function(
       return(NULL)
     },
     error = function(e) {
-      return(NULL)
+      NULL
     }
   )
 }
@@ -744,5 +744,5 @@ log_message <- function(
     }
   }
 
-  return(msg)
+  msg
 }
