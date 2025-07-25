@@ -2,68 +2,85 @@
 % Please edit documentation in R/log_message.R
 \name{log_message}
 \alias{log_message}
-\title{Print diagnostic message}
+\title{Print formatted message}
 \usage{
 log_message(
   ...,
   verbose = TRUE,
   message_type = c("info", "success", "warning", "error"),
   cli_model = TRUE,
-  timestamp = TRUE,
-  timestamp_format = "\%Y-\%m-\%d \%H:\%M:\%S",
   level = 1,
   symbol = "  ",
   text_color = NULL,
   back_color = NULL,
-  multiline_indent = TRUE,
+  text_style = NULL,
+  multiline_indent = FALSE,
+  timestamp = TRUE,
+  timestamp_format = paste0("[", format(Sys.time(), "\%Y-\%m-\%d \%H:\%M:\%S"), "] "),
+  timestamp_style = TRUE,
   .envir = parent.frame(),
   .frame = .envir
 )
 }
 \arguments{
-\item{...}{Text to print.}
+\item{...}{The message to print.}
 
-\item{verbose}{Logical value, default is \emph{\code{TRUE}}.
-Whether to print the message.}
+\item{verbose}{Whether to print the message.
+Default is \emph{\code{TRUE}}.}
 
-\item{message_type}{Type of message, default is \emph{\code{info}}.
-Could be choose one of \emph{\code{info}}, \emph{\code{success}}, \emph{\code{warning}}, and \emph{\code{error}}.}
+\item{message_type}{Type of message.
+Could be choose one of \emph{\code{info}}, \emph{\code{success}}, \emph{\code{warning}}, and \emph{\code{error}}.
+Default is \emph{\code{info}}.}
 
-\item{cli_model}{Logical value, default is \emph{\code{TRUE}}.
-Whether to use the \code{cli} package to print the message.}
+\item{cli_model}{Whether to use the \code{cli} package to print the message.
+Default is \emph{\code{TRUE}}.}
 
-\item{timestamp}{Logical value, default is \emph{\code{TRUE}}.
-Whether to show the current time in the message.}
+\item{level}{The level of the message, which affects the indentation.
+Level 1 has no indentation, higher levels add more indentation.
+Default is \emph{\code{1}}.}
 
-\item{timestamp_format}{Character value, default is \emph{\code{"\%Y-\%m-\%d \%H:\%M:\%S"}}.
-Format string for timestamp display.}
+\item{symbol}{The symbol used for indentation.
+When specified, it ignores the level parameter and uses the symbol directly.
+Default is \emph{\code{"  "}} (two spaces).}
 
-\item{level}{Integer value, default is \emph{\code{1}}.
-The level of the message, which affects the indentation.
-Level 1 has no indentation, higher levels add more indentation.}
+\item{text_color}{Color for the message text.
+Supports R color names (e.g., "orange"),
+hexadecimal colors (e.g., "#000000"),
+basic colors: "red", "green", "blue", "yellow", "magenta",
+"cyan", "white", "black", "grey", "silver", "none",
+and bright colors: "br_red", "br_green", "br_blue",
+"br_yellow", "br_magenta", "br_cyan", "br_white", "br_black".
+Default is \emph{\code{NULL}}.}
 
-\item{symbol}{Character value, default is \emph{\code{"  "}} (two spaces).
-The symbol used for indentation.
-When specified, it ignores the level parameter and uses the symbol directly.}
+\item{back_color}{Background color for the message text.
+Details see parameter \code{text_color}.
+Default is \emph{\code{NULL}}.}
 
-\item{text_color}{Character value, default is \emph{\code{NULL}}.
-Color for the message text.
-Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", "black".}
+\item{text_style}{Text styles to apply.
+Can be one or more of: "bold", "italic", "underline", "strikethrough", "dim", "inverse".
+Multiple styles can be combined (e.g., c("bold", "underline")).
+Default is \emph{\code{NULL}}.}
 
-\item{back_color}{Character value, default is \emph{\code{NULL}}.
-Background color for the message text.
-Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", "black".}
+\item{multiline_indent}{Whether to apply consistent formatting (timestamp and indentation) to each line in multiline messages.
+When TRUE, each line gets the full formatting; when FALSE, only the first line gets the timestamp.
+Default is \emph{\code{FALSE}}.}
 
-\item{multiline_indent}{Logical value, default is \emph{\code{TRUE}}.
-Whether to apply consistent formatting (timestamp and indentation) to each line in multiline messages.
-When TRUE, each line gets the full formatting; when FALSE, only the first line gets the timestamp.}
+\item{timestamp}{Whether to show the current time in the message.
+Default is \emph{\code{TRUE}}.}
+
+\item{timestamp_format}{Format string for timestamp display.
+Default is \emph{\code{"\%Y-\%m-\%d \%H:\%M:\%S"}}.}
+
+\item{timestamp_style}{Whether to apply the same text styling to the timestamp as the message text.
+When TRUE, timestamp formatting matches the message; when FALSE, timestamp keeps its default appearance.
+Default is \emph{\code{TRUE}}.}
 
 \item{.envir}{The environment to evaluate calls in. Default is \emph{\code{parent.frame()}}.}
 
 \item{.frame}{The frame to use for error reporting. Default is \emph{\code{.envir}}.}
 }
 \value{
-\code{Formated message} printed to the console.
+\code{Formated message}.
 }
 \description{
 Integrate the message printing function with the \code{cli} package,
@@ -73,76 +90,130 @@ The message could be suppressed by \link[base:message]{base::suppressMessages}.
 \examples{
 # basic usage
 log_message("Hello, ", "world!")
+
 log_message("hello, world!")
+
 log_message("Hello, world!", timestamp = FALSE)
-log_message("Hello, ", "world!", message_type = "success")
-log_message("Hello, world!", message_type = "warning")
-log_message("Hello, ", "world!", cli_model = FALSE)
+
+log_message(
+  "Hello, ", "world!",
+  message_type = "success"
+)
+
+log_message(
+  "Hello, world!",
+  message_type = "warning"
+)
+
+log_message(
+  "Hello, ", "world!",
+  cli_model = FALSE
+)
+
 
 # suppress messages
 suppressMessages(log_message("Hello, world!"))
 log_message("Hello, world!", verbose = FALSE)
 options(log_message.verbose = FALSE)
 log_message("Hello, world!")
-options(log_message.verbose = TRUE)
 
-# cli formatting
-log_message("hello, {.arg world}!")
-message("hello, {.arg world}!")
-log_message("hello, {.code world}!")
+# for global verbose option
+options(log_message.verbose = TRUE)
+log_message("Hello, world!", verbose = FALSE)
+options(log_message.verbose = NULL)
+
+
+# cli inline markup
+log_message("{.arg abc} is a argument")
+
+## 'message' can not deal with cli inline markup
 message("hello, {.code world}!")
-log_message("{.emph R}")
-log_message("Hello, {.file world}!")
-log_message("press {.kbd ENTER}")
+
+log_message("{.val list('abc')} is a {.cls {class(list('abc'))}}")
+
+log_message("{.code lm(y ~ x)} is a code example")
+
+log_message("{.dt List}list('abc')")
+
 log_message("address: {.email example@example.com}")
-log_message("URL: {.url https://example.com}")
+
+log_message("{.emph R} is a programming language")
+
+log_message("{.envvar R_HOME}")
+
+log_message("{.file log_message.R} is a file")
+
+log_message("{.fn lm} is a function")
+
+log_message("{.fun lm} is a function")
+
+log_message("{.help lm} to get help")
+
+log_message("... see {.help [{.fun lm}](stats::lm)} to learn more")
+
+log_message(
+  "See the {.href [cli homepage](https://cli.r-lib.org)} for details"
+)
+
+log_message("press {.kbd ENTER}")
+
+log_message("press {.key ENTER}")
+
+log_message("URL: {.url https://cli.r-lib.org}")
+
 log_message("Some {.field field}")
-log_message("Hello, {.pkg world}!")
-log_message("Hello, {.val world}!")
+
+log_message("{.path /usr/bin/R} is a path")
+
+log_message("{.pkg cli} is a package")
+
+log_message("{.val object} is a variable")
+
+log_message("{.run Rscript log_message.R} is a runnable file")
+
+log_message("{.str object} is a string")
+
+log_message("{.strong abc} is a strong string")
+
+log_message("{.topic stats::lm} is a topic")
+
+log_message("{.vignette cli} is a vignette")
+
 
 # set indentation
 log_message("Hello, world!", level = 2)
+
 log_message("Hello, world!", symbol = "->")
 
-# multiline message
-log_message("Line 1\nLine 2\nLine 3", multiline_indent = TRUE)
 log_message(
-  "Multi-line\ncolored\nmessage",
-  text_color = "blue",
-  multiline_indent = FALSE
-)
-log_message(
-  "Multi-line\ncolored\nmessage",
-  text_color = "blue",
-  multiline_indent = FALSE,
-  timestamp = FALSE
+  "Hello, world!",
+  symbol = "#####",
+  level = 3
 )
 
 # color formatting
 log_message(
   "This is a red message",
-  text_color = "red"
+  text_color = "#ff9900"
 )
+
 log_message(
   "This is a message with background",
-  back_color = "cyan"
+  back_color = "#EE4000"
 )
+
 log_message(
   "This is a message with both text and background",
-  text_color = "red",
+  text_color = "white",
   back_color = "cyan"
 )
-# color formatting also works with `cli_model = FALSE`
-log_message(
-  "This is a red message",
-  text_color = "red",
-  cli_model = FALSE
-)
+
 log_message(
   "This is a message with background",
-  back_color = "cyan",
+  back_color = "#EE4000",
   cli_model = FALSE
 )
+
 log_message(
   "This is a message with both text and background",
   text_color = "red",
@@ -150,13 +221,117 @@ log_message(
   cli_model = FALSE
 )
 
+log_message(
+  "Hex color with {.arg cli_model = FALSE}",
+  text_color = "#FF5733",
+  cli_model = FALSE
+)
+
+log_message(
+  "Bright red text",
+  text_color = "br_red"
+)
+
+log_message(
+  "Bright background",
+  back_color = "br_yellow"
+)
+
+log_message(
+  "Combined grey and style",
+  text_color = "grey",
+  text_style = "bold"
+)
+
+# text style formatting
+log_message(
+  "Bold message",
+  text_style = "bold"
+)
+
+log_message(
+  "Italic message",
+  text_style = "italic"
+)
+
+log_message(
+  "Underlined message",
+  text_style = "underline"
+)
+
+log_message(
+  "Combined styles",
+  text_style = c("bold", "underline")
+)
+
+log_message(
+  "Color and style",
+  text_color = "blue",
+  text_style = c("bold", "italic")
+)
+
+log_message(
+  "Hex color and style",
+  text_color = "#FF5733",
+  text_style = c("bold", "underline")
+)
+
+
+# multiline message
+log_message(
+  "Line 1\nLine 2\nLine 3",
+  multiline_indent = TRUE,
+  text_style = "italic"
+)
+
+log_message(
+  "Multi-line\ncolored\nmessage",
+  text_color = "blue",
+  text_style = "italic"
+)
+
+log_message(
+  "Multi-line\ncolored\nmessage",
+  text_color = "blue",
+  timestamp = FALSE
+)
+
+# timestamp styling
+log_message(
+  "Multi-line message\nwith timestamp styling",
+  text_color = "red",
+  text_style = "bold",
+  timestamp_style = TRUE
+)
+
+log_message(
+  "Multi-line message\nwithout timestamp styling",
+  text_color = "#669999",
+  text_style = c("bold", "italic"),
+  timestamp_style = FALSE
+)
+
+
+# combine cli package and log_message
+log_message(
+  cli::col_green(
+    "I am a green line ",
+    cli::col_blue(
+      cli::style_underline(
+        cli::style_bold("with a blue substring")
+      )
+    ),
+    " that becomes green again!"
+  )
+)
+
 # cli variables
-fun <- function(x) {
+fun <- function(x = 1) {
   log_message("{.val x}")
   log_message("{.val {x}}")
   log_message("{.val {x + 1}}")
 }
-fun(1)
+fun()
 }
 \references{
 \url{https://cli.r-lib.org/articles/index.html}
