@@ -2,11 +2,13 @@
 #'
 #' @md
 #' @param x A matrix.
-#' @param parallel Logical value, default is *`FALSE`*.
-#' Setting to parallelize the computation with [RcppParallel::setThreadOptions].
-#' @param sparse Logical value, default is *`FALSE`*, whether to output a sparse matrix.
+#' @param parallel Whether to parallelize the computation with [RcppParallel::setThreadOptions].
+#' Default is `FALSE`.
+#' @param sparse Whether to output a sparse matrix.
+#' Default is `FALSE`.
 #'
-#' @return A dense or sparse matrix
+#' @return
+#' A dense or sparse matrix.
 #'
 #' @export
 #'

@@ -15,13 +15,14 @@
 #' 5 %ss% 10
 `%ss%` <- function(a, b) {
   if (is.null(a)) {
-    return(b)
+    b
   } else {
-    return(a)
+    a
   }
 }
 
-#' Invoke a function with a list of arguments
+#' @title Invoke a function with a list of arguments
+#'
 #' @param .fn A function, or function name as a string.
 #' @param .args A list of arguments.
 #' @param ... Other arguments passed to the function.
@@ -73,8 +74,10 @@ invoke_fun <- function(
   rlang::eval_bare(call, .env)
 }
 
-#' Capitalizes the characters
-#' Making the first letter uppercase
+#' @title Capitalize the first letter of each word
+#'
+#' @description
+#' Capitalizes the characters making the first letter uppercase.
 #'
 #' @param x A vector of character strings to be capitalized.
 #' @param force_tolower Whether to force the remaining letters to be lowercase.
@@ -212,6 +215,7 @@ unnest_fun <- function(
 #' @description
 #' Remove leading/trailing spaces and normalize multiple spaces between words in character strings.
 #'
+#' @md
 #' @param x A vector of character strings.
 #' @param trim_start Logical value, default is `TRUE`.
 #' Whether to remove leading spaces before the first word.
@@ -294,41 +298,43 @@ remove_space <- function(
     )
   }
 
-  result <- x
-
   if (trim_start) {
-    result <- gsub("^\\s+", "", result)
+    x <- gsub("^\\s+", "", x)
   }
-
   if (trim_end) {
-    result <- gsub("\\s+$", "", result)
+    x <- gsub("\\s+$", "", x)
   }
 
   if (collapse_multiple) {
     if (preserve_newlines) {
-      result <- gsub("[ \t\r\f\v]+", " ", result)
-      result <- gsub("\\s*\n\\s*", "\n", result)
+      x <- gsub("[ \t\r\f\v]+", " ", x)
+      x <- gsub("\\s*\n\\s*", "\n", x)
     } else {
-      result <- gsub("\\s+", " ", result)
+      x <- gsub("\\s+", " ", x)
     }
   }
 
-  return(result)
+  return(x)
 }
 
-#' Try to evaluate an expression a set number of times before failing
+#' @title Try to evaluate an expression a set number of times before failing
 #'
-#' The function is used as a fail-safe if your R code sometimes works and sometimes
-#' doesn't, usually because it depends on a resource that may be temporarily
-#' unavailable. It tries to evaluate the expression `max_tries` times. If all the
-#' attempts fail, it throws an error; if not, the evaluated expression is returned.
+#' @description
+#' The function is used as a fail-safe if your R code sometimes works and sometimes doesn't,
+#' usually because it depends on a resource that may be temporarily unavailable.
+#' It tries to evaluate the expression `max_tries` times.
+#' If all the attempts fail, it throws an error;
+#' if not, the evaluated expression is returned.
 #'
+#' @md
 #' @param expr The expression to be evaluated.
-#' @param max_tries The maximum number of attempts to evaluate the expression before giving up. Default is set to 5.
-#' @param error_message a string, additional custom error message you would like to be displayed when an error occurs.
-#' @param retry_message a string, a message displayed when a new try to evaluate the expression would be attempted.
+#' @param max_tries The maximum number of attempts to evaluate the expression before giving up.
+#' Default is set to `5`.
+#' @param error_message Additional custom error message to be displayed when an error occurs.
+#' @param retry_message Message displayed when a new try to evaluate the expression would be attempted.
 #'
-#' @return This function returns the evaluated expression if successful,
+#' @return
+#' The evaluated expression if successful,
 #' otherwise it throws an error if all attempts are unsuccessful.
 #' @export
 #'
@@ -359,11 +365,10 @@ try_get <- function(
     out <- tryCatch(
       expr = eval.parent(substitute(expr)),
       error = function(error) {
-        log_message(error)
-        log_message("")
-        log_message(error_message)
+        log_message(error, message_type = "warning")
+        log_message(error_message, message_type = "warning")
         Sys.sleep(1)
-        return(error)
+        error
       }
     )
     if (inherits(out, "error") && ntry >= max_tries) {
@@ -375,7 +380,7 @@ try_get <- function(
       if (!inherits(out, "error")) {
         break
       } else {
-        log_message(retry_message)
+        log_message(retry_message, message_type = "warning")
       }
     }
   }
@@ -387,8 +392,9 @@ try_get <- function(
 #' @md
 #' @inheritParams utils::download.file
 #' @param methods Methods to be used for downloading files.
-#' The default is to try different download methods in turn until the download is successfully completed.
+#' Default is `"auto"`, which means to try different download methods when the current method fails.
 #' @param max_tries Number of tries for each download method.
+#' Default is `2`.
 #' @param ... Other arguments passed to [utils::download.file].
 #'
 #' @export
@@ -402,7 +408,10 @@ download <- function(
     ...,
     max_tries = 2) {
   if (missing(url) || missing(destfile)) {
-    stop("'url' and 'destfile' must be both provided.")
+    log_message(
+      "{.arg url} and {.arg destfile} must be both provided.",
+      message_type = "error"
+    )
   }
   ntry <- 0
   status <- NULL
@@ -422,10 +431,16 @@ download <- function(
           status <- 1
         }, error = function(error) {
           log_message(error)
-          log_message("Cannot download from the url: ", url)
-          log_message("Failed to download using \"", method, "\". Retry...\n")
+          log_message(
+            "Cannot download from the url: {.url {url}}",
+            message_type = "warning"
+          )
+          log_message(
+            "Failed to download using {.val {method}}",
+            message_type = "warning"
+          )
           Sys.sleep(1)
-          return(NULL)
+          NULL
         }
       )
       if (!is.null(status)) {
@@ -434,7 +449,10 @@ download <- function(
     }
     ntry <- ntry + 1
     if (is.null(status) && ntry >= max_tries) {
-      log_message("Download failed.", message_type = "error")
+      log_message(
+        "Download failed after {.val {max_tries}} tries from {.val {url}}",
+        message_type = "error"
+      )
     }
   }
   return(invisible(NULL))

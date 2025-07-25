@@ -1,22 +1,23 @@
-#' @title figlet
+#' @title The figlet function
 #'
-#' @description Create ASCII art text using figlet fonts.
+#' @description
+#' Create ASCII art text using figlet.
 #'
-#' @param text Text to make bigger
-#' @param font Name of font, path to font, or `figlet_font` object
-#' @param width Width to use when justifying and breaking lines
-#' @param justify Text justification to use in rendering ("left",
-#'   "centre", "right")
-#' @param absolute Logical, indicating if alignment is absolute
-#' @param strip Logical, indicating if whitespace should be removed
+#' @md
+#' @param text Text to make bigger.
+#' @param font Name of font, path to font, or `figlet_font` object.
+#' @param width Width to use when justifying and breaking lines.
+#' @param justify Text justification to use in rendering ("left", "centre", "right").
+#' @param absolute Logical, indicating if alignment is absolute.
+#' @param strip Logical, indicating if whitespace should be removed.
 #'
-#' @return An object of class `figlet_text` which is a character
-#'   vector with a handy print method
+#' @return
+#' An object of class `figlet_text` which is a character vector with a handy print method.
 #'
 #' @references
+#' \url{https://github.com/richfitz/rfiglet},
+#' \url{https://github.com/jbkunst/figletr},
 #' \url{http://www.figlet.org/}
-#' \url{https://github.com/richfitz/rfiglet}
-#' \url{https://github.com/jbkunst/figletr}
 #'
 #' @export
 #'

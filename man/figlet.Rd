@@ -2,7 +2,7 @@
 % Please edit documentation in R/figlet.R
 \name{figlet}
 \alias{figlet}
-\title{figlet}
+\title{The figlet function}
 \usage{
 figlet(
   text,
@@ -14,31 +14,29 @@ figlet(
 )
 }
 \arguments{
-\item{text}{Text to make bigger}
+\item{text}{Text to make bigger.}
 
-\item{font}{Name of font, path to font, or `figlet_font` object}
+\item{font}{Name of font, path to font, or \code{figlet_font} object.}
 
-\item{width}{Width to use when justifying and breaking lines}
+\item{width}{Width to use when justifying and breaking lines.}
 
-\item{justify}{Text justification to use in rendering ("left",
-"centre", "right")}
+\item{justify}{Text justification to use in rendering ("left", "centre", "right").}
 
-\item{absolute}{Logical, indicating if alignment is absolute}
+\item{absolute}{Logical, indicating if alignment is absolute.}
 
-\item{strip}{Logical, indicating if whitespace should be removed}
+\item{strip}{Logical, indicating if whitespace should be removed.}
 }
 \value{
-An object of class `figlet_text` which is a character
-  vector with a handy print method
+An object of class \code{figlet_text} which is a character vector with a handy print method.
 }
 \description{
-Create ASCII art text using figlet fonts.
+Create ASCII art text using figlet.
 }
 \examples{
 figlet("thisutils")
 }
 \references{
+\url{https://github.com/richfitz/rfiglet},
+\url{https://github.com/jbkunst/figletr},
 \url{http://www.figlet.org/}
-\url{https://github.com/richfitz/rfiglet}
-\url{https://github.com/jbkunst/figletr}
 }

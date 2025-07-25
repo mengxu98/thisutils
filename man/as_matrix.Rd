@@ -9,13 +9,14 @@ as_matrix(x, parallel = FALSE, sparse = FALSE)
 \arguments{
 \item{x}{A matrix.}
 
-\item{parallel}{Logical value, default is \emph{\code{FALSE}}.
-Setting to parallelize the computation with \link[RcppParallel:setThreadOptions]{RcppParallel::setThreadOptions}.}
+\item{parallel}{Whether to parallelize the computation with \link[RcppParallel:setThreadOptions]{RcppParallel::setThreadOptions}.
+Default is \code{FALSE}.}
 
-\item{sparse}{Logical value, default is \emph{\code{FALSE}}, whether to output a sparse matrix.}
+\item{sparse}{Whether to output a sparse matrix.
+Default is \code{FALSE}.}
 }
 \value{
-A dense or sparse matrix
+A dense or sparse matrix.
 }
 \description{
 Convert sparse matrix into dense matrix
