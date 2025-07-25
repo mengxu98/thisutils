@@ -7,34 +7,35 @@
 #' @param desc_file The DESCRIPTION file.
 #' Must be provided, it will be used to extract package information.
 #' Using `add_pkg_file("DESCRIPTION", output_dir = "R")`,
-#' will be created <pkg_name>-package.R based on the DESCRIPTION file in `R` dir.
+#' will be created `<pkg_name>-package.R` based on the DESCRIPTION file in `"R"` directory.
 #' If you want to use some specific information,
 #' such as `author_name` or `author_email`, you can provide them manually.
 #' @param pkg_name Character string, the name of the package.
-#' Default is NULL, which will be read from DESCRIPTION file.
+#' Default is `NULL`, which will be read from DESCRIPTION file.
 #' @param title Character string, title of the package.
-#' Default is NULL, which will be read from DESCRIPTION file.
+#' Default is `NULL`, which will be read from DESCRIPTION file.
 #' @param pkg_description Character string, short description of the package.
-#' Default is NULL, which will be read from DESCRIPTION file.
+#' Default is `NULL`, which will be read from DESCRIPTION file.
 #' @param author_name Character string, name of the package author.
-#' Default is NULL, which will be read from DESCRIPTION file.
+#' Default is `NULL`, which will be read from DESCRIPTION file.
 #' @param author_email Character string, email of the package author.
-#' Default is NULL, which will be read from DESCRIPTION file.
+#' Default is `NULL`, which will be read from DESCRIPTION file.
 #' @param github_url Character string, GitHub URL of the package.
-#' Default is NULL, which will be read from DESCRIPTION file or constructed based on package name.
+#' Default is `NULL`, which will be read from DESCRIPTION file or constructed based on package name.
 #' @param output_dir Character string, directory where to save the package file.
-#' Default is NULL, you should specify it, such as 'R'.
-#' @param use_figlet Logical, whether to use figlet for ASCII art generation.
-#' Default is TRUE. Details see [figlet].
+#' Default is `NULL`, you should specify it, such as `"R"`.
+#' @param use_figlet Whether to use figlet for ASCII art generation.
+#' Default is `TRUE`. Details see [figlet].
 #' @param figlet_font Character string, figlet font to use.
-#' Default is "Slant".
+#' Default is `"Slant"`.
 #' @param colors Character vector, colors to use for the logo elements.
-#' @param unicode Logical, whether to use Unicode symbols.
-#' Default is TRUE.
-#' @param verbose Logical, whether to print progress messages.
-#' Default is TRUE.
+#' @param unicode Whether to use Unicode symbols.
+#' Default is `TRUE`.
+#' @param verbose Whether to print progress messages.
+#' Default is `TRUE`.
 #'
-#' @return Creates a file in specified output directory
+#' @return
+#' Creates a file in specified output directory.
 #'
 #' @export
 add_pkg_file <- function(

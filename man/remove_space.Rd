@@ -15,16 +15,16 @@ remove_space(
 \arguments{
 \item{x}{A vector of character strings.}
 
-\item{trim_start}{Logical value, default is `TRUE`.
+\item{trim_start}{Logical value, default is \code{TRUE}.
 Whether to remove leading spaces before the first word.}
 
-\item{trim_end}{Logical value, default is `FALSE`.
+\item{trim_end}{Logical value, default is \code{FALSE}.
 Whether to remove trailing spaces after the last word.}
 
-\item{collapse_multiple}{Logical value, default is `TRUE`.
+\item{collapse_multiple}{Logical value, default is \code{TRUE}.
 Whether to collapse multiple consecutive spaces between words into a single space.}
 
-\item{preserve_newlines}{Logical value, default is `TRUE`.
+\item{preserve_newlines}{Logical value, default is \code{TRUE}.
 Whether to preserve newline characters when collapsing spaces.}
 }
 \value{

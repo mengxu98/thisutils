@@ -19,19 +19,19 @@ simulate_sparse_matrix(
 \item{ncol}{Number of columns in the matrix.}
 
 \item{sparsity}{Proportion of zero elements (sparsity level).
-Default is 0.95, meaning 95\% of elements are zero (5\% are non-zero).}
+Default is \code{0.95}, meaning 95\% of elements are zero (5\% are non-zero).}
 
 \item{distribution_fun}{Function to generate non-zero values.}
 
-\item{decimal}{Numeric value, default is \emph{\code{0}}.
-Controls the number of decimal places in the generated values.
-If set to \emph{\code{0}}, values will be integers.
-When decimal > 0, random decimal parts are uniformly distributed across the full range.}
+\item{decimal}{Controls the number of decimal places in the generated values.
+If set to \code{0}, values will be integers.
+When \code{decimal} > 0, random decimal parts are uniformly distributed across the full range.
+Default is \code{0}.}
 
 \item{seed}{Random seed for reproducibility.}
 }
 \value{
-A sparse matrix of class "dgCMatrix"
+A sparse matrix of class "dgCMatrix".
 }
 \description{
 This function generates a sparse matrix with a specified number of rows and columns,

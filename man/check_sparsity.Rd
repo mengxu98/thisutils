@@ -10,7 +10,7 @@ check_sparsity(x)
 \item{x}{A matrix.}
 }
 \value{
-Sparsity of matrix
+Sparsity of matrix.
 }
 \description{
 Check sparsity of matrix

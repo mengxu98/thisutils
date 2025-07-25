@@ -4,12 +4,13 @@
 #' @param x A vector or list to apply over.
 #' @param fun The function to be applied to each element.
 #' @param cores The number of cores to use for parallelization with [foreach::foreach].
-#' Default is *`1`*.
+#' Default is `1`.
 #' @param export_fun The functions to export the function to workers.
-#' @param verbose Logical value, default is *`TRUE`*.
-#' Whether to print progress messages.
+#' @param verbose Whether to print progress messages.
+#' Default is `TRUE`.
 #'
-#' @return A list of computed results
+#' @return
+#' A list of computed results.
 #'
 #' @export
 #'
@@ -132,12 +133,6 @@ parallelize_fun <- function(
   return(output_list)
 }
 
-#' Detect available cores for parallel processing
-#'
-#' @param cores Number of cores requested
-#' @param num_session Number of items to process
-#' @return Number of cores to use
-#' @noRd
 .cores_detect <- function(
     cores = 1,
     num_session = NULL) {

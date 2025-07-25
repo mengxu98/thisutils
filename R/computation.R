@@ -1,21 +1,24 @@
 #' @title Generate a simulated sparse matrix
 #'
-#' @description This function generates a sparse matrix with a specified number of rows and columns,
+#' @description
+#' This function generates a sparse matrix with a specified number of rows and columns,
 #' a given sparsity level, and a distribution function for the non-zero values.
 #'
 #' @md
 #' @param nrow Number of rows in the matrix.
 #' @param ncol Number of columns in the matrix.
 #' @param sparsity Proportion of zero elements (sparsity level).
-#' Default is 0.95, meaning 95% of elements are zero (5% are non-zero).
+#' Default is `0.95`, meaning 95% of elements are zero (5% are non-zero).
 #' @param distribution_fun Function to generate non-zero values.
-#' @param decimal Numeric value, default is *`0`*.
-#' Controls the number of decimal places in the generated values.
-#' If set to *`0`*, values will be integers.
-#' When decimal > 0, random decimal parts are uniformly distributed across the full range.
+#' @param decimal Controls the number of decimal places in the generated values.
+#' If set to `0`, values will be integers.
+#' When `decimal` > 0, random decimal parts are uniformly distributed across the full range.
+#' Default is `0`.
 #' @param seed Random seed for reproducibility.
 #'
-#' @return A sparse matrix of class "dgCMatrix"
+#' @return
+#' A sparse matrix of class "dgCMatrix".
+#'
 #' @export
 #'
 #' @examples
@@ -70,7 +73,9 @@ simulate_sparse_matrix <- function(
 #'
 #' @param x A matrix.
 #'
-#' @return Sparsity of matrix
+#' @return
+#' Sparsity of matrix.
+#'
 #' @export
 check_sparsity <- function(x) {
   if (methods::is(x, "sparseMatrix")) {
@@ -98,13 +103,13 @@ check_sparsity <- function(x) {
   .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
 }
 
-#' @title coefficient of determination (\eqn{R^2})
+#' @title Coefficient of determination (\eqn{R^2})
 #'
-#' @md
 #' @param y_true A numeric vector with ground truth values.
 #' @param y_pred A numeric vector with predicted values.
 #'
-#' @return \eqn{R^2} value
+#' @return
+#' The \eqn{R^2} value.
 #'
 #' @export
 #'
@@ -118,14 +123,16 @@ r_square <- function(y_true, y_pred) {
 
 #' @title Normalize numeric vector
 #'
+#' @md
 #' @param x Input numeric vector.
 #' @param method Method used for normalization.
-#' @param na_rm Whether to remove `NA` values,
-#' and if setting TRUE, using `0` instead.
+#' @param na_rm Whether to remove `NA` values, and if setting `TRUE`, using `0` instead.
+#' Default is `TRUE`.
 #' @param ... Parameters for other methods.
 #'
-#' @md
-#' @return Normalized numeric vector
+#' @return
+#' Normalized numeric vector.
+#'
 #' @export
 #'
 #' @examples
@@ -198,7 +205,9 @@ normalization <- function(
 #' @param from The range of the original data.
 #' @param to The range of the rescaled data.
 #'
-#' @return A numeric vector with rescaled values.
+#' @return
+#' A numeric vector with rescaled values.
+#'
 #' @export
 #'
 #' @examples

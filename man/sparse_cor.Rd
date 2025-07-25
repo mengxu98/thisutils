@@ -2,7 +2,7 @@
 % Please edit documentation in R/sparse_cor.R
 \name{sparse_cor}
 \alias{sparse_cor}
-\title{A sparse correlation function}
+\title{Sparse correlation function}
 \usage{
 sparse_cor(
   x,
@@ -33,7 +33,7 @@ sparse_cor(
 A correlation matrix.
 }
 \description{
-Safe correlation function which returns a sparse matrix without missing values
+Safe correlation function which returns a sparse matrix without missing values.
 }
 \examples{
 m1 <- simulate_sparse_matrix(

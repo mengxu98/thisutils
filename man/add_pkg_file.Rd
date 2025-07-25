@@ -25,47 +25,47 @@ add_pkg_file(
 \item{desc_file}{The DESCRIPTION file.
 Must be provided, it will be used to extract package information.
 Using \code{add_pkg_file("DESCRIPTION", output_dir = "R")},
-will be created <pkg_name>-package.R based on the DESCRIPTION file in \code{R} dir.
+will be created \verb{<pkg_name>-package.R} based on the DESCRIPTION file in \code{"R"} directory.
 If you want to use some specific information,
 such as \code{author_name} or \code{author_email}, you can provide them manually.}
 
 \item{pkg_name}{Character string, the name of the package.
-Default is NULL, which will be read from DESCRIPTION file.}
+Default is \code{NULL}, which will be read from DESCRIPTION file.}
 
 \item{title}{Character string, title of the package.
-Default is NULL, which will be read from DESCRIPTION file.}
+Default is \code{NULL}, which will be read from DESCRIPTION file.}
 
 \item{pkg_description}{Character string, short description of the package.
-Default is NULL, which will be read from DESCRIPTION file.}
+Default is \code{NULL}, which will be read from DESCRIPTION file.}
 
 \item{author_name}{Character string, name of the package author.
-Default is NULL, which will be read from DESCRIPTION file.}
+Default is \code{NULL}, which will be read from DESCRIPTION file.}
 
 \item{author_email}{Character string, email of the package author.
-Default is NULL, which will be read from DESCRIPTION file.}
+Default is \code{NULL}, which will be read from DESCRIPTION file.}
 
 \item{github_url}{Character string, GitHub URL of the package.
-Default is NULL, which will be read from DESCRIPTION file or constructed based on package name.}
+Default is \code{NULL}, which will be read from DESCRIPTION file or constructed based on package name.}
 
 \item{output_dir}{Character string, directory where to save the package file.
-Default is NULL, you should specify it, such as 'R'.}
+Default is \code{NULL}, you should specify it, such as \code{"R"}.}
 
-\item{use_figlet}{Logical, whether to use figlet for ASCII art generation.
-Default is TRUE. Details see \link{figlet}.}
+\item{use_figlet}{Whether to use figlet for ASCII art generation.
+Default is \code{TRUE}. Details see \link{figlet}.}
 
 \item{figlet_font}{Character string, figlet font to use.
-Default is "Slant".}
+Default is \code{"Slant"}.}
 
 \item{colors}{Character vector, colors to use for the logo elements.}
 
-\item{unicode}{Logical, whether to use Unicode symbols.
-Default is TRUE.}
+\item{unicode}{Whether to use Unicode symbols.
+Default is \code{TRUE}.}
 
-\item{verbose}{Logical, whether to print progress messages.
-Default is TRUE.}
+\item{verbose}{Whether to print progress messages.
+Default is \code{TRUE}.}
 }
 \value{
-Creates a file in specified output directory
+Creates a file in specified output directory.
 }
 \description{
 Automatically generate a file containing functions and related code for R package development.

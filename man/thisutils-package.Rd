@@ -9,7 +9,8 @@
 \url{https://mengxu98.github.io/thisutils/}
 }
 \description{
-Provides utility functions for data analysis and scientific computing. Includes functions for parallel processing, and other computational tasks to streamline workflows.
+Provides utility functions for data analysis and scientific computing.
+Includes functions for parallel processing, and other computational tasks to streamline workflows.
 }
 \seealso{
 Useful links:

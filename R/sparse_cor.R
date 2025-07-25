@@ -1,6 +1,7 @@
-#' @title A sparse correlation function
+#' @title Sparse correlation function
 #'
-#' @description Safe correlation function which returns a sparse matrix without missing values
+#' @description
+#' Safe correlation function which returns a sparse matrix without missing values.
 #'
 #' @md
 #' @param x Sparse matrix or character vector.
