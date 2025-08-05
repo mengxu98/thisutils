@@ -9,7 +9,7 @@ a given sparsity level, and a distribution function for the non-zero values."></
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,6 +18,7 @@ a given sparsity level, and a distribution function for the non-zero values."></
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/mengxu98/thisutils" title="GitHub" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/mengxu98" title="MengXu" aria-label="MengXu's GitHub profile"><span class="fa fas fa-home fa-lg"></span></a></li>
 <li class="nav-item dropdown">
@@ -70,7 +71,7 @@ a given sparsity level, and a distribution function for the non-zero values.</p>
 
 <dt id="arg-sparsity">sparsity<a class="anchor" aria-label="anchor" href="#arg-sparsity"></a></dt>
 <dd><p>Proportion of zero elements (sparsity level).
-Default is 0.95, meaning 95% of elements are zero (5% are non-zero).</p></dd>
+Default is <code>0.95</code>, meaning 95% of elements are zero (5% are non-zero).</p></dd>
 
 
 <dt id="arg-distribution-fun">distribution_fun<a class="anchor" aria-label="anchor" href="#arg-distribution-fun"></a></dt>
@@ -78,10 +79,10 @@ Default is 0.95, meaning 95% of elements are zero (5% are non-zero).</p></dd>
 
 
 <dt id="arg-decimal">decimal<a class="anchor" aria-label="anchor" href="#arg-decimal"></a></dt>
-<dd><p>Numeric value, default is <em><code>0</code></em>.
-Controls the number of decimal places in the generated values.
-If set to <em><code>0</code></em>, values will be integers.
-When decimal &gt; 0, random decimal parts are uniformly distributed across the full range.</p></dd>
+<dd><p>Controls the number of decimal places in the generated values.
+If set to <code>0</code>, values will be integers.
+When <code>decimal</code> &gt; 0, random decimal parts are uniformly distributed across the full range.
+Default is <code>0</code>.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -90,7 +91,7 @@ When decimal &gt; 0, random decimal parts are uniformly distributed across the f
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A sparse matrix of class "dgCMatrix"</p>
+    <p>A sparse matrix of class "dgCMatrix".</p>
     </div>
 
     <div class="section level2">
