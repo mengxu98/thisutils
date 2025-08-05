@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{capitalize}
 \alias{capitalize}
-\title{Capitalizes the characters
-Making the first letter uppercase}
+\title{Capitalize the first letter of each word}
 \usage{
 capitalize(x, force_tolower = FALSE)
 }
@@ -13,8 +12,7 @@ capitalize(x, force_tolower = FALSE)
 \item{force_tolower}{Whether to force the remaining letters to be lowercase.}
 }
 \description{
-Capitalizes the characters
-Making the first letter uppercase
+Capitalizes the characters making the first letter uppercase.
 }
 \examples{
 x <- c(

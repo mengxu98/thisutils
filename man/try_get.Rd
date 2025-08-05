@@ -9,21 +9,23 @@ try_get(expr, max_tries = 5, error_message = "", retry_message = "Retrying...")
 \arguments{
 \item{expr}{The expression to be evaluated.}
 
-\item{max_tries}{The maximum number of attempts to evaluate the expression before giving up. Default is set to 5.}
+\item{max_tries}{The maximum number of attempts to evaluate the expression before giving up.
+Default is set to \code{5}.}
 
-\item{error_message}{a string, additional custom error message you would like to be displayed when an error occurs.}
+\item{error_message}{Additional custom error message to be displayed when an error occurs.}
 
-\item{retry_message}{a string, a message displayed when a new try to evaluate the expression would be attempted.}
+\item{retry_message}{Message displayed when a new try to evaluate the expression would be attempted.}
 }
 \value{
-This function returns the evaluated expression if successful,
+The evaluated expression if successful,
 otherwise it throws an error if all attempts are unsuccessful.
 }
 \description{
-The function is used as a fail-safe if your R code sometimes works and sometimes
-doesn't, usually because it depends on a resource that may be temporarily
-unavailable. It tries to evaluate the expression `max_tries` times. If all the
-attempts fail, it throws an error; if not, the evaluated expression is returned.
+The function is used as a fail-safe if your R code sometimes works and sometimes doesn't,
+usually because it depends on a resource that may be temporarily unavailable.
+It tries to evaluate the expression \code{max_tries} times.
+If all the attempts fail, it throws an error;
+if not, the evaluated expression is returned.
 }
 \examples{
 f <- function() {

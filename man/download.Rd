@@ -23,14 +23,15 @@ download(
     saved.  Tilde-expansion is performed.}
 
 \item{methods}{Methods to be used for downloading files.
-The default is to try different download methods in turn until the download is successfully completed.}
+Default is \code{"auto"}, which means to try different download methods when the current method fails.}
 
 \item{quiet}{If \code{TRUE}, suppress status messages (if any), and
     the progress bar.}
 
 \item{...}{Other arguments passed to \link[utils:download.file]{utils::download.file}.}
 
-\item{max_tries}{Number of tries for each download method.}
+\item{max_tries}{Number of tries for each download method.
+Default is \code{2}.}
 }
 \description{
 Download file from the Internet
