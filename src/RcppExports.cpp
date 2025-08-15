@@ -41,6 +41,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// matrix_to_table
+DataFrame matrix_to_table(SEXP matrix, Nullable<CharacterVector> row_names, Nullable<CharacterVector> col_names, double threshold, bool keep_zero);
+RcppExport SEXP _thisutils_matrix_to_table(SEXP matrixSEXP, SEXP row_namesSEXP, SEXP col_namesSEXP, SEXP thresholdSEXP, SEXP keep_zeroSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type matrix(matrixSEXP);
+    Rcpp::traits::input_parameter< Nullable<CharacterVector> >::type row_names(row_namesSEXP);
+    Rcpp::traits::input_parameter< Nullable<CharacterVector> >::type col_names(col_namesSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< bool >::type keep_zero(keep_zeroSEXP);
+    rcpp_result_gen = Rcpp::wrap(matrix_to_table(matrix, row_names, col_names, threshold, keep_zero));
+    return rcpp_result_gen;
+END_RCPP
+}
 // split_indices
 std::vector<std::vector<int>> split_indices(IntegerVector group, int n);
 RcppExport SEXP _thisutils_split_indices(SEXP groupSEXP, SEXP nSEXP) {
@@ -53,11 +68,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// table_to_matrix
+SEXP table_to_matrix(DataFrame table, Nullable<CharacterVector> row_names, Nullable<CharacterVector> col_names, double threshold, bool return_sparse);
+RcppExport SEXP _thisutils_table_to_matrix(SEXP tableSEXP, SEXP row_namesSEXP, SEXP col_namesSEXP, SEXP thresholdSEXP, SEXP return_sparseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame >::type table(tableSEXP);
+    Rcpp::traits::input_parameter< Nullable<CharacterVector> >::type row_names(row_namesSEXP);
+    Rcpp::traits::input_parameter< Nullable<CharacterVector> >::type col_names(col_namesSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< bool >::type return_sparse(return_sparseSEXP);
+    rcpp_result_gen = Rcpp::wrap(table_to_matrix(table, row_names, col_names, threshold, return_sparse));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_thisutils_asMatrix", (DL_FUNC) &_thisutils_asMatrix, 5},
     {"_thisutils_asMatrixParallel", (DL_FUNC) &_thisutils_asMatrixParallel, 5},
+    {"_thisutils_matrix_to_table", (DL_FUNC) &_thisutils_matrix_to_table, 5},
     {"_thisutils_split_indices", (DL_FUNC) &_thisutils_split_indices, 2},
+    {"_thisutils_table_to_matrix", (DL_FUNC) &_thisutils_table_to_matrix, 5},
     {NULL, NULL, 0}
 };
 

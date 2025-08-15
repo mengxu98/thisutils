@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.0.9
+
+* **func**: Add `matrix_to_table` and `table_to_matrix` functions for data conversion between matrix and table formats.
+
+* **docs**: Update documentation for some functions.
+
 # thisutils 0.0.8
 
-* **Enhancements**: Update documentation for some functions.
+* **docs**: Update documentation for some functions.
