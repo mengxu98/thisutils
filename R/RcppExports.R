@@ -9,6 +9,43 @@ asMatrixParallel <- function(rp, cp, z, nrows, ncols) {
     .Call('_thisutils_asMatrixParallel', PACKAGE = 'thisutils', rp, cp, z, nrows, ncols)
 }
 
+#' @title Switch matrix to table
+#'
+#' @md
+#' @param matrix A matrix.
+#' @param row_names Character vector of row names to filter by.
+#' @param col_names Character vector of column names to filter by.
+#' @param threshold The threshold for filtering values based on absolute values.
+#' Defaults to `0`.
+#' @param keep_zero Whether to keep zero values in the table. Defaults to `false`.
+#'
+#' @return A table with three columns: `row`, `col`, and `value`.
+#' @export
+#'
+#' @examples
+#' test_matrix <- simulate_sparse_matrix(10, 10)
+#' colnames(test_matrix) <- paste0("c", 1:10)
+#' rownames(test_matrix) <- paste0("r", 1:10)
+#' table <- matrix_to_table(test_matrix)
+#' matrix_new <- table_to_matrix(table)
+#' test_matrix <- test_matrix[rownames(matrix_new), colnames(matrix_new)] |>
+#'   as_matrix()
+#' identical(test_matrix, matrix_new)
+#'
+#' matrix_to_table(
+#'   test_matrix,
+#'   threshold = 2
+#' )
+#'
+#' matrix_to_table(
+#'   test_matrix,
+#'   row_names = c("r1", "r2"),
+#'   col_names = c("c1", "c2")
+#' )
+matrix_to_table <- function(matrix, row_names = NULL, col_names = NULL, threshold = 0.0, keep_zero = FALSE) {
+    .Call('_thisutils_matrix_to_table', PACKAGE = 'thisutils', matrix, row_names, col_names, threshold, keep_zero)
+}
+
 #' @title Split indices.
 #'
 #' @description An optimised version of split for the special case of splitting row indices into groups.
@@ -29,5 +66,50 @@ asMatrixParallel <- function(rp, cp, z, nrows, ncols) {
 #' split_indices(sample(10, 100, rep = TRUE), 10)
 split_indices <- function(group, n = 0L) {
     .Call('_thisutils_split_indices', PACKAGE = 'thisutils', group, n)
+}
+
+#' @title Switch table to matrix
+#'
+#' @md
+#' @param table A table with three columns: `row`, `col`, and `value`.
+#' @param row_names Character vector of row names to filter by.
+#' @param col_names Character vector of column names to filter by.
+#' @param threshold The threshold for filtering values based on absolute values.
+#' Defaults to `0`.
+#' @param return_sparse Whether to return a sparse matrix. Defaults to `false`.
+#'
+#' @return A matrix.
+#' @export
+#'
+#' @examples
+#' table <- data.frame(
+#'   row = c("r1", "r2", "r3", "r4", "r5", "r6"),
+#'   col = c("c4", "c5", "c6", "c1", "c2", "c3"),
+#'   value = c(0.6, -0.5, -0.4, 0.3, 0.2, 0.1)
+#' )
+#' matrix <- table_to_matrix(table)
+#' table_new <- matrix_to_table(matrix)
+#' identical(table, table_new)
+#'
+#' table_to_matrix(table, threshold = 0.3)
+#'
+#' table_to_matrix(
+#'   table,
+#'   row_names = c("r1", "r2"),
+#'   col_names = c("c4", "c5")
+#' )
+#'
+#' sparse_matrix <- simulate_sparse_matrix(10, 10)
+#' table_sparse <- matrix_to_table(
+#'   sparse_matrix,
+#'   keep_zero = TRUE
+#' )
+#' sparse_matrix_new <- table_to_matrix(
+#'   table_sparse,
+#'   return_sparse = TRUE
+#' )
+#' identical(sparse_matrix, sparse_matrix_new)
+table_to_matrix <- function(table, row_names = NULL, col_names = NULL, threshold = 0.0, return_sparse = FALSE) {
+    .Call('_thisutils_table_to_matrix', PACKAGE = 'thisutils', table, row_names, col_names, threshold, return_sparse)
 }
 
