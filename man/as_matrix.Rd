@@ -4,15 +4,15 @@
 \alias{as_matrix}
 \title{Convert sparse matrix into dense matrix}
 \usage{
-as_matrix(x, parallel = FALSE, sparse = FALSE)
+as_matrix(x, return_sparse = FALSE, parallel = FALSE)
 }
 \arguments{
 \item{x}{A matrix.}
 
-\item{parallel}{Whether to parallelize the computation with \link[RcppParallel:setThreadOptions]{RcppParallel::setThreadOptions}.
+\item{return_sparse}{Whether to output a sparse matrix.
 Default is \code{FALSE}.}
 
-\item{sparse}{Whether to output a sparse matrix.
+\item{parallel}{Whether to parallelize the computation with \link[RcppParallel:setThreadOptions]{RcppParallel::setThreadOptions}.
 Default is \code{FALSE}.}
 }
 \value{
@@ -37,7 +37,7 @@ system.time(
   c <- as_matrix(m, parallel = TRUE)
 )
 system.time(
-  d <- as_matrix(m, sparse = TRUE)
+  d <- as_matrix(m, return_sparse = TRUE)
 )
 
 m[1:5, 1:5]

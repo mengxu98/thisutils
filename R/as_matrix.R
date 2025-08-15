@@ -2,9 +2,9 @@
 #'
 #' @md
 #' @param x A matrix.
-#' @param parallel Whether to parallelize the computation with [RcppParallel::setThreadOptions].
+#' @param return_sparse Whether to output a sparse matrix.
 #' Default is `FALSE`.
-#' @param sparse Whether to output a sparse matrix.
+#' @param parallel Whether to parallelize the computation with [RcppParallel::setThreadOptions].
 #' Default is `FALSE`.
 #'
 #' @return
@@ -28,7 +28,7 @@
 #'   c <- as_matrix(m, parallel = TRUE)
 #' )
 #' system.time(
-#'   d <- as_matrix(m, sparse = TRUE)
+#'   d <- as_matrix(m, return_sparse = TRUE)
 #' )
 #'
 #' m[1:5, 1:5]
@@ -43,10 +43,10 @@
 #' identical(b, d)
 as_matrix <- function(
     x,
-    parallel = FALSE,
-    sparse = FALSE) {
+    return_sparse = FALSE,
+    parallel = FALSE) {
   if (!methods::is(x, "sparseMatrix")) {
-    if (sparse) {
+    if (return_sparse) {
       return(
         Matrix::Matrix(
           x,
