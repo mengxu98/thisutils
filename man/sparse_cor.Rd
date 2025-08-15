@@ -47,11 +47,11 @@ a <- sparse_cor(m1)
 b <- sparse_cor(m1, m2)
 c <- as_matrix(
   cor(as_matrix(m1)),
-  sparse = TRUE
+  return_sparse = TRUE
 )
 d <- as_matrix(
   cor(as_matrix(m1), as_matrix(m2)),
-  sparse = TRUE
+  return_sparse = TRUE
 )
 
 a[1:5, 1:5]
