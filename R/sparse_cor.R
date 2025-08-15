@@ -28,11 +28,11 @@
 #' b <- sparse_cor(m1, m2)
 #' c <- as_matrix(
 #'   cor(as_matrix(m1)),
-#'   sparse = TRUE
+#'   return_sparse = TRUE
 #' )
 #' d <- as_matrix(
 #'   cor(as_matrix(m1), as_matrix(m2)),
-#'   sparse = TRUE
+#'   return_sparse = TRUE
 #' )
 #'
 #' a[1:5, 1:5]
@@ -70,12 +70,12 @@ sparse_cor <- function(
     remove_inf = TRUE,
     ...) {
   if (!methods::is(x, "sparseMatrix")) {
-    x <- as_matrix(x, sparse = TRUE)
+    x <- as_matrix(x, return_sparse = TRUE)
   }
 
   if (!is.null(y)) {
     if (!methods::is(y, "sparseMatrix")) {
-      y <- as_matrix(y, sparse = TRUE)
+      y <- as_matrix(y, return_sparse = TRUE)
     }
     if (nrow(x) != nrow(y)) {
       stop("x and y must have the same number of rows.")
@@ -133,7 +133,7 @@ sparse_cor <- function(
     corr_mat[is.infinite(corr_mat)] <- 1
   }
 
-  corr_mat <- as_matrix(corr_mat, sparse = TRUE)
+  corr_mat <- as_matrix(corr_mat, return_sparse = TRUE)
 
   if (!allow_neg) {
     corr_mat[corr_mat < 0] <- 0
