@@ -84,11 +84,11 @@ SEXP table_to_matrix(DataFrame table,
   std::vector<std::string> row_strings;
   std::vector<std::string> col_strings;
 
-  for (size_t i = 0; i < filter_rows.length(); i++)
+  for (R_xlen_t i = 0; i < filter_rows.length(); i++)
   {
     row_strings.push_back(Rcpp::as<std::string>(filter_rows[i]));
   }
-  for (size_t i = 0; i < filter_cols.length(); i++)
+  for (R_xlen_t i = 0; i < filter_cols.length(); i++)
   {
     col_strings.push_back(Rcpp::as<std::string>(filter_cols[i]));
   }
@@ -150,7 +150,7 @@ SEXP table_to_matrix(DataFrame table,
     std::vector<int> sparse_i, sparse_j;
     std::vector<double> sparse_x;
 
-    for (size_t i = 0; i < table.nrows(); ++i)
+    for (R_xlen_t i = 0; i < table.nrows(); ++i)
     {
       std::string row_name = Rcpp::as<std::string>(table_rows[i]);
       std::string col_name = Rcpp::as<std::string>(table_cols[i]);
@@ -193,7 +193,7 @@ SEXP table_to_matrix(DataFrame table,
     colnames(matrix) = sorted_cols;
 
     // Fill matrix only with filtered and valid entries
-    for (size_t i = 0; i < table.nrows(); ++i)
+    for (R_xlen_t i = 0; i < table.nrows(); ++i)
     {
       std::string row_name = Rcpp::as<std::string>(table_rows[i]);
       std::string col_name = Rcpp::as<std::string>(table_cols[i]);
