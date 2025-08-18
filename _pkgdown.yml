@@ -67,6 +67,7 @@ reference:
   - check_sparsity
   - download
   - invoke_fun
+  - matrix_process
   - matrix_to_table
   - normalization
   - print.thisutils_logo

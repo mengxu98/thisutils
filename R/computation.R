@@ -253,3 +253,80 @@ zero_range <- function(
   }
   abs((x[1] - x[2]) / m) < tol
 }
+
+fc_matrix <- function(matrix) {
+  row_means <- if (methods::is(matrix, "sparseMatrix")) {
+    Matrix::rowMeans(matrix)
+  } else {
+    rowMeans(matrix)
+  }
+  matrix / row_means
+}
+
+zscore_matrix <- function(matrix, ...) {
+  Matrix::t(scale(Matrix::t(matrix), ...))
+}
+
+log2fc_matrix <- function(matrix) {
+  row_means <- if (methods::is(matrix, "sparseMatrix")) {
+    Matrix::rowMeans(matrix)
+  } else {
+    rowMeans(matrix)
+  }
+  log2(matrix / row_means)
+}
+
+#' @title Process matrix
+#'
+#' @param matrix A matrix.
+#' @param method Method to use for processing the matrix.
+#' @param ... Other arguments passed to the method.
+#'
+#' @return A processed matrix.
+#'
+#' @export
+#'
+#' @examples
+#' m <- simulate_sparse_matrix(10, 10)
+#' matrix_process(m, method = "raw")
+#' matrix_process(m, method = "zscore")
+#' matrix_process(m, method = "fc")
+#' matrix_process(m, method = "log2fc")
+#' matrix_process(m, method = "log1p")
+#' m <- as_matrix(m)
+#' matrix_process(m, method = function(x) x / rowMeans(x))
+matrix_process <- function(
+    matrix,
+    method = c("raw", "zscore", "fc", "log2fc", "log1p"),
+    ...) {
+  if (is.function(method)) {
+    matrix_processed <- method(matrix, ...)
+  } else {
+    matrix_processed <- switch(
+      EXPR = method,
+      "raw" = {
+        matrix
+      },
+      "fc" = {
+        fc_matrix(matrix, ...)
+      },
+      "zscore" = {
+        zscore_matrix(matrix, ...)
+      },
+      "log2fc" = {
+        log2fc_matrix(matrix)
+      },
+      "log1p" = {
+        log1p(matrix)
+      }
+    )
+  }
+
+  if (!identical(dim(matrix_processed), dim(matrix))) {
+    log_message(
+      "The dimensions of the matrix are changed after processing",
+      message_type = "error"
+    )
+  }
+  return(matrix_processed)
+}
