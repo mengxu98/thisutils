@@ -2,24 +2,21 @@
 % Please edit documentation in R/as_matrix.R
 \name{as_matrix}
 \alias{as_matrix}
-\title{Convert sparse matrix into dense matrix}
+\title{Convert matrix into dense/sparse matrix}
 \usage{
-as_matrix(x, return_sparse = FALSE, parallel = FALSE)
+as_matrix(x, return_sparse = FALSE)
 }
 \arguments{
 \item{x}{A matrix.}
 
 \item{return_sparse}{Whether to output a sparse matrix.
 Default is \code{FALSE}.}
-
-\item{parallel}{Whether to parallelize the computation with \link[RcppParallel:setThreadOptions]{RcppParallel::setThreadOptions}.
-Default is \code{FALSE}.}
 }
 \value{
 A dense or sparse matrix.
 }
 \description{
-Convert sparse matrix into dense matrix
+Convert matrix into dense/sparse matrix
 }
 \examples{
 m <- simulate_sparse_matrix(
@@ -27,27 +24,9 @@ m <- simulate_sparse_matrix(
   decimal = 3
 )
 
-system.time(
-  a <- as.matrix(m)
-)
-system.time(
-  b <- as_matrix(m)
-)
-system.time(
-  c <- as_matrix(m, parallel = TRUE)
-)
-system.time(
-  d <- as_matrix(m, return_sparse = TRUE)
-)
-
-m[1:5, 1:5]
+a <- as_matrix(m)
 a[1:5, 1:5]
-b[1:5, 1:5]
-c[1:5, 1:5]
 
-identical(a, b)
-identical(a, c)
-identical(b, c)
-identical(a, d)
-identical(b, d)
+b <- as_matrix(m, return_sparse = TRUE)
+b[1:5, 1:5]
 }
