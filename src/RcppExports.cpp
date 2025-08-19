@@ -11,36 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// asMatrix
-NumericMatrix asMatrix(NumericVector rp, NumericVector cp, NumericVector z, int nrows, int ncols);
-RcppExport SEXP _thisutils_asMatrix(SEXP rpSEXP, SEXP cpSEXP, SEXP zSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type rp(rpSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type cp(cpSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
-    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
-    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
-    rcpp_result_gen = Rcpp::wrap(asMatrix(rp, cp, z, nrows, ncols));
-    return rcpp_result_gen;
-END_RCPP
-}
-// asMatrixParallel
-NumericMatrix asMatrixParallel(NumericVector rp, NumericVector cp, NumericVector z, int nrows, int ncols);
-RcppExport SEXP _thisutils_asMatrixParallel(SEXP rpSEXP, SEXP cpSEXP, SEXP zSEXP, SEXP nrowsSEXP, SEXP ncolsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type rp(rpSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type cp(cpSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
-    Rcpp::traits::input_parameter< int >::type nrows(nrowsSEXP);
-    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
-    rcpp_result_gen = Rcpp::wrap(asMatrixParallel(rp, cp, z, nrows, ncols));
-    return rcpp_result_gen;
-END_RCPP
-}
 // matrix_to_table
 DataFrame matrix_to_table(SEXP matrix, Nullable<CharacterVector> row_names, Nullable<CharacterVector> col_names, double threshold, bool keep_zero);
 RcppExport SEXP _thisutils_matrix_to_table(SEXP matrixSEXP, SEXP row_namesSEXP, SEXP col_namesSEXP, SEXP thresholdSEXP, SEXP keep_zeroSEXP) {
@@ -85,8 +55,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_thisutils_asMatrix", (DL_FUNC) &_thisutils_asMatrix, 5},
-    {"_thisutils_asMatrixParallel", (DL_FUNC) &_thisutils_asMatrixParallel, 5},
     {"_thisutils_matrix_to_table", (DL_FUNC) &_thisutils_matrix_to_table, 5},
     {"_thisutils_split_indices", (DL_FUNC) &_thisutils_split_indices, 2},
     {"_thisutils_table_to_matrix", (DL_FUNC) &_thisutils_table_to_matrix, 5},
