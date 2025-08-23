@@ -21,14 +21,10 @@ Imports:
     parallel,
     purrr,
     Rcpp,
-    RcppArmadillo,
     rlang,
     stats
-Suggests:
-    httr2
 LinkingTo:
-    Rcpp,
-    RcppArmadillo
+    Rcpp
 Config/Needs/website: mengxu98/thistemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
