@@ -23,7 +23,8 @@ download(
     saved.  Tilde-expansion is performed.}
 
 \item{methods}{Methods to be used for downloading files.
-Default is \code{"auto"}, which means to try different download methods when the current method fails.}
+Can be \code{"auto"}, \code{"wget"}, \code{"libcurl"}, \code{"curl"}, \code{"wininet"}, \code{"internal"}.
+Default is \code{"auto"}, which means to try different download methods.}
 
 \item{quiet}{If \code{TRUE}, suppress status messages (if any), and
     the progress bar.}

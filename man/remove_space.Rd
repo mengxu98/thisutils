@@ -15,23 +15,23 @@ remove_space(
 \arguments{
 \item{x}{A vector of character strings.}
 
-\item{trim_start}{Logical value, default is \code{TRUE}.
-Whether to remove leading spaces before the first word.}
+\item{trim_start}{Whether to remove leading spaces before the first word.
+Default is \code{TRUE}.}
 
-\item{trim_end}{Logical value, default is \code{FALSE}.
-Whether to remove trailing spaces after the last word.}
+\item{trim_end}{Whether to remove trailing spaces after the last word.
+Default is \code{FALSE}.}
 
-\item{collapse_multiple}{Logical value, default is \code{TRUE}.
-Whether to collapse multiple consecutive spaces between words into a single space.}
+\item{collapse_multiple}{Whether to collapse multiple consecutive spaces between words into a single space.
+Default is \code{TRUE}.}
 
-\item{preserve_newlines}{Logical value, default is \code{TRUE}.
-Whether to preserve newline characters when collapsing spaces.}
+\item{preserve_newlines}{Whether to preserve newline characters when collapsing spaces.
+Default is \code{TRUE}.}
 }
 \value{
 A character vector with spaces normalized according to the specified parameters.
 }
 \description{
-Remove leading/trailing spaces and normalize multiple spaces between words in character strings.
+Remove and normalize spaces
 }
 \examples{
 x <- c(
