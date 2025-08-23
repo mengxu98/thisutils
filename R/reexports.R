@@ -1,3 +1,2 @@
-#' @importFrom Rcpp evalCpp sourceCpp
-#' @importFrom RcppArmadillo armadillo_version
+#' @importFrom Rcpp compileAttributes
 NULL
