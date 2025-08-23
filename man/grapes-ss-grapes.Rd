@@ -7,15 +7,15 @@
 a \%ss\% b
 }
 \arguments{
-\item{a}{The left side value to check}
+\item{a}{The left side value to check.}
 
-\item{b}{The right side value to use if a is NULL}
+\item{b}{The right side value to use if \code{a} is \code{NULL}.}
 }
 \value{
-a if it is not NULL, otherwise b
+\code{a} if it is not \code{NULL}, otherwise \code{b}.
 }
 \description{
-This operator returns the left side if it's not NULL,
+This operator returns the left side if it's not \code{NULL},
 otherwise it returns the right side.
 }
 \examples{

@@ -12,7 +12,7 @@ capitalize(x, force_tolower = FALSE)
 \item{force_tolower}{Whether to force the remaining letters to be lowercase.}
 }
 \description{
-Capitalizes the characters making the first letter uppercase.
+Capitalize the first letter of each word
 }
 \examples{
 x <- c(

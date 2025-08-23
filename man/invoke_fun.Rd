@@ -14,7 +14,7 @@ invoke_fun(.fn, .args = list(), ..., .env = rlang::caller_env())
 \item{...}{Other arguments passed to the function.}
 
 \item{.env}{Environment in which to evaluate the call.
-This will be most useful if .fn is a string, or the function has side-effects.}
+This will be most useful if \code{.fn} is a string, or the function has side-effects.}
 }
 \description{
 Invoke a function with a list of arguments

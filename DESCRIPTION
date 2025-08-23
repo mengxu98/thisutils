@@ -22,15 +22,13 @@ Imports:
     purrr,
     Rcpp,
     RcppArmadillo,
-    RcppParallel,
     rlang,
     stats
 Suggests:
     httr2
 LinkingTo:
     Rcpp,
-    RcppArmadillo,
-    RcppParallel
+    RcppArmadillo
 Config/Needs/website: mengxu98/thistemplate
 Config/testthat/edition: 3
 Encoding: UTF-8

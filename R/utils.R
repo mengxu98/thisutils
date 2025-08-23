@@ -1,13 +1,15 @@
 #' @title Value selection operator
 #'
 #' @description
-#' This operator returns the left side if it's not NULL,
+#' This operator returns the left side if it's not `NULL`,
 #' otherwise it returns the right side.
 #'
-#' @param a The left side value to check
-#' @param b The right side value to use if a is NULL
+#' @md
+#' @param a The left side value to check.
+#' @param b The right side value to use if `a` is `NULL`.
 #'
-#' @return a if it is not NULL, otherwise b
+#' @return `a` if it is not `NULL`, otherwise `b`.
+#'
 #' @export
 #'
 #' @examples
@@ -23,11 +25,12 @@
 
 #' @title Invoke a function with a list of arguments
 #'
+#' @md
 #' @param .fn A function, or function name as a string.
 #' @param .args A list of arguments.
 #' @param ... Other arguments passed to the function.
 #' @param .env Environment in which to evaluate the call.
-#' This will be most useful if .fn is a string, or the function has side-effects.
+#' This will be most useful if `.fn` is a string, or the function has side-effects.
 #'
 #' @export
 #'
@@ -75,9 +78,6 @@ invoke_fun <- function(
 }
 
 #' @title Capitalize the first letter of each word
-#'
-#' @description
-#' Capitalizes the characters making the first letter uppercase.
 #'
 #' @param x A vector of character strings to be capitalized.
 #' @param force_tolower Whether to force the remaining letters to be lowercase.
@@ -212,19 +212,16 @@ unnest_fun <- function(
 
 #' @title Remove and normalize spaces
 #'
-#' @description
-#' Remove leading/trailing spaces and normalize multiple spaces between words in character strings.
-#'
 #' @md
 #' @param x A vector of character strings.
-#' @param trim_start Logical value, default is `TRUE`.
-#' Whether to remove leading spaces before the first word.
-#' @param trim_end Logical value, default is `FALSE`.
-#' Whether to remove trailing spaces after the last word.
-#' @param collapse_multiple Logical value, default is `TRUE`.
-#' Whether to collapse multiple consecutive spaces between words into a single space.
-#' @param preserve_newlines Logical value, default is `TRUE`.
-#' Whether to preserve newline characters when collapsing spaces.
+#' @param trim_start Whether to remove leading spaces before the first word.
+#' Default is `TRUE`.
+#' @param trim_end Whether to remove trailing spaces after the last word.
+#' Default is `FALSE`.
+#' @param collapse_multiple Whether to collapse multiple consecutive spaces between words into a single space.
+#' Default is `TRUE`.
+#' @param preserve_newlines Whether to preserve newline characters when collapsing spaces.
+#' Default is `TRUE`.
 #'
 #' @return A character vector with spaces normalized according to the specified parameters.
 #' @export
@@ -268,32 +265,32 @@ remove_space <- function(
   }
   if (!inherits(x, "character")) {
     log_message(
-      "x must be the type of character.",
+      "{.arg x} must be the type of character",
       message_type = "error"
     )
   }
 
   if (!is.logical(trim_start) || length(trim_start) != 1) {
     log_message(
-      "trim_start must be a single logical value.",
+      "{.arg trim_start} must be a single logical value",
       message_type = "error"
     )
   }
   if (!is.logical(trim_end) || length(trim_end) != 1) {
     log_message(
-      "trim_end must be a single logical value.",
+      "{.arg trim_end} must be a single logical value",
       message_type = "error"
     )
   }
   if (!is.logical(collapse_multiple) || length(collapse_multiple) != 1) {
     log_message(
-      "collapse_multiple must be a single logical value.",
+      "{.arg collapse_multiple} must be a single logical value",
       message_type = "error"
     )
   }
   if (!is.logical(preserve_newlines) || length(preserve_newlines) != 1) {
     log_message(
-      "preserve_newlines must be a single logical value.",
+      "{.arg preserve_newlines} must be a single logical value",
       message_type = "error"
     )
   }
@@ -329,7 +326,7 @@ remove_space <- function(
 #' @md
 #' @param expr The expression to be evaluated.
 #' @param max_tries The maximum number of attempts to evaluate the expression before giving up.
-#' Default is set to `5`.
+#' Default is `5`.
 #' @param error_message Additional custom error message to be displayed when an error occurs.
 #' @param retry_message Message displayed when a new try to evaluate the expression would be attempted.
 #'
@@ -392,7 +389,8 @@ try_get <- function(
 #' @md
 #' @inheritParams utils::download.file
 #' @param methods Methods to be used for downloading files.
-#' Default is `"auto"`, which means to try different download methods when the current method fails.
+#' Can be `"auto"`, `"wget"`, `"libcurl"`, `"curl"`, `"wininet"`, `"internal"`.
+#' Default is `"auto"`, which means to try different download methods.
 #' @param max_tries Number of tries for each download method.
 #' Default is `2`.
 #' @param ... Other arguments passed to [utils::download.file].
@@ -409,7 +407,7 @@ download <- function(
     max_tries = 2) {
   if (missing(url) || missing(destfile)) {
     log_message(
-      "{.arg url} and {.arg destfile} must be both provided.",
+      "{.arg url} and {.arg destfile} must be both provided",
       message_type = "error"
     )
   }
@@ -432,11 +430,7 @@ download <- function(
         }, error = function(error) {
           log_message(error)
           log_message(
-            "Cannot download from the url: {.url {url}}",
-            message_type = "warning"
-          )
-          log_message(
-            "Failed to download using {.val {method}}",
+            "Failed to download using {.pkg {method}}, from {.url {url}}",
             message_type = "warning"
           )
           Sys.sleep(1)
@@ -450,7 +444,7 @@ download <- function(
     ntry <- ntry + 1
     if (is.null(status) && ntry >= max_tries) {
       log_message(
-        "Download failed after {.val {max_tries}} tries from {.val {url}}",
+        "Download failed after {.val {max_tries}} tries from {.url {url}}",
         message_type = "error"
       )
     }
