@@ -10,7 +10,7 @@ try_get(expr, max_tries = 5, error_message = "", retry_message = "Retrying...")
 \item{expr}{The expression to be evaluated.}
 
 \item{max_tries}{The maximum number of attempts to evaluate the expression before giving up.
-Default is set to \code{5}.}
+Default is \code{5}.}
 
 \item{error_message}{Additional custom error message to be displayed when an error occurs.}
 
