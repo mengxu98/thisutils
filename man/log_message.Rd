@@ -26,61 +26,64 @@ log_message(
 \item{...}{The message to print.}
 
 \item{verbose}{Whether to print the message.
-Default is \emph{\code{TRUE}}.}
+Default is \code{TRUE}.}
 
 \item{message_type}{Type of message.
-Could be choose one of \emph{\code{info}}, \emph{\code{success}}, \emph{\code{warning}}, and \emph{\code{error}}.
-Default is \emph{\code{info}}.}
+Could be choose one of \code{"info"}, \code{"success"}, \code{"warning"}, and \code{"error"}.
+Default is \code{"info"}.}
 
 \item{cli_model}{Whether to use the \code{cli} package to print the message.
-Default is \emph{\code{TRUE}}.}
+Default is \code{TRUE}.}
 
 \item{level}{The level of the message, which affects the indentation.
-Level 1 has no indentation, higher levels add more indentation.
-Default is \emph{\code{1}}.}
+Level \code{1} has no indentation, higher levels add more indentation.
+Default is \code{1}.}
 
 \item{symbol}{The symbol used for indentation.
 When specified, it ignores the level parameter and uses the symbol directly.
-Default is \emph{\code{"  "}} (two spaces).}
+Default is \code{"  "} (two spaces).}
 
 \item{text_color}{Color for the message text.
-Supports R color names (e.g., "orange"),
-hexadecimal colors (e.g., "#000000"),
-basic colors: "red", "green", "blue", "yellow", "magenta",
-"cyan", "white", "black", "grey", "silver", "none",
-and bright colors: "br_red", "br_green", "br_blue",
-"br_yellow", "br_magenta", "br_cyan", "br_white", "br_black".
-Default is \emph{\code{NULL}}.}
+Supports R color names (e.g., \code{"orange"}),
+hexadecimal colors (e.g., \code{"#000000"}),
+basic colors: \code{"red"}, \code{"green"}, \code{"blue"}, \code{"yellow"}, \code{"magenta"},
+\code{"cyan"}, \code{"white"}, \code{"black"}, \code{"grey"}, \code{"silver"}, \code{"none"},
+and bright colors: \code{"br_red"}, \code{"br_green"}, \code{"br_blue"},
+\code{"br_yellow"}, \code{"br_magenta"}, \code{"br_cyan"}, \code{"br_white"}, \code{"br_black"}.
+Default is \code{NULL}.}
 
 \item{back_color}{Background color for the message text.
 Details see parameter \code{text_color}.
-Default is \emph{\code{NULL}}.}
+Default is \code{NULL}.}
 
 \item{text_style}{Text styles to apply.
-Can be one or more of: "bold", "italic", "underline", "strikethrough", "dim", "inverse".
-Multiple styles can be combined (e.g., c("bold", "underline")).
-Default is \emph{\code{NULL}}.}
+Can be one or more of:
+\code{"bold"}, \code{"italic"}, \code{"underline"}, \code{"strikethrough"}, \code{"dim"}, \code{"inverse"}.
+Multiple styles can be combined (e.g., \code{c("bold", "underline")}).
+Default is \code{NULL}.}
 
 \item{multiline_indent}{Whether to apply consistent formatting (timestamp and indentation) to each line in multiline messages.
-When TRUE, each line gets the full formatting; when FALSE, only the first line gets the timestamp.
-Default is \emph{\code{FALSE}}.}
+When \code{TRUE}, each line gets the full formatting; when \code{FALSE}, only the first line gets the timestamp.
+Default is \code{FALSE}.}
 
 \item{timestamp}{Whether to show the current time in the message.
-Default is \emph{\code{TRUE}}.}
+Default is \code{TRUE}.}
 
 \item{timestamp_format}{Format string for timestamp display.
-Default is \emph{\code{"\%Y-\%m-\%d \%H:\%M:\%S"}}.}
+Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
 
 \item{timestamp_style}{Whether to apply the same text styling to the timestamp as the message text.
-When TRUE, timestamp formatting matches the message; when FALSE, timestamp keeps its default appearance.
-Default is \emph{\code{TRUE}}.}
+When \code{TRUE}, timestamp formatting matches the message; when \code{FALSE}, timestamp keeps its default appearance.
+Default is \code{TRUE}.}
 
-\item{.envir}{The environment to evaluate calls in. Default is \emph{\code{parent.frame()}}.}
+\item{.envir}{The environment to evaluate calls in.
+Default is \code{parent.frame()}.}
 
-\item{.frame}{The frame to use for error reporting. Default is \emph{\code{.envir}}.}
+\item{.frame}{The frame to use for error reporting.
+Default is \code{.envir}.}
 }
 \value{
-\code{Formated message}.
+Formated message.
 }
 \description{
 Integrate the message printing function with the \code{cli} package,
