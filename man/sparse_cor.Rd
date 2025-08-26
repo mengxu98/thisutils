@@ -33,7 +33,7 @@ sparse_cor(
 A correlation matrix.
 }
 \description{
-Safe correlation function which returns a sparse matrix without missing values.
+Safe correlation function which returns a sparse matrix.
 }
 \examples{
 m1 <- simulate_sparse_matrix(

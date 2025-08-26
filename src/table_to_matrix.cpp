@@ -52,9 +52,22 @@ SEXP table_to_matrix(DataFrame table,
                      double threshold = 0.0,
                      bool return_sparse = false)
 {
-  CharacterVector table_rows = table["row"];
-  CharacterVector table_cols = table["col"];
-  NumericVector values = table["value"];
+  // Validate input: table must have exactly 3 columns
+  if (table.size() != 3)
+  {
+    stop("Input table must have exactly 3 columns");
+  }
+
+  // Assign columns: first=row, second=col, third=value
+  CharacterVector table_rows = table[0]; // First column as row names
+  CharacterVector table_cols = table[1]; // Second column as column names
+  NumericVector values = table[2];       // Third column as values
+
+  // Validate that the third column is numeric
+  if (!Rf_isNumeric(table[2]))
+  {
+    stop("The third column must be numeric (values)");
+  }
 
   // Handle optional row and column parameters
   CharacterVector filter_rows;

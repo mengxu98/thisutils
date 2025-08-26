@@ -30,7 +30,8 @@
 #' @param .args A list of arguments.
 #' @param ... Other arguments passed to the function.
 #' @param .env Environment in which to evaluate the call.
-#' This will be most useful if `.fn` is a string, or the function has side-effects.
+#' This will be most useful if `.fn` is a string,
+#' or the function has side-effects.
 #'
 #' @export
 #'

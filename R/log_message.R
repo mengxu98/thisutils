@@ -8,47 +8,50 @@
 #' @md
 #' @param ... The message to print.
 #' @param verbose Whether to print the message.
-#' Default is *`TRUE`*.
+#' Default is `TRUE`.
 #' @param message_type Type of message.
-#' Could be choose one of *`info`*, *`success`*, *`warning`*, and *`error`*.
-#' Default is *`info`*.
+#' Could be choose one of `"info"`, `"success"`, `"warning"`, and `"error"`.
+#' Default is `"info"`.
 #' @param cli_model Whether to use the `cli` package to print the message.
-#' Default is *`TRUE`*.
+#' Default is `TRUE`.
 #' @param level The level of the message, which affects the indentation.
-#' Level 1 has no indentation, higher levels add more indentation.
-#' Default is *`1`*.
+#' Level `1` has no indentation, higher levels add more indentation.
+#' Default is `1`.
 #' @param symbol The symbol used for indentation.
 #' When specified, it ignores the level parameter and uses the symbol directly.
-#' Default is *`"  "`* (two spaces).
+#' Default is `"  "` (two spaces).
 #' @param text_color Color for the message text.
-#' Supports R color names (e.g., "orange"),
-#' hexadecimal colors (e.g., "#000000"),
-#' basic colors: "red", "green", "blue", "yellow", "magenta",
-#' "cyan", "white", "black", "grey", "silver", "none",
-#' and bright colors: "br_red", "br_green", "br_blue",
-#' "br_yellow", "br_magenta", "br_cyan", "br_white", "br_black".
-#' Default is *`NULL`*.
+#' Supports R color names (e.g., `"orange"`),
+#' hexadecimal colors (e.g., `"#000000"`),
+#' basic colors: `"red"`, `"green"`, `"blue"`, `"yellow"`, `"magenta"`,
+#' `"cyan"`, `"white"`, `"black"`, `"grey"`, `"silver"`, `"none"`,
+#' and bright colors: `"br_red"`, `"br_green"`, `"br_blue"`,
+#' `"br_yellow"`, `"br_magenta"`, `"br_cyan"`, `"br_white"`, `"br_black"`.
+#' Default is `NULL`.
 #' @param back_color Background color for the message text.
 #' Details see parameter `text_color`.
-#' Default is *`NULL`*.
+#' Default is `NULL`.
 #' @param text_style Text styles to apply.
-#' Can be one or more of: "bold", "italic", "underline", "strikethrough", "dim", "inverse".
-#' Multiple styles can be combined (e.g., c("bold", "underline")).
-#' Default is *`NULL`*.
+#' Can be one or more of:
+#' `"bold"`, `"italic"`, `"underline"`, `"strikethrough"`, `"dim"`, `"inverse"`.
+#' Multiple styles can be combined (e.g., `c("bold", "underline")`).
+#' Default is `NULL`.
 #' @param timestamp Whether to show the current time in the message.
-#' Default is *`TRUE`*.
+#' Default is `TRUE`.
 #' @param timestamp_format Format string for timestamp display.
-#' Default is *`"%Y-%m-%d %H:%M:%S"`*.
+#' Default is `"%Y-%m-%d %H:%M:%S"`.
 #' @param multiline_indent Whether to apply consistent formatting (timestamp and indentation) to each line in multiline messages.
-#' When TRUE, each line gets the full formatting; when FALSE, only the first line gets the timestamp.
-#' Default is *`FALSE`*.
+#' When `TRUE`, each line gets the full formatting; when `FALSE`, only the first line gets the timestamp.
+#' Default is `FALSE`.
 #' @param timestamp_style Whether to apply the same text styling to the timestamp as the message text.
-#' When TRUE, timestamp formatting matches the message; when FALSE, timestamp keeps its default appearance.
-#' Default is *`TRUE`*.
-#' @param .envir The environment to evaluate calls in. Default is *`parent.frame()`*.
-#' @param .frame The frame to use for error reporting. Default is *`.envir`*.
+#' When `TRUE`, timestamp formatting matches the message; when `FALSE`, timestamp keeps its default appearance.
+#' Default is `TRUE`.
+#' @param .envir The environment to evaluate calls in.
+#' Default is `parent.frame()`.
+#' @param .frame The frame to use for error reporting.
+#' Default is `.envir`.
 #'
-#' @return \code{Formated message}.
+#' @return Formated message.
 #'
 #' @references
 #' \url{https://cli.r-lib.org/articles/index.html}
