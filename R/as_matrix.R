@@ -24,7 +24,7 @@
 as_matrix <- function(
     x,
     return_sparse = FALSE) {
-  if (!methods::is(x, "sparseMatrix")) {
+  if (!inherits(x, "sparseMatrix")) {
     if (return_sparse) {
       return(
         Matrix::Matrix(x, sparse = TRUE, dimnames = dimnames(x))
