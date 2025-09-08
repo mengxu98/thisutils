@@ -33,8 +33,7 @@
 #' @export
 #' @examples
 #' thisutils_logo()
-thisutils_logo <- function(
-    unicode = cli::is_utf8_output()) {
+thisutils_logo <- function(unicode = cli::is_utf8_output()) {
   logo <- c(
     "    0        1      2           3    4
    __  __    _              __  _  __
@@ -55,8 +54,10 @@ thisutils_logo <- function(
     "yellow", "green", "white", "magenta", "cyan"
   )
 
-  col_hexa <- purrr::map2(
-    hexa, cols, ~ cli::make_ansi_style(.y)(.x)
+  col_hexa <- mapply(
+    function(x, y) cli::make_ansi_style(y)(x),
+    hexa, cols,
+    SIMPLIFY = FALSE
   )
 
   for (i in 0:9) {
