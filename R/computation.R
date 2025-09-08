@@ -78,7 +78,7 @@ simulate_sparse_matrix <- function(
 #'
 #' @export
 check_sparsity <- function(x) {
-  if (methods::is(x, "sparseMatrix")) {
+  if (inherits(x, "sparseMatrix")) {
     non_zero_count <- Matrix::nnzero(x)
     total_counts <- prod(dim(x))
   } else {
@@ -255,7 +255,7 @@ zero_range <- function(
 }
 
 fc_matrix <- function(matrix) {
-  row_means <- if (methods::is(matrix, "sparseMatrix")) {
+  row_means <- if (inherits(matrix, "sparseMatrix")) {
     Matrix::rowMeans(matrix)
   } else {
     rowMeans(matrix)
@@ -268,7 +268,7 @@ zscore_matrix <- function(matrix, ...) {
 }
 
 log2fc_matrix <- function(matrix) {
-  row_means <- if (methods::is(matrix, "sparseMatrix")) {
+  row_means <- if (inherits(matrix, "sparseMatrix")) {
     Matrix::rowMeans(matrix)
   } else {
     rowMeans(matrix)

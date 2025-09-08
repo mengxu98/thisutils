@@ -1,7 +1,7 @@
 #' @title Sparse correlation function
 #'
 #' @description
-#' Safe correlation function which returns a sparse matrix without missing values.
+#' Safe correlation function which returns a sparse matrix.
 #'
 #' @md
 #' @param x Sparse matrix or character vector.
@@ -69,12 +69,12 @@ sparse_cor <- function(
     remove_na = TRUE,
     remove_inf = TRUE,
     ...) {
-  if (!methods::is(x, "sparseMatrix")) {
+  if (!inherits(x, "sparseMatrix")) {
     x <- as_matrix(x, return_sparse = TRUE)
   }
 
   if (!is.null(y)) {
-    if (!methods::is(y, "sparseMatrix")) {
+    if (!inherits(y, "sparseMatrix")) {
       y <- as_matrix(y, return_sparse = TRUE)
     }
     if (nrow(x) != nrow(y)) {
@@ -162,13 +162,13 @@ sparse_cor <- function(
 #' a$cov[1:5, 1:5]
 #' a$cor[1:5, 1:5]
 pearson_correlation <- function(x, y = NULL) {
-  if (!methods::is(x, "sparseMatrix")) {
+  if (!inherits(x, "sparseMatrix")) {
     log_message(
       "x should be a sparse matrix",
       message_type = "error"
     )
   }
-  if (!is.null(y) && !methods::is(y, "sparseMatrix")) {
+  if (!is.null(y) && !inherits(y, "sparseMatrix")) {
     log_message(
       "y should be a sparse matrix",
       message_type = "error"
@@ -184,7 +184,7 @@ pearson_correlation <- function(x, y = NULL) {
     sdvec <- sqrt(diag(covmat))
     cormat <- covmat / tcrossprod(sdvec)
   } else {
-    if (!methods::is(y, "sparseMatrix")) {
+    if (!inherits(y, "sparseMatrix")) {
       log_message(
         "y should be a sparse matrix",
         message_type = "error"
