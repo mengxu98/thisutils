@@ -76,7 +76,6 @@ reference:
   - rescale
   - split_indices
   - simulate_sparse_matrix
-  - str_wrap
   - table_to_matrix
   - try_get
   - unnest_fun
