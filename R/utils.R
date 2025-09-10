@@ -122,34 +122,6 @@ capitalize <- function(x, force_tolower = FALSE) {
   return(x)
 }
 
-#' @title Wrap text
-#'
-#' @param x A character vector to wrap.
-#' @param width The maximum width of the lines.
-#'
-#' @return A character vector with wrapped text.
-#' @export
-#' @examples
-#' str_wrap(rep("Hello, world!", 10))
-#' str_wrap(rep("Hello, world!", 10), width = 10)
-str_wrap <- function(x, width = 80) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-  if (inherits(x, "factor")) {
-    x <- as.character(x)
-  }
-  x_wrap <- unlist(
-    lapply(
-      x,
-      function(i) {
-        paste0(strwrap(i, width = width), collapse = "\n")
-      }
-    )
-  )
-  return(x_wrap)
-}
-
 #' @title Unnest a list-column
 #'
 #' @description
