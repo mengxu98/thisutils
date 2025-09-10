@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.1.4
+
+* **func**:
+  * Delete `str_wrap()` function.
+
 # thisutils 0.1.3
 
 * **func**:
