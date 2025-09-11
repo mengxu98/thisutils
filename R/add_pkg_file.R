@@ -5,9 +5,9 @@
 #'
 #' @md
 #' @param desc_file The DESCRIPTION file.
-#' Must be provided, it will be used to extract package information.
-#' Using `add_pkg_file("DESCRIPTION", output_dir = "R")`,
-#' will be created `<pkg_name>-package.R` based on the DESCRIPTION file in `"R"` directory.
+#' Default is `"DESCRIPTION"`, it will be used to extract package information.
+#' Using `add_pkg_file()` will automatically use the DESCRIPTION file in the current directory
+#' and create `<pkg_name>-package.R` in the `"R"` directory.
 #' If you want to use some specific information,
 #' such as `author_name` or `author_email`, you can provide them manually.
 #' @param pkg_name Character string, the name of the package.
@@ -23,7 +23,7 @@
 #' @param github_url Character string, GitHub URL of the package.
 #' Default is `NULL`, which will be read from DESCRIPTION file or constructed based on package name.
 #' @param output_dir Character string, directory where to save the package file.
-#' Default is `NULL`, you should specify it, such as `"R"`.
+#' Default is `"R"`.
 #' @param use_figlet Whether to use figlet for ASCII art generation.
 #' Default is `TRUE`. Details see [figlet].
 #' @param figlet_font Character string, figlet font to use.
@@ -39,14 +39,14 @@
 #'
 #' @export
 add_pkg_file <- function(
-    desc_file,
+    desc_file = "DESCRIPTION",
     pkg_name = NULL,
     title = NULL,
     pkg_description = NULL,
     author_name = NULL,
     author_email = NULL,
     github_url = NULL,
-    output_dir = NULL,
+    output_dir = "R",
     use_figlet = TRUE,
     figlet_font = "Slant",
     colors = c(
@@ -55,17 +55,7 @@ add_pkg_file <- function(
     ),
     unicode = TRUE,
     verbose = TRUE) {
-  desc_info <- if (!is.null(desc_file)) {
-    .read_description(desc_file, verbose)
-  } else {
-    list(
-      Package = NULL,
-      Description = NULL,
-      Author = NULL,
-      Email = NULL,
-      GitHub_URL = NULL
-    )
-  }
+  desc_info <- .read_description(desc_file, verbose)
 
   if (is.null(pkg_name)) {
     pkg_name <- desc_info$Package
@@ -145,26 +135,17 @@ add_pkg_file <- function(
     unicode = unicode
   )
 
-  if (!is.null(output_dir)) {
-    output_file <- file.path(
-      output_dir,
-      paste0(pkg_name, "-package.R")
-    )
-    writeLines(file_content, output_file)
-    log_message(
-      "Package file written to: {.file {output_file}}",
-      message_type = "success",
-      verbose = verbose
-    )
-    invisible(file_content)
-  } else {
-    log_message(
-      "Not provided {.arg output_dir}, please specify it, such as {.val R}",
-      message_type = "warning",
-      verbose = verbose
-    )
-    invisible(file_content)
-  }
+  output_file <- file.path(
+    output_dir,
+    paste0(pkg_name, "-package.R")
+  )
+  writeLines(file_content, output_file)
+  log_message(
+    "Package file written to: {.file {output_file}}",
+    message_type = "success",
+    verbose = verbose
+  )
+  invisible(file_content)
 }
 
 .generate_content <- function(
@@ -220,8 +201,8 @@ add_pkg_file <- function(
     "#'",
     "#' @export",
     "#' @examples",
-    paste0("#' ", pkg_name, "_logo()"),
-    paste0(pkg_name, "_logo <- function(unicode = cli::is_utf8_output()) {"),
+    paste0("#' ", tolower(pkg_name), "_logo()"),
+    paste0(tolower(pkg_name), "_logo <- function(unicode = cli::is_utf8_output()) {"),
     "  logo <- c(",
     paste0("    \"", ascii_with_numbers, "\""),
     "  )",
@@ -241,7 +222,7 @@ add_pkg_file <- function(
     "",
     "  structure(",
     "    cli::col_blue(logo),",
-    paste0("    class = \"", pkg_name, "_logo\""),
+    paste0("    class = \"", tolower(pkg_name), "_logo\""),
     "  )",
     "}",
     "",
@@ -252,11 +233,11 @@ add_pkg_file <- function(
     "#'",
     "#' @return Print the ASCII logo",
     "#'",
-    paste0("#' @method print ", pkg_name, "_logo"),
+    paste0("#' @method print ", tolower(pkg_name), "_logo"),
     "#'",
     "#' @export",
     "#'",
-    paste0("print.", pkg_name, "_logo <- function(x, ...) {"),
+    paste0("print.", tolower(pkg_name), "_logo <- function(x, ...) {"),
     "  cat(x, ..., sep = \"\\n\")",
     "  invisible(x)",
     "}",
@@ -278,7 +259,7 @@ add_pkg_file <- function(
     "    strrep(\"-\", 60)",
     "  )",
     "",
-    paste0("  packageStartupMessage(", pkg_name, "_logo())"),
+    paste0("  packageStartupMessage(", tolower(pkg_name), "_logo())"),
     "  packageStartupMessage(msg)",
     "}"
   )
