@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.1.5
+
+* **func**:
+  * Update `add_pkg_file()` function. Now, `add_pkg_file()` can automatically extract information of *R* package from `DESCRIPTION` file and save it in the `./R/` folder.
+
 # thisutils 0.1.4
 
 * **func**:
