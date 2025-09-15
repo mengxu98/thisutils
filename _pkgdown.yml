@@ -43,7 +43,7 @@ reference:
 - contents:
   - parallelize_fun
 
-- subtitle: "Logging"
+- subtitle: "Logging messages"
 - contents:
   - log_message
 
@@ -69,6 +69,10 @@ reference:
   - invoke_fun
   - matrix_process
   - matrix_to_table
+  - max_depth
+  - maximump
+  - meanp
+  - minimump
   - normalization
   - print.thisutils_logo
   - r_square
@@ -79,3 +83,5 @@ reference:
   - table_to_matrix
   - try_get
   - unnest_fun
+  - votep
+  - wilkinsonp
