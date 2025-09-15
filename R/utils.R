@@ -424,3 +424,280 @@ download <- function(
   }
   return(invisible(NULL))
 }
+
+#' @title Wilkinson's p-value
+#'
+#' @param p A vector of p-values.
+#' @param r The number of studies to include in the p-value calculation.
+#' @param alpha The significance level.
+#' @param log.p Whether to return the log of the p-value.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' wilkinsonp(p)
+#' wilkinsonp(p, r = 2)
+#' wilkinsonp(p, alpha = 0.01)
+#' wilkinsonp(p, log.p = TRUE)
+wilkinsonp <- function(p, r = 1, alpha = 0.05, log.p = FALSE) {
+  alpha <- ifelse(alpha > 1, alpha / 100, alpha)
+  stopifnot(alpha > 0, alpha < 1)
+  alpha <- ifelse(alpha > 0.5, 1 - alpha, alpha)
+  keep <- (p >= 0) & (p <= 1)
+  invalid <- sum(1L * keep) < 2
+  if (invalid) {
+    log_message(
+      "Must have at least two valid p values",
+      message_type = "warning"
+    )
+    res <- list(
+      p = NA_real_,
+      pr = NA_real_,
+      r = r,
+      critp = NA_real_,
+      alpha = alpha,
+      validp = p[keep]
+    )
+  } else {
+    pi <- p[keep]
+    k <- length(pi)
+    if (k != length(p)) {
+      log_message(
+        "Some studies omitted",
+        message_type = "warning"
+      )
+    }
+    if ((r < 1) | (r > k)) {
+      r <- 1
+      log_message(
+        "Illegal r set to 1",
+        message_type = "warning"
+      )
+    }
+    pi <- sort(pi)
+    pr <- pi[r]
+    res <- list(
+      p = stats::pbeta(pr, r, k + 1 - r, log.p = log.p),
+      pr = pr,
+      r = r,
+      critp = stats::qbeta(alpha, r, k + 1 - r),
+      alpha = alpha,
+      validp = pi
+    )
+  }
+  res
+}
+
+#' @title Maximum p-value
+#'
+#' @param p A vector of p-values.
+#' @param alpha The significance level.
+#' @param log.p Whether to return the log of the p-value.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' maximump(p)
+#' maximump(p, alpha = 0.01)
+#' maximump(p, log.p = TRUE)
+maximump <- function(p, alpha = 0.05, log.p = FALSE) {
+  keep <- (p >= 0) & (p <= 1)
+  validp <- p[keep]
+  k <- length(validp)
+  res <- wilkinsonp(p, r = k, alpha, log.p)
+  res
+}
+
+#' @title Minimum p-value
+#'
+#' @param p A vector of p-values.
+#' @param alpha The significance level.
+#' @param log.p Whether to return the log of the p-value.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' minimump(p)
+#' minimump(p, alpha = 0.01)
+#' minimump(p, log.p = TRUE)
+minimump <- function(p, alpha = 0.05, log.p = FALSE) {
+  res <- wilkinsonp(p, r = 1, alpha, log.p)
+  res
+}
+
+#' @title Mean p-value
+#'
+#' @param p A vector of p-values.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' meanp(p)
+#' meanp(p, log.p = TRUE)
+meanp <- function(p) {
+  keep <- (p >= 0) & (p <= 1)
+  invalid <- sum(1L * keep) < 4
+  if (invalid) {
+    log_message(
+      "Must have at least four valid p values",
+      message_type = "warning"
+    )
+    res <- list(z = NA_real_, p = NA_real_, validp = p[keep])
+  } else {
+    pi <- mean(p[keep])
+    k <- length(p[keep])
+    z <- (0.5 - pi) * sqrt(12 * k)
+    if (k != length(p)) {
+      log_message(
+        "Some studies omitted",
+        message_type = "warning"
+      )
+    }
+    res <- list(
+      z = z,
+      p = stats::pnorm(z, lower.tail = FALSE),
+      validp = p[keep]
+    )
+  }
+  res
+}
+
+sump <- function(p) {
+  keep <- (p >= 0) & (p <= 1)
+  invalid <- sum(1L * keep) < 2
+  if (invalid) {
+    log_message(
+      "Must have at least two valid p values",
+      message_type = "warning"
+    )
+    res <- list(p = NA_real_, conservativep = NA_real_, validp = p[keep])
+  } else {
+    sigmap <- sum(p[keep])
+    k <- length(p[keep])
+    conservativep <- exp(k * log(sigmap) - lgamma(k + 1))
+    nterm <- floor(sigmap) + 1
+    denom <- lfactorial(k)
+    psum <- 0
+    terms <- vector("numeric", nterm)
+    for (i in 1:nterm) {
+      terms[i] <- lchoose(k, i - 1) +
+        k *
+          log(
+            sigmap -
+              i +
+              1
+          ) -
+        denom
+      pm <- 2 * (i %% 2) - 1
+      psum <- psum + pm * exp(terms[i])
+    }
+    if (k != length(p)) {
+      log_message(
+        "Some studies omitted",
+        message_type = "warning"
+      )
+    }
+    if (sigmap > 20) {
+      log_message(
+        "Likely to be unreliable, check with another method",
+        message_type = "warning"
+      )
+    }
+    res <- list(
+      p = psum,
+      conservativep = conservativep,
+      validp = p[keep]
+    )
+  }
+  res
+}
+
+#' @title Vote p-value
+#'
+#' @param p A vector of p-values.
+#' @param alpha The significance level.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' votep(p)
+#' votep(p, alpha = 0.01)
+#' votep(p, log.p = TRUE)
+votep <- function(p, alpha = 0.5) {
+  alpha <- ifelse(alpha > 1, alpha / 100, alpha)
+  stopifnot(alpha > 0, alpha < 1)
+  keep <- (p >= 0) & (p <= 1)
+  alp <- vector("numeric", 2)
+  if (alpha <= 0.5) {
+    alp[1] <- alpha
+    alp[2] <- 1 - alpha
+  } else {
+    alp[2] <- alpha
+    alp[1] <- 1 - alpha
+  }
+  invalid <- sum(1L * keep) < 2
+  if (invalid) {
+    log_message(
+      "Must have at least two valid p values",
+      message_type = "warning"
+    )
+    res <- list(
+      p = NA_real_,
+      pos = NA_integer_,
+      neg = NA_integer_,
+      alpha = alpha,
+      validp = p[keep]
+    )
+  } else {
+    pi <- p[keep]
+    k <- length(pi)
+    pos <- sum(1L * (pi < alp[1]))
+    neg <- sum(1L * (pi > alp[2]))
+    if (k != length(p)) {
+      log_message(
+        "Some studies omitted",
+        message_type = "warning"
+      )
+    }
+    if ((pos + neg) <= 0) {
+      log_message(
+        "All p-values are within specified limits of alpha",
+        message_type = "warning"
+      )
+      p <- 1
+    } else {
+      p <- stats::binom.test(
+        pos, pos + neg, 0.5,
+        alternative = "greater"
+      )$p.value
+    }
+    res <- list(
+      p = p,
+      pos = pos,
+      neg = neg,
+      alpha = alpha,
+      validp = pi
+    )
+  }
+  res
+}
+
+#' @title Maximum depth of a list
+#'
+#' @param x A list.
+#' @param depth The depth of the list.
+#' @export
+#'
+#' @examples
+#' x <- list(
+#'   a = list(b = list(c = 1)),
+#'   d = list(e = list(f = 2))
+#' )
+#' max_depth(x)
+max_depth <- function(x, depth = 0) {
+  if (is.list(x)) {
+    return(max(unlist(lapply(x, max_depth, depth + 1))))
+  } else {
+    return(depth)
+  }
+}
