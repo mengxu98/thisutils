@@ -80,6 +80,7 @@ reference:
   - rescale
   - split_indices
   - simulate_sparse_matrix
+  - sump
   - table_to_matrix
   - try_get
   - unnest_fun
