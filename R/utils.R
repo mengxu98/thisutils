@@ -533,7 +533,6 @@ minimump <- function(p, alpha = 0.05, log.p = FALSE) {
 #' @examples
 #' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
 #' meanp(p)
-#' meanp(p, log.p = TRUE)
 meanp <- function(p) {
   keep <- (p >= 0) & (p <= 1)
   invalid <- sum(1L * keep) < 4
@@ -562,6 +561,14 @@ meanp <- function(p) {
   res
 }
 
+#' @title Sum p-value
+#'
+#' @param p A vector of p-values.
+#' @export
+#'
+#' @examples
+#' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+#' sump(p)
 sump <- function(p) {
   keep <- (p >= 0) & (p <= 1)
   invalid <- sum(1L * keep) < 2
@@ -622,7 +629,6 @@ sump <- function(p) {
 #' p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
 #' votep(p)
 #' votep(p, alpha = 0.01)
-#' votep(p, log.p = TRUE)
 votep <- function(p, alpha = 0.5) {
   alpha <- ifelse(alpha > 1, alpha / 100, alpha)
   stopifnot(alpha > 0, alpha < 1)
