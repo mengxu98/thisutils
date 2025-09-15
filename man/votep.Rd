@@ -18,5 +18,4 @@ Vote p-value
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
 votep(p)
 votep(p, alpha = 0.01)
-votep(p, log.p = TRUE)
 }
