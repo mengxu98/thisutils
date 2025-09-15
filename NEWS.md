@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.1.6
+
+* **func**:
+  * Add statistical *P-value* combination functions: `wilkinsonp()`, `maximump()`, `minimump()`, `meanp()`, `votep()`, and `sump()` for meta-analysis and multiple study result integration.
+  * Add `max_depth()` function to calculate the maximum depth of nested lists.
+
 # thisutils 0.1.5
 
 * **func**:
