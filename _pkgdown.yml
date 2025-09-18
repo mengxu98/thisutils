@@ -46,6 +46,7 @@ reference:
 - subtitle: "Logging messages"
 - contents:
   - log_message
+  - parse_inline_expressions
 
 - subtitle: "ASCII art"
 - contents:

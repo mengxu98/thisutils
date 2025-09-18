@@ -434,7 +434,7 @@ log_message <- function(
                                     caller_call) {
     if (!is.null(color_value) && !.check_color(color_value)) {
       error_msg <- paste0(
-        "{.arg ", param_name, "} must be a valid color name, ",
+        "{.arg {param_name}} must be a valid color name, ",
         "hexadecimal color code (e.g., '#000000'), or R color name"
       )
       cli::cli_abort(
@@ -455,8 +455,6 @@ log_message <- function(
       .envir = parent.frame()
     )
   }
-
-
 
   if (!is.null(text_style)) {
     valid_styles <- c(
@@ -480,7 +478,6 @@ log_message <- function(
   }
 }
 
-# Helper functions for message formatting
 .get_indent_part <- function(symbol, level) {
   if (symbol != "  ") {
     paste0(paste(rep(symbol, level), collapse = ""), " ")
@@ -887,6 +884,127 @@ log_message <- function(
     },
     error = function(e) {
       FALSE
+    }
+  )
+}
+
+#' @title Parse inline expressions
+#'
+#' @description
+#' Parse `{}` inline expressions and evaluate them in the current environment,
+#' while preserving outer formatting markers like `{.val ...}`.
+#'
+#' @param text A character string containing inline expressions to parse.
+#' @param env Environment in which to evaluate expressions.
+#' Defaults to the calling environment.
+#'
+#' @return
+#' A character string with expressions evaluated but formatting preserved.
+#'
+#' @export
+#'
+#' @examples
+#' i <- 1
+#' parse_inline_expressions(
+#'   "{.val {i}}"
+#' )
+#'
+#' x <- 5
+#' y <- 10
+#' parse_inline_expressions(
+#'   "{.pkg {x + y}}"
+#' )
+#'
+#' name <- "testing"
+#' name <- parse_inline_expressions(
+#'   "{.pkg {name}}"
+#' )
+#' name
+#'
+#' log_message(name)
+parse_inline_expressions <- function(
+    text,
+    env = parent.frame()) {
+  vapply(
+    text,
+    .replace_expressions,
+    character(1),
+    env = env,
+    USE.NAMES = FALSE
+  )
+}
+
+.replace_expressions <- function(text, env) {
+  pattern <- "\\{([^{}]+)\\}"
+
+  max_iterations <- 10
+  iteration <- 0
+
+  while (grepl(pattern, text) && iteration < max_iterations) {
+    iteration <- iteration + 1
+
+    matches <- gregexpr(pattern, text, perl = TRUE)[[1]]
+    if (matches[1] == -1) break
+
+    match_starts <- as.numeric(matches)
+    match_lengths <- attr(matches, "match.length")
+
+    order_idx <- order(match_starts, decreasing = TRUE)
+
+    for (i in order_idx) {
+      start_pos <- match_starts[i]
+      match_length <- match_lengths[i]
+
+      match <- substr(text, start_pos, start_pos + match_length - 1)
+      replacement <- .process_match(match, env)
+
+      text <- paste0(
+        substr(text, 1, start_pos - 1),
+        replacement,
+        substr(text, start_pos + match_length, nchar(text))
+      )
+    }
+  }
+
+  text
+}
+
+.process_match <- function(match, env) {
+  inner_content <- substr(match, 2, nchar(match) - 1)
+
+  if (grepl("^\\.[a-zA-Z_]+\\s+", inner_content)) {
+    .process_format_expression(inner_content, env)
+  } else {
+    .evaluate_expression(inner_content, env)
+  }
+}
+
+.process_format_expression <- function(content, env) {
+  parts <- strsplit(content, "\\s+", 2)[[1]]
+
+  if (length(parts) != 2) {
+    return(paste0("{", content, "}"))
+  }
+
+  format_tag <- parts[1]
+  format_content <- parts[2]
+
+  if (grepl("\\{", format_content)) {
+    return(paste0("{", content, "}"))
+  }
+
+  evaluated <- .evaluate_expression(format_content, env)
+  paste0("{", format_tag, " ", evaluated, "}")
+}
+
+.evaluate_expression <- function(expr, env) {
+  tryCatch(
+    {
+      result <- eval(parse(text = expr), envir = env)
+      as.character(result)
+    },
+    error = function(e) {
+      expr
     }
   )
 }
