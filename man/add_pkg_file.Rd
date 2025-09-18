@@ -5,14 +5,6 @@
 \title{Add package file}
 \usage{
 add_pkg_file(
-  desc_file = "DESCRIPTION",
-  pkg_name = NULL,
-  title = NULL,
-  pkg_description = NULL,
-  author_name = NULL,
-  author_email = NULL,
-  github_url = NULL,
-  output_dir = "R",
   use_figlet = TRUE,
   figlet_font = "Slant",
   colors = c("red", "yellow", "green", "magenta", "cyan", "yellow", "green", "white",
@@ -22,34 +14,6 @@ add_pkg_file(
 )
 }
 \arguments{
-\item{desc_file}{The DESCRIPTION file.
-Default is \code{"DESCRIPTION"}, it will be used to extract package information.
-Using \code{add_pkg_file()} will automatically use the DESCRIPTION file in the current directory
-and create \verb{<pkg_name>-package.R} in the \code{"R"} directory.
-If you want to use some specific information,
-such as \code{author_name} or \code{author_email}, you can provide them manually.}
-
-\item{pkg_name}{Character string, the name of the package.
-Default is \code{NULL}, which will be read from DESCRIPTION file.}
-
-\item{title}{Character string, title of the package.
-Default is \code{NULL}, which will be read from DESCRIPTION file.}
-
-\item{pkg_description}{Character string, short description of the package.
-Default is \code{NULL}, which will be read from DESCRIPTION file.}
-
-\item{author_name}{Character string, name of the package author.
-Default is \code{NULL}, which will be read from DESCRIPTION file.}
-
-\item{author_email}{Character string, email of the package author.
-Default is \code{NULL}, which will be read from DESCRIPTION file.}
-
-\item{github_url}{Character string, GitHub URL of the package.
-Default is \code{NULL}, which will be read from DESCRIPTION file or constructed based on package name.}
-
-\item{output_dir}{Character string, directory where to save the package file.
-Default is \code{"R"}.}
-
 \item{use_figlet}{Whether to use figlet for ASCII art generation.
 Default is \code{TRUE}. Details see \link{figlet}.}
 
