@@ -4,7 +4,16 @@
 \alias{parallelize_fun}
 \title{Parallelize a function}
 \usage{
-parallelize_fun(x, fun, cores = 1, export_fun = NULL, verbose = TRUE)
+parallelize_fun(
+  x,
+  fun,
+  cores = 1,
+  export_fun = NULL,
+  clean_result = FALSE,
+  throw_error = TRUE,
+  timestamp_format = paste0("[", format(Sys.time(), "\%Y-\%m-\%d \%H:\%M:\%S"), "] "),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{x}{A vector or list to apply over.}
@@ -16,11 +25,23 @@ Default is \code{1}.}
 
 \item{export_fun}{The functions to export the function to workers.}
 
-\item{verbose}{Whether to print progress messages.
+\item{clean_result}{Whether to remove failed results from output.
+If \code{FALSE}, failed results are kept as error objects.
+Default is \code{FALSE}.}
+
+\item{throw_error}{Whether to print detailed error information for failed results.
+Default is \code{TRUE}.}
+
+\item{timestamp_format}{Format string for timestamp display.
+Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
+
+\item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
 }
 \value{
 A list of computed results.
+If \code{clean_result = FALSE}, failed results are included as error objects.
+If \code{clean_result = TRUE}, only successful results are returned.
 }
 \description{
 Parallelize a function
@@ -35,4 +56,27 @@ parallelize_fun(list(1, 2, 3), function(x) {
   Sys.sleep(0.2)
   x^2
 }, cores = 2)
+
+# Examples with error handling
+parallelize_fun(1:5, function(x) {
+  if (x == 3) stop("Error on element 3")
+  x^2
+}, clean_result = FALSE)
+
+parallelize_fun(1:5, function(x) {
+  if (x == 3) stop("Error on element 3")
+  x^2
+}, clean_result = TRUE)
+
+# Control error printing
+parallelize_fun(1:5, function(x) {
+  if (x == 2) stop("Error on element 3")
+  if (x == 4) stop("Error on element 4")
+  x^2
+})
+
+parallelize_fun(1:5, function(x) {
+  if (x == 3) stop("Error on element 3")
+  x^2
+}, throw_error = FALSE)
 }

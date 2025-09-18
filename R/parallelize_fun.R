@@ -1,16 +1,22 @@
 #' @title Parallelize a function
 #'
 #' @md
+#' @inheritParams log_message
 #' @param x A vector or list to apply over.
 #' @param fun The function to be applied to each element.
 #' @param cores The number of cores to use for parallelization with [foreach::foreach].
 #' Default is `1`.
 #' @param export_fun The functions to export the function to workers.
-#' @param verbose Whether to print progress messages.
+#' @param clean_result Whether to remove failed results from output.
+#' If `FALSE`, failed results are kept as error objects.
+#' Default is `FALSE`.
+#' @param throw_error Whether to print detailed error information for failed results.
 #' Default is `TRUE`.
 #'
 #' @return
 #' A list of computed results.
+#' If `clean_result = FALSE`, failed results are included as error objects.
+#' If `clean_result = TRUE`, only successful results are returned.
 #'
 #' @export
 #'
@@ -24,25 +30,52 @@
 #'   Sys.sleep(0.2)
 #'   x^2
 #' }, cores = 2)
+#'
+#' # Examples with error handling
+#' parallelize_fun(1:5, function(x) {
+#'   if (x == 3) stop("Error on element 3")
+#'   x^2
+#' }, clean_result = FALSE)
+#'
+#' parallelize_fun(1:5, function(x) {
+#'   if (x == 3) stop("Error on element 3")
+#'   x^2
+#' }, clean_result = TRUE)
+#'
+#' # Control error printing
+#' parallelize_fun(1:5, function(x) {
+#'   if (x == 2) stop("Error on element 3")
+#'   if (x == 4) stop("Error on element 4")
+#'   x^2
+#' })
+#'
+#' parallelize_fun(1:5, function(x) {
+#'   if (x == 3) stop("Error on element 3")
+#'   x^2
+#' }, throw_error = FALSE)
 parallelize_fun <- function(
     x,
     fun,
     cores = 1,
     export_fun = NULL,
+    clean_result = FALSE,
+    throw_error = TRUE,
+    timestamp_format = paste0(
+      "[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] "
+    ),
     verbose = TRUE) {
   total <- length(x)
   if (verbose) {
-    time_str <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
     options(cli.progress_show_after = 0)
     options(cli.progress_clear = FALSE)
     pb <- cli::cli_progress_bar(
       format = paste0(
-        "{cli::pb_spin} [{time_str}] ",
+        "{cli::pb_spin} {timestamp_format}",
         "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
         "ETA: {cli::pb_eta}"
       ),
       format_done = paste0(
-        "{cli::col_green(cli::symbol$tick)} [{time_str}] ",
+        "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
         "Completed {.pkg {cli::pb_total}} tasks ",
         "in {cli::pb_elapsed}"
       ),
@@ -54,21 +87,39 @@ parallelize_fun <- function(
   if (cores == 1) {
     log_message(
       "Using {.pkg {1}} core",
+      timestamp_format = timestamp_format,
       verbose = verbose
     )
 
     if (verbose) {
       output_list <- vector("list", total)
 
-
       for (i in seq_along(x)) {
-        output_list[[i]] <- fun(x[[i]])
+        output_list[[i]] <- tryCatch(
+          fun(x[[i]]),
+          error = function(e) {
+            structure(
+              list(error = e$message, index = i, input = x[[i]]),
+              class = "parallelize_error"
+            )
+          }
+        )
         cli::cli_progress_update(id = pb)
       }
 
       cli::cli_progress_done(id = pb)
     } else {
-      output_list <- base::lapply(X = x, FUN = fun)
+      output_list <- base::lapply(X = x, FUN = function(xi) {
+        tryCatch(
+          fun(xi),
+          error = function(e) {
+            structure(
+              list(error = e$message, input = xi),
+              class = "parallelize_error"
+            )
+          }
+        )
+      })
     }
   }
 
@@ -78,6 +129,7 @@ parallelize_fun <- function(
 
     log_message(
       "Using {.pkg {foreach::getDoParWorkers()}} cores",
+      timestamp_format = timestamp_format,
       verbose = verbose
     )
 
@@ -95,7 +147,21 @@ parallelize_fun <- function(
           .combine = "c",
           .export = export_fun
         ) %dopar% {
-          list(fun(x[[i]]))
+          list(
+            tryCatch(
+              fun(x[[i]]),
+              error = function(e) {
+                structure(
+                  list(
+                    error = e$message,
+                    index = i,
+                    input = x[[i]]
+                  ),
+                  class = "parallelize_error"
+                )
+              }
+            )
+          )
         }
 
         output_chunks[[chunk_idx]] <- chunk_results
@@ -112,7 +178,15 @@ parallelize_fun <- function(
         i = seq_along(x),
         .export = export_fun
       ) %dopar% {
-        fun(x[[i]])
+        tryCatch(
+          fun(x[[i]]),
+          error = function(e) {
+            structure(
+              list(error = e$message, index = i, input = x[[i]]),
+              class = "parallelize_error"
+            )
+          }
+        )
       }
     }
 
@@ -121,11 +195,62 @@ parallelize_fun <- function(
 
   log_message(
     "Building results",
+    timestamp_format = timestamp_format,
     verbose = verbose
   )
   if (verbose) {
     options(cli.progress_show_after = NULL)
     options(cli.progress_clear = NULL)
+  }
+
+  error_indices <- sapply(
+    output_list, function(x) inherits(x, "parallelize_error")
+  )
+  if (any(error_indices)) {
+    error_count <- sum(error_indices)
+    log_message(
+      "Found {.pkg {error_count}} failed result{?s}",
+      timestamp_format = timestamp_format,
+      message_type = "warning",
+      verbose = verbose
+    )
+
+    if (throw_error && verbose) {
+      error_objects <- output_list[error_indices]
+      error_inputs <- x[error_indices]
+
+      error_message <- mapply(
+        function(error_obj, input_val) {
+          parse_inline_expressions(
+            "{.val {input_val}}: {.emph {error_obj$error}}"
+          )
+        }, error_objects, error_inputs
+      )
+      error_message <- paste0(
+        error_message,
+        collapse = "\n"
+      )
+      error_message <- paste0(
+        "Error details:\n",
+        error_message
+      )
+      log_message(
+        error_message,
+        symbol = cli::symbol$cross,
+        text_color = "red",
+        verbose = verbose
+      )
+    }
+
+    if (clean_result) {
+      output_list <- output_list[!error_indices]
+      x <- x[!error_indices]
+      log_message(
+        "Removed {.pkg {error_count}} failed result{?s}",
+        timestamp_format = timestamp_format,
+        verbose = verbose
+      )
+    }
   }
 
   names(output_list) <- x
