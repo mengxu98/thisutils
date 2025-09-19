@@ -1,7 +1,7 @@
 #' @title Print formatted message
 #'
 #' @description
-#' Integrate the message printing function with the `cli` package,
+#' Integrate the message printing function with the \href{https://cli.r-lib.org}{cli} package,
 #' and the [base::message] function.
 #' The message could be suppressed by [base::suppressMessages].
 #'
@@ -10,7 +10,7 @@
 #' @param verbose Whether to print the message.
 #' Default is `TRUE`.
 #' @param message_type Type of message.
-#' Could be choose one of `"info"`, `"success"`, `"warning"`, and `"error"`.
+#' Could be choose one of `"info"`, `"success"`, `"warning"`, `"error"`, and `"running"`.
 #' Default is `"info"`.
 #' @param cli_model Whether to use the `cli` package to print the message.
 #' Default is `TRUE`.
@@ -44,10 +44,11 @@
 #' When `TRUE`, each line gets the full formatting; when `FALSE`, only the first line gets the timestamp.
 #' Default is `FALSE`.
 #' @param timestamp_style Whether to apply the same text styling to the timestamp as the message text.
-#' When `TRUE`, timestamp formatting matches the message; when `FALSE`, timestamp keeps its default appearance.
+#' When `TRUE`, timestamp formatting matches the message;
+#' when `FALSE`, timestamp keeps its default appearance.
 #' Default is `TRUE`.
 #' @param .envir The environment to evaluate calls in.
-#' Default is `parent.frame()`.
+#' Default is [parent.frame].
 #' @param .frame The frame to use for error reporting.
 #' Default is `.envir`.
 #'
@@ -73,6 +74,11 @@
 #' log_message(
 #'   "Hello, world!",
 #'   message_type = "warning"
+#' )
+#'
+#' log_message(
+#'   "Processing data...",
+#'   message_type = "running"
 #' )
 #'
 #' log_message(
@@ -305,7 +311,9 @@
 log_message <- function(
     ...,
     verbose = TRUE,
-    message_type = c("info", "success", "warning", "error"),
+    message_type = c(
+      "info", "success", "warning", "error", "running"
+    ),
     cli_model = TRUE,
     level = 1,
     symbol = "  ",
@@ -531,7 +539,13 @@ log_message <- function(
     EXPR = message_type,
     "info" = cli::cli_alert_info(message, .envir = .envir),
     "success" = cli::cli_alert_success(message, .envir = .envir),
-    "warning" = cli::cli_alert_warning(message, .envir = .envir)
+    "warning" = cli::cli_alert_warning(message, .envir = .envir),
+    "running" = cli::cli_text(
+      paste0(
+        cli::make_ansi_style("orange")(cli::symbol$circle_dotted), " ", message
+      ),
+      .envir = .envir
+    )
   )
 }
 
@@ -677,7 +691,8 @@ log_message <- function(
       EXPR = message_type,
       "info" = "",
       "success" = "SUCCESS: ",
-      "warning" = "WARNING: "
+      "warning" = "WARNING: ",
+      "running" = "RUNNING: "
     )
     message(paste0(prefix, formatted_msg))
   }
