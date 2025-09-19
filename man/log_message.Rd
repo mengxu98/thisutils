@@ -7,7 +7,7 @@
 log_message(
   ...,
   verbose = TRUE,
-  message_type = c("info", "success", "warning", "error"),
+  message_type = c("info", "success", "warning", "error", "running"),
   cli_model = TRUE,
   level = 1,
   symbol = "  ",
@@ -29,7 +29,7 @@ log_message(
 Default is \code{TRUE}.}
 
 \item{message_type}{Type of message.
-Could be choose one of \code{"info"}, \code{"success"}, \code{"warning"}, and \code{"error"}.
+Could be choose one of \code{"info"}, \code{"success"}, \code{"warning"}, \code{"error"}, and \code{"running"}.
 Default is \code{"info"}.}
 
 \item{cli_model}{Whether to use the \code{cli} package to print the message.
@@ -73,11 +73,12 @@ Default is \code{TRUE}.}
 Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
 
 \item{timestamp_style}{Whether to apply the same text styling to the timestamp as the message text.
-When \code{TRUE}, timestamp formatting matches the message; when \code{FALSE}, timestamp keeps its default appearance.
+When \code{TRUE}, timestamp formatting matches the message;
+when \code{FALSE}, timestamp keeps its default appearance.
 Default is \code{TRUE}.}
 
 \item{.envir}{The environment to evaluate calls in.
-Default is \code{parent.frame()}.}
+Default is \link{parent.frame}.}
 
 \item{.frame}{The frame to use for error reporting.
 Default is \code{.envir}.}
@@ -86,7 +87,7 @@ Default is \code{.envir}.}
 Formated message.
 }
 \description{
-Integrate the message printing function with the \code{cli} package,
+Integrate the message printing function with the \href{https://cli.r-lib.org}{cli} package,
 and the \link[base:message]{base::message} function.
 The message could be suppressed by \link[base:message]{base::suppressMessages}.
 }
@@ -106,6 +107,11 @@ log_message(
 log_message(
   "Hello, world!",
   message_type = "warning"
+)
+
+log_message(
+  "Processing data...",
+  message_type = "running"
 )
 
 log_message(
