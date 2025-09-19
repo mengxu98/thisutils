@@ -1,5 +1,13 @@
 # thisutils
 
+# thisutils 0.1.7
+
+* **func**:
+  * Refactor `add_pkg_file()` function: Simplified function parameters by removing manual parameter inputs and automatically extracting all package information from DESCRIPTION file. Enhanced error handling and improved logging messages.
+  * Enhance `parallelize_fun()` function with robust error handling: Added `clean_result` parameter to control automatic removal of failed results, and `throw_error` parameter to control detailed error message display. Functions now gracefully handle partial failures without stopping execution.
+  * Add `parse_inline_expressions()` function: High-performance inline expression parser that evaluates `{}` expressions while preserving CLI formatting markers like `{.val ...}`.
+  * Enhance `log_message()` function: Add new `"running"` message type with orange circle dotted symbol (`◌`) to indicate ongoing processes.
+
 # thisutils 0.1.6
 
 * **func**:
