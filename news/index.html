@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,16 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.7" id="thisutils-017">thisutils 0.1.7<a class="anchor" aria-label="anchor" href="#thisutils-017"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Refactor <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function: Simplified function parameters by removing manual parameter inputs and automatically extracting all package information from DESCRIPTION file. Enhanced error handling and improved logging messages.</li>
+<li>Enhance <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function with robust error handling: Added <code>clean_result</code> parameter to control automatic removal of failed results, and <code>throw_error</code> parameter to control detailed error message display. Functions now gracefully handle partial failures without stopping execution.</li>
+<li>Add <code><a href="../reference/parse_inline_expressions.html">parse_inline_expressions()</a></code> function: High-performance inline expression parser that evaluates <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code> expressions while preserving CLI formatting markers like <code>{.val ...}</code>.</li>
+<li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code> function: Add new <code>"running"</code> message type with orange circle dotted symbol (<code>◌</code>) to indicate ongoing processes.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.6" id="thisutils-016">thisutils 0.1.6<a class="anchor" aria-label="anchor" href="#thisutils-016"></a></h2>
 <ul><li>
