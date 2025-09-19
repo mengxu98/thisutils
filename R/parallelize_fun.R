@@ -70,7 +70,7 @@ parallelize_fun <- function(
     options(cli.progress_clear = FALSE)
     pb <- cli::cli_progress_bar(
       format = paste0(
-        "{cli::pb_spin} {timestamp_format}",
+        "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
         "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
         "ETA: {cli::pb_eta}"
       ),
