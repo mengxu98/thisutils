@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.1.8
+
+* **func**:
+  * Remove `list_figlet_fonts()` function.
+
 # thisutils 0.1.7
 
 * **func**:
