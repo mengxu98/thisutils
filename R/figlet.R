@@ -46,44 +46,6 @@ figlet <- function(
   return(str)
 }
 
-#' @title List available figlet fonts
-#'
-#' @description
-#' List all figlet font files available in the package or system.
-#'
-#' @return Character vector of available font names.
-#'
-#' @export
-#'
-#' @examples
-#' list_figlet_fonts()
-list_figlet_fonts <- function() {
-  inst_fonts_dir <- system.file("fonts", package = "thisutils")
-  available_fonts <- character(0)
-
-  if (dir.exists(inst_fonts_dir)) {
-    font_files <- list.files(
-      inst_fonts_dir,
-      pattern = "\\.flf$",
-      full.names = FALSE
-    )
-    available_fonts <- tools::file_path_sans_ext(font_files)
-  }
-
-  if (!"Slant" %in% available_fonts) {
-    available_fonts <- c("Slant", available_fonts)
-  }
-
-  if (length(available_fonts) > 0) {
-    log_message("Available figlet fonts:")
-    for (font in available_fonts) {
-      log_message("Font: ", font, level = 2)
-    }
-  }
-
-  invisible(available_fonts)
-}
-
 .figlet_render <- function(
     text,
     font,
@@ -120,10 +82,10 @@ list_figlet_fonts <- function() {
   for (char in seq_along(char_index)) {
     cur_char <- font$chars[[char_index[[char]]]]
     if (is.null(cur_char)) {
-      stop(sprintf(
-        "The font '%s' does not contain the characters '%s'",
-        font$name, substr(text, char, char)
-      ))
+      log_message(
+        "The font {.val {font$name}} does not contain the characters {.val {substr(text, char, char)}}",
+        message_type = "error"
+      )
     }
 
     state$curr_char_width <- cur_char$width
@@ -206,9 +168,11 @@ list_figlet_fonts <- function() {
       above <- add_above[idx, ]
       below <- add_below[i, ]
 
-      smushed <- .vcapply(seq_len(width), function(col) {
-        .vsmush_chars(above[col], below[col], font$options)
-      })
+      smushed <- .vcapply(
+        seq_len(width), function(col) {
+          .vsmush_chars(above[col], below[col], font$options)
+        }
+      )
 
       idx <- n_above - max_smush + i
       if (idx >= 1L && idx <= n_above) {
@@ -315,9 +279,6 @@ figlet_font <- function(font) {
       "fonts/Slant.flf",
       package = "thisutils"
     )
-    if (!file.exists(font_path)) {
-      stop("Slant.flf font not found in package")
-    }
     return(.figlet_font_read(font_path))
   }
 
@@ -325,13 +286,19 @@ figlet_font <- function(font) {
     return(.figlet_font_read(font))
   }
 
-  stop(sprintf("Font '%s' not found", font))
+  log_message(
+    "Font {.val {font}} not found",
+    message_type = "error"
+  )
 }
 
 .figlet_font_read <- function(filename) {
   name <- tools::file_path_sans_ext(basename(filename))
   if (!file.exists(filename)) {
-    stop(sprintf("'%s' (%s) does not exist", name, filename))
+    log_message(
+      "{.file {filename}} does not exist",
+      message_type = "error"
+    )
   }
   data <- readLines(filename, warn = FALSE)
   options <- .figlet_font_options(data, filename, name)
@@ -353,16 +320,25 @@ figlet_font <- function(font) {
 
 .figlet_font_options <- function(data, filename, name) {
   if (length(data) == 0) {
-    stop(sprintf("'%s' (%s) is empty", name, filename))
+    log_message(
+      "{.file {filename}} is empty",
+      message_type = "error"
+    )
   }
   re_magic_number <- "^[tf]lf2."
   header <- data[[1]]
   if (!grepl(re_magic_number, header, perl = TRUE)) {
-    stop(sprintf("'%s' (%s) is not a valid font", name, filename))
+    log_message(
+      "{.file {filename}} is not a valid font",
+      message_type = "error"
+    )
   }
   header <- strsplit(sub(re_magic_number, "", header), " ")[[1]]
   if (length(header) < 6) {
-    stop(sprintf("'%s' (%s) has a malformed header", name, filename))
+    log_message(
+      "{.file {filename}} has a malformed header",
+      message_type = "error"
+    )
   }
 
   nms <- c(
@@ -440,8 +416,6 @@ figlet_font <- function(font) {
     data = matrix(unlist(m), length(txt), byrow = TRUE)
   )
 }
-
-
 
 .asc <- function(x) {
   strtoi(charToRaw(x), 16L)
