@@ -75,7 +75,13 @@ add_pkg_file <- function(
   if (use_figlet) {
     tryCatch(
       {
-        ascii_art <- figlet(pkg_name, font = figlet_font)
+        ascii_art <- figlet(
+          pkg_name,
+          font = figlet_font,
+          width = 60,
+          justify = "centre",
+          absolute = TRUE
+        )
         ascii_lines <- as.character(ascii_art)
         log_message(
           "Generated ASCII art logo successfully",
@@ -262,8 +268,8 @@ add_pkg_file <- function(
     return("")
   }
 
-  top_numbers <- "    0        1      2           3    4"
-  bottom_numbers <- "  5             6      7      8       9"
+  top_numbers <- "          0          1        2             3     4"
+  bottom_numbers <- "      5               6      7        8          9"
 
   all_lines <- c(top_numbers, ascii_lines, bottom_numbers)
   result <- paste(all_lines, collapse = "\n")
