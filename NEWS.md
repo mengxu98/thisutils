@@ -1,9 +1,9 @@
 # thisutils
 
-# thisutils 0.1.8
+# thisutils 0.1.9
 
 * **func**:
-  * Remove `list_figlet_fonts()` function.
+  * Remove `list_figlet_fonts()` and `rescale()` functions.
 
 # thisutils 0.1.7
 
