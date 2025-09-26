@@ -77,7 +77,6 @@ reference:
   - print.thisutils_logo
   - r_square
   - remove_space
-  - rescale
   - split_indices
   - simulate_sparse_matrix
   - sump
