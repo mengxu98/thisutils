@@ -199,61 +199,6 @@ normalization <- function(
   x
 }
 
-#' @title Rescale numeric vector
-#'
-#' @param x A numeric vector.
-#' @param from The range of the original data.
-#' @param to The range of the rescaled data.
-#'
-#' @return
-#' A numeric vector with rescaled values.
-#'
-#' @export
-#'
-#' @examples
-#' x <- rnorm(10)
-#' rescale(x)
-#' rescale(x, from = c(0, 1))
-#' rescale(x, to = c(0, 2))
-rescale <- function(
-    x,
-    from = range(x, na.rm = TRUE, finite = TRUE),
-    to = c(0, 1)) {
-  if (zero_range(from) || zero_range(to)) {
-    return(ifelse(is.na(x), NA, mean(to)))
-  } else {
-    return((x - from[1]) / diff(from) * diff(to) + to[1])
-  }
-}
-
-zero_range <- function(
-    x,
-    tol = 1000 * .Machine$double.eps) {
-  if (length(x) == 1) {
-    return(TRUE)
-  }
-  if (length(x) != 2) {
-    log_message(
-      "x must be length 1 or 2",
-      message_type = "error"
-    )
-  }
-  if (any(is.na(x))) {
-    return(NA)
-  }
-  if (x[1] == x[2]) {
-    return(TRUE)
-  }
-  if (all(is.infinite(x))) {
-    return(FALSE)
-  }
-  m <- min(abs(x))
-  if (m == 0) {
-    return(FALSE)
-  }
-  abs((x[1] - x[2]) / m) < tol
-}
-
 fc_matrix <- function(matrix) {
   row_means <- if (inherits(matrix, "sparseMatrix")) {
     Matrix::rowMeans(matrix)
