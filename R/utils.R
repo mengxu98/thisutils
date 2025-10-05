@@ -290,7 +290,7 @@ remove_space <- function(
 #' @title Try to evaluate an expression a set number of times before failing
 #'
 #' @description
-#' The function is used as a fail-safe if your R code sometimes works and sometimes doesn't,
+#' The function is used as a fail-safe if code sometimes works and sometimes doesn't,
 #' usually because it depends on a resource that may be temporarily unavailable.
 #' It tries to evaluate the expression `max_tries` times.
 #' If all the attempts fail, it throws an error;
@@ -425,12 +425,12 @@ download <- function(
   return(invisible(NULL))
 }
 
-#' @title Wilkinson's p-value
+#' @title Wilkinson's P-value
 #'
-#' @param p A vector of p-values.
-#' @param r The number of studies to include in the p-value calculation.
+#' @param p A vector of P-values.
+#' @param r The number of studies to include in the P-value calculation.
 #' @param alpha The significance level.
-#' @param log.p Whether to return the log of the p-value.
+#' @param log.p Whether to return the log of the P-value.
 #' @export
 #'
 #' @examples
@@ -447,7 +447,7 @@ wilkinsonp <- function(p, r = 1, alpha = 0.05, log.p = FALSE) {
   invalid <- sum(1L * keep) < 2
   if (invalid) {
     log_message(
-      "Must have at least two valid p values",
+      "Must have at least two valid P-values",
       message_type = "warning"
     )
     res <- list(
@@ -467,7 +467,7 @@ wilkinsonp <- function(p, r = 1, alpha = 0.05, log.p = FALSE) {
         message_type = "warning"
       )
     }
-    if ((r < 1) | (r > k)) {
+    if ((r < 1) || (r > k)) {
       r <- 1
       log_message(
         "Illegal r set to 1",
@@ -488,11 +488,9 @@ wilkinsonp <- function(p, r = 1, alpha = 0.05, log.p = FALSE) {
   res
 }
 
-#' @title Maximum p-value
+#' @title Maximum P-value
 #'
-#' @param p A vector of p-values.
-#' @param alpha The significance level.
-#' @param log.p Whether to return the log of the p-value.
+#' @inheritParams wilkinsonp
 #' @export
 #'
 #' @examples
@@ -508,11 +506,9 @@ maximump <- function(p, alpha = 0.05, log.p = FALSE) {
   res
 }
 
-#' @title Minimum p-value
+#' @title Minimum P-value
 #'
-#' @param p A vector of p-values.
-#' @param alpha The significance level.
-#' @param log.p Whether to return the log of the p-value.
+#' @inheritParams wilkinsonp
 #' @export
 #'
 #' @examples
@@ -525,9 +521,9 @@ minimump <- function(p, alpha = 0.05, log.p = FALSE) {
   res
 }
 
-#' @title Mean p-value
+#' @title Mean P-value
 #'
-#' @param p A vector of p-values.
+#' @inheritParams wilkinsonp
 #' @export
 #'
 #' @examples
@@ -538,10 +534,14 @@ meanp <- function(p) {
   invalid <- sum(1L * keep) < 4
   if (invalid) {
     log_message(
-      "Must have at least four valid p values",
+      "Must have at least four valid P-values",
       message_type = "warning"
     )
-    res <- list(z = NA_real_, p = NA_real_, validp = p[keep])
+    res <- list(
+      z = NA_real_,
+      p = NA_real_,
+      validp = p[keep]
+    )
   } else {
     pi <- mean(p[keep])
     k <- length(p[keep])
@@ -561,9 +561,9 @@ meanp <- function(p) {
   res
 }
 
-#' @title Sum p-value
+#' @title Sum P-value
 #'
-#' @param p A vector of p-values.
+#' @inheritParams wilkinsonp
 #' @export
 #'
 #' @examples
@@ -574,10 +574,14 @@ sump <- function(p) {
   invalid <- sum(1L * keep) < 2
   if (invalid) {
     log_message(
-      "Must have at least two valid p values",
+      "Must have at least two valid P-values",
       message_type = "warning"
     )
-    res <- list(p = NA_real_, conservativep = NA_real_, validp = p[keep])
+    res <- list(
+      p = NA_real_,
+      conservativep = NA_real_,
+      validp = p[keep]
+    )
   } else {
     sigmap <- sum(p[keep])
     k <- length(p[keep])
@@ -619,10 +623,9 @@ sump <- function(p) {
   res
 }
 
-#' @title Vote p-value
+#' @title Vote P-value
 #'
-#' @param p A vector of p-values.
-#' @param alpha The significance level.
+#' @inheritParams wilkinsonp
 #' @export
 #'
 #' @examples
@@ -644,7 +647,7 @@ votep <- function(p, alpha = 0.5) {
   invalid <- sum(1L * keep) < 2
   if (invalid) {
     log_message(
-      "Must have at least two valid p values",
+      "Must have at least two valid P-values",
       message_type = "warning"
     )
     res <- list(
@@ -667,7 +670,7 @@ votep <- function(p, alpha = 0.5) {
     }
     if ((pos + neg) <= 0) {
       log_message(
-        "All p-values are within specified limits of alpha",
+        "All P-values are within specified limits of alpha",
         message_type = "warning"
       )
       p <- 1

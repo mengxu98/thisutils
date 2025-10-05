@@ -2,15 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{meanp}
 \alias{meanp}
-\title{Mean p-value}
+\title{Mean P-value}
 \usage{
 meanp(p)
 }
 \arguments{
-\item{p}{A vector of p-values.}
+\item{p}{A vector of P-values.}
 }
 \description{
-Mean p-value
+Mean P-value
 }
 \examples{
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
