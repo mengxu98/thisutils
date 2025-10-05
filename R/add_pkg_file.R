@@ -248,7 +248,7 @@ add_pkg_file <- function(
     "}",
     "",
     ".onAttach <- function(libname, pkgname) {",
-    "  verbose <- get_verbose()",
+    "  verbose <- thisutils::get_verbose()",
     "  if (isTRUE(verbose)) {",
     "    version <- utils::packageDescription(",
     "      pkgname,",
@@ -265,6 +265,10 @@ add_pkg_file <- function(
     paste0(
       "      cli::col_grey(\"  suppressPackageStartupMessages(library(",
       pkg_name, "))\"),"
+    ),
+    "      \"\\n\",",
+    paste0(
+      "      cli::col_grey(\"  or options(log_message.verbose = FALSE)\"),"
     ),
     "      \"\\n\",",
     "      strrep(\"-\", 60)",

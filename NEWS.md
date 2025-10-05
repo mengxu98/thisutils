@@ -1,5 +1,16 @@
 # thisutils
 
+# thisutils 0.2.0
+
+* **func**:
+  * Add package logo.
+  * Add `get_verbose()` function: New exported function to get verbose option from global options or local arguments, providing better control over message display.
+  * Enhance `.onAttach()` function: Now respects verbose settings and only displays startup messages when verbose mode is enabled, improving user experience.
+  * Update `add_pkg_file()` function: Generated `.onAttach()` function now includes verbose check using `get_verbose()`, ensuring consistency with package behavior.
+
+* **docs**:
+  * Corrected brace escaping in `parse_inline_expressions()`.
+
 # thisutils 0.1.9
 
 * **func**:
