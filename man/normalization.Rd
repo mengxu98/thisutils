@@ -11,7 +11,8 @@ normalization(x, method = "max_min", na_rm = TRUE, ...)
 
 \item{method}{Method used for normalization.}
 
-\item{na_rm}{Whether to remove \code{NA} values, and if setting \code{TRUE}, using \code{0} instead.
+\item{na_rm}{Whether to remove \code{NA} values,
+and if setting \code{TRUE}, using \code{0} instead.
 Default is \code{TRUE}.}
 
 \item{...}{Parameters for other methods.}

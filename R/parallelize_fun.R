@@ -86,7 +86,7 @@ parallelize_fun <- function(
 
   if (cores == 1) {
     log_message(
-      "Using {.pkg {1}} core",
+      "Using {.pkg 1} core",
       timestamp_format = timestamp_format,
       verbose = verbose
     )
@@ -99,7 +99,11 @@ parallelize_fun <- function(
           fun(x[[i]]),
           error = function(e) {
             structure(
-              list(error = e$message, index = i, input = x[[i]]),
+              list(
+                error = e$message,
+                index = i,
+                input = x[[i]]
+              ),
               class = "parallelize_error"
             )
           }
@@ -109,17 +113,22 @@ parallelize_fun <- function(
 
       cli::cli_progress_done(id = pb)
     } else {
-      output_list <- base::lapply(X = x, FUN = function(xi) {
-        tryCatch(
-          fun(xi),
-          error = function(e) {
-            structure(
-              list(error = e$message, input = xi),
-              class = "parallelize_error"
-            )
-          }
-        )
-      })
+      output_list <- base::lapply(
+        X = x, FUN = function(xi) {
+          tryCatch(
+            fun(xi),
+            error = function(e) {
+              structure(
+                list(
+                  error = e$message,
+                  input = xi
+                ),
+                class = "parallelize_error"
+              )
+            }
+          )
+        }
+      )
     }
   }
 
@@ -134,7 +143,10 @@ parallelize_fun <- function(
     )
 
     if (verbose) {
-      chunks <- split(seq_along(x), rep(1:cores, length.out = total))
+      chunks <- split(
+        seq_along(x),
+        rep(1:cores, length.out = total)
+      )
 
       output_chunks <- vector("list", total)
       for (chunk_idx in seq_along(chunks)) {
@@ -182,7 +194,11 @@ parallelize_fun <- function(
           fun(x[[i]]),
           error = function(e) {
             structure(
-              list(error = e$message, index = i, input = x[[i]]),
+              list(
+                error = e$message,
+                index = i,
+                input = x[[i]]
+              ),
               class = "parallelize_error"
             )
           }

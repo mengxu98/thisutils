@@ -2,21 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{wilkinsonp}
 \alias{wilkinsonp}
-\title{Wilkinson's p-value}
+\title{Wilkinson's P-value}
 \usage{
 wilkinsonp(p, r = 1, alpha = 0.05, log.p = FALSE)
 }
 \arguments{
-\item{p}{A vector of p-values.}
+\item{p}{A vector of P-values.}
 
-\item{r}{The number of studies to include in the p-value calculation.}
+\item{r}{The number of studies to include in the P-value calculation.}
 
 \item{alpha}{The significance level.}
 
-\item{log.p}{Whether to return the log of the p-value.}
+\item{log.p}{Whether to return the log of the P-value.}
 }
 \description{
-Wilkinson's p-value
+Wilkinson's P-value
 }
 \examples{
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)

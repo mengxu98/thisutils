@@ -195,10 +195,13 @@ add_pkg_file <- function(
     "#' @examples",
     paste0("#' ", tolower(pkg_name), "_logo()"),
     paste0(
-      tolower(pkg_name), "_logo <- function(unicode = cli::is_utf8_output()) {"
+      tolower(pkg_name),
+      "_logo <- function(unicode = cli::is_utf8_output()) {"
     ),
     "  logo <- c(",
-    paste0("    \"", ascii_with_numbers, "\""),
+    paste0(
+      "    \"", ascii_with_numbers, "\""
+    ),
     "  )",
     "",
     .generate_hexa(length(colors), colors, unicode),
@@ -209,14 +212,18 @@ add_pkg_file <- function(
     "    SIMPLIFY = FALSE",
     "  )",
     "",
-    paste0("  for (i in 0:", length(colors) - 1, ") {"),
+    paste0(
+      "  for (i in 0:", length(colors) - 1, ") {"
+    ),
     "    pat <- paste0(\"\\\\b\", i, \"\\\\b\")",
     "    logo <- sub(pat, col_hexa[[i + 1]], logo)",
     "  }",
     "",
     "  structure(",
     "    cli::col_blue(logo),",
-    paste0("    class = \"", tolower(pkg_name), "_logo\""),
+    paste0(
+      "    class = \"", tolower(pkg_name), "_logo\""
+    ),
     "  )",
     "}",
     "",
@@ -227,34 +234,48 @@ add_pkg_file <- function(
     "#'",
     "#' @return Print the ASCII logo",
     "#'",
-    paste0("#' @method print ", tolower(pkg_name), "_logo"),
+    paste0(
+      "#' @method print ", tolower(pkg_name), "_logo"
+    ),
     "#'",
     "#' @export",
     "#'",
-    paste0("print.", tolower(pkg_name), "_logo <- function(x, ...) {"),
+    paste0(
+      "print.", tolower(pkg_name), "_logo <- function(x, ...) {"
+    ),
     "  cat(x, ..., sep = \"\\n\")",
     "  invisible(x)",
     "}",
     "",
     ".onAttach <- function(libname, pkgname) {",
-    "  version <- utils::packageDescription(pkgname, fields = \"Version\")",
+    "  verbose <- get_verbose()",
+    "  if (isTRUE(verbose)) {",
+    "    version <- utils::packageDescription(",
+    "      pkgname,",
+    "      fields = \"Version\"",
+    "    )",
     "",
-    "  msg <- paste0(",
-    "    strrep(\"-\", 60),",
-    "    \"\\n\",",
-    "    cli::col_blue(pkgname, \" version \", version),",
-    "    \"\\n\",",
-    "    cli::col_grey(\"This message can be suppressed by:\"),",
-    "    \"\\n\",",
+    "    msg <- paste0(",
+    "      strrep(\"-\", 60),",
+    "      \"\\n\",",
+    "      cli::col_blue(pkgname, \" version \", version),",
+    "      \"\\n\",",
+    "      cli::col_grey(\"This message can be suppressed by:\"),",
+    "      \"\\n\",",
     paste0(
-      "    cli::col_grey(\"  suppressPackageStartupMessages(library(", pkg_name, "))\"),"
+      "      cli::col_grey(\"  suppressPackageStartupMessages(library(",
+      pkg_name, "))\"),"
     ),
-    "    \"\\n\",",
-    "    strrep(\"-\", 60)",
-    "  )",
+    "      \"\\n\",",
+    "      strrep(\"-\", 60)",
+    "    )",
     "",
-    paste0("  packageStartupMessage(", tolower(pkg_name), "_logo())"),
-    "  packageStartupMessage(msg)",
+    paste0(
+      "    packageStartupMessage(",
+      tolower(pkg_name), "_logo())"
+    ),
+    "    packageStartupMessage(msg)",
+    "  }",
     "}"
   )
 

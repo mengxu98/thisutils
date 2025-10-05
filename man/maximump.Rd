@@ -2,19 +2,19 @@
 % Please edit documentation in R/utils.R
 \name{maximump}
 \alias{maximump}
-\title{Maximum p-value}
+\title{Maximum P-value}
 \usage{
 maximump(p, alpha = 0.05, log.p = FALSE)
 }
 \arguments{
-\item{p}{A vector of p-values.}
+\item{p}{A vector of P-values.}
 
 \item{alpha}{The significance level.}
 
-\item{log.p}{Whether to return the log of the p-value.}
+\item{log.p}{Whether to return the log of the P-value.}
 }
 \description{
-Maximum p-value
+Maximum P-value
 }
 \examples{
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)

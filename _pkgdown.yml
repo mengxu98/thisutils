@@ -45,6 +45,7 @@ reference:
 
 - subtitle: "Logging messages"
 - contents:
+  - get_verbose
   - log_message
   - parse_inline_expressions
 
