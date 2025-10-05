@@ -1,4 +1,4 @@
-# ***thisutils*** <img src="man/figures/logo.svg" align="right" width="150"/>
+# ***thisutils*** <img src="man/figures/logo.svg" align="right" width="120"/>
 
 <!-- badges: start -->
 
