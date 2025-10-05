@@ -4,7 +4,7 @@
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 727.2 825.4"
 	 style="enable-background:new 0 0 727.2 825.4;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#231815;stroke:#231815;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st0{fill:#141E3E;stroke:#18469B;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 	
 		.st1{opacity:0.5;fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;enable-background:new    ;}
 	
@@ -28,9 +28,9 @@
 	
 		.st11{opacity:0.5;fill:#79C178;stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;enable-background:new    ;}
 	.st12{opacity:0.8;fill:#FFFFFF;enable-background:new    ;}
-	.st13{font-family:'TimesNewRomanPS-ItalicMT';}
+	.st13{font-family:'Arial-ItalicMT';}
 	.st14{font-size:60px;}
-	.st15{font-family:'TimesNewRomanPS-BoldMT';}
+	.st15{font-family:'Arial-BoldMT';}
 	.st16{font-size:72px;}
 	.st17{fill:#FFFFFF;}
 	.st18{font-family:'TimesNewRomanPS-BoldItalicMT';}
@@ -72,10 +72,10 @@
 <path class="st11" d="M255.4,501.3l-40.5-23.4c-1.5-0.9-3.4-0.9-4.9,0l-40.5,23.4c-1.5,0.9-2.5,2.5-2.5,4.3v46.8
 	c0,1.7,0.9,3.4,2.5,4.3l40.5,23.4c1.5,0.9,3.4,0.9,4.9,0l40.5-23.5c1.5-0.9,2.5-2.5,2.5-4.3v-46.7C258,503.8,257,502.2,255.4,501.3z
 	"/>
-<text transform="matrix(1 0 0 1 72.9726 294.9012)" class="st12 st13 st14">log_message</text>
-<text transform="matrix(1 0 0 1 79.6156 376.9901)" class="st12 st13 st14">parallelize_fun</text>
-<text transform="matrix(1 0 0 1 97.9726 449.3999)" class="st12 st15 st16">. . .</text>
-<text transform="matrix(0.866 -0.5 0.5 0.866 336.6957 771.1688)" class="st17 st18 st19">thisutils</text>
+<text transform="matrix(1 0 0 1 48.9726 294.9012)" class="st12 st13 st14">log_message</text>
+<text transform="matrix(1 0 0 1 49.452 376.9901)" class="st12 st13 st14">parallelize_fun</text>
+<text transform="matrix(1 0 0 1 74.9726 449.3999)" class="st12 st15 st16">. . .</text>
+<text transform="matrix(0.866 -0.5 0.5 0.866 341.6957 771.1688)" class="st17 st18 st19">thisutils</text>
 <path class="st1" d="M606,245.8l-40.5-23.4c-1.5-0.9-3.4-0.9-4.9,0l-40.5,23.4c-1.5,0.9-2.5,2.5-2.5,4.3v46.8c0,1.7,0.9,3.4,2.5,4.3
 	l40.5,23.4c1.5,0.9,3.4,0.9,4.9,0l40.5-23.5c1.5-0.9,2.5-2.5,2.5-4.3v-46.7C608.5,248.4,607.5,246.7,606,245.8z"/>
 </svg>
