@@ -126,7 +126,8 @@ r_square <- function(y_true, y_pred) {
 #' @md
 #' @param x Input numeric vector.
 #' @param method Method used for normalization.
-#' @param na_rm Whether to remove `NA` values, and if setting `TRUE`, using `0` instead.
+#' @param na_rm Whether to remove `NA` values,
+#' and if setting `TRUE`, using `0` instead.
 #' Default is `TRUE`.
 #' @param ... Parameters for other methods.
 #'

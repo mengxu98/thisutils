@@ -17,7 +17,7 @@ A character string with expressions evaluated but formatting preserved.
 }
 \description{
 Parse `{}` inline expressions and evaluate them in the current environment,
-while preserving outer formatting markers like `{.val ...}`.
+while preserving outer formatting markers like `\{.val ...\}`.
 }
 \examples{
 i <- 1

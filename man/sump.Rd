@@ -2,15 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{sump}
 \alias{sump}
-\title{Sum p-value}
+\title{Sum P-value}
 \usage{
 sump(p)
 }
 \arguments{
-\item{p}{A vector of p-values.}
+\item{p}{A vector of P-values.}
 }
 \description{
-Sum p-value
+Sum P-value
 }
 \examples{
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)

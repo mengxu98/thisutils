@@ -21,7 +21,7 @@ The evaluated expression if successful,
 otherwise it throws an error if all attempts are unsuccessful.
 }
 \description{
-The function is used as a fail-safe if your R code sometimes works and sometimes doesn't,
+The function is used as a fail-safe if code sometimes works and sometimes doesn't,
 usually because it depends on a resource that may be temporarily unavailable.
 It tries to evaluate the expression \code{max_tries} times.
 If all the attempts fail, it throws an error;

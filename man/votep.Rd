@@ -2,17 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{votep}
 \alias{votep}
-\title{Vote p-value}
+\title{Vote P-value}
 \usage{
 votep(p, alpha = 0.5)
 }
 \arguments{
-\item{p}{A vector of p-values.}
+\item{p}{A vector of P-values.}
 
 \item{alpha}{The significance level.}
 }
 \description{
-Vote p-value
+Vote P-value
 }
 \examples{
 p <- c(0.01, 0.02, 0.03, 0.04, 0.05)

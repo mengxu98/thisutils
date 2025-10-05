@@ -87,20 +87,26 @@ print.thisutils_logo <- function(x, ...) {
 }
 
 .onAttach <- function(libname, pkgname) {
-  version <- utils::packageDescription(pkgname, fields = "Version")
+  verbose <- get_verbose()
+  if (isTRUE(verbose)) {
+    version <- utils::packageDescription(
+      pkgname,
+      fields = "Version"
+    )
 
-  msg <- paste0(
-    strrep("-", 60),
-    "\n",
-    cli::col_blue(pkgname, " version ", version),
-    "\n",
-    cli::col_grey("This message can be suppressed by:"),
-    "\n",
-    cli::col_grey("  suppressPackageStartupMessages(library(thisutils))"),
-    "\n",
-    strrep("-", 60)
-  )
+    msg <- paste0(
+      strrep("-", 60),
+      "\n",
+      cli::col_blue(pkgname, " version ", version),
+      "\n",
+      cli::col_grey("This message can be suppressed by:"),
+      "\n",
+      cli::col_grey("  suppressPackageStartupMessages(library(thisutils))"),
+      "\n",
+      strrep("-", 60)
+    )
 
-  packageStartupMessage(thisutils_logo())
-  packageStartupMessage(msg)
+    packageStartupMessage(thisutils_logo())
+    packageStartupMessage(msg)
+  }
 }

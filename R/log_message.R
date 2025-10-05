@@ -328,7 +328,7 @@ log_message <- function(
     timestamp_style = TRUE,
     .envir = parent.frame(),
     .frame = .envir) {
-  verbose <- .get_verbose(verbose)
+  verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
   msg <- .build_message(...)
 
@@ -374,26 +374,56 @@ log_message <- function(
   invisible(NULL)
 }
 
-.get_verbose <- function(verbose) {
-  verbose_option <- getOption("log_message.verbose", NULL)
+#' @title Get the verbose option
+#'
+#' @description
+#' Get the verbose option from the global options or the local argument.
+#'
+#' @param verbose The verbose option.
+#' Default is `NULL`, which means to get the verbose option from the global options.
+#' @return The verbose option.
+#' @export
+#'
+#' @examples
+#' get_verbose()
+#' get_verbose(verbose = FALSE)
+#' get_verbose(verbose = TRUE)
+#'
+#' options(log_message.verbose = FALSE)
+#' get_verbose()
+#' get_verbose(verbose = TRUE)
+#'
+#' options(log_message.verbose = TRUE)
+#' get_verbose()
+#'
+#' options(log_message.verbose = NULL)
+get_verbose <- function(verbose = NULL) {
+  verbose_global <- getOption("log_message.verbose", NULL)
 
-  if (is.null(verbose_option)) {
-    return(verbose)
-  }
-
-  if (!is.logical(verbose_option) || length(verbose_option) != 1) {
-    cli::cli_alert_warning(
-      "{.arg log_message.verbose} is not a logical value, set to {.pkg NULL}",
-      .envir = parent.frame()
-    )
-    cli::cli_alert_warning(
-      "or using {.code options(log_message.verbose = TRUE/FALSE)}",
-      .envir = parent.frame()
-    )
-    options(log_message.verbose = NULL)
-    verbose <- FALSE
+  if (is.null(verbose_global)) {
+    if (is.null(verbose)) {
+      verbose <- TRUE
+    } else {
+      if (!is.logical(verbose) || length(verbose) != 1) {
+        cli::cli_alert_warning(
+          "{.arg verbose} is not a logical value, set to {.pkg TRUE}"
+        )
+        verbose <- TRUE
+      }
+    }
   } else {
-    verbose <- verbose_option
+    if (!is.logical(verbose_global) || length(verbose_global) != 1) {
+      cli::cli_alert_warning(
+        "{.arg log_message.verbose} is not a logical value, set to {.pkg NULL}"
+      )
+      cli::cli_alert_warning(
+        "or using {.code options(log_message.verbose = TRUE/FALSE)}"
+      )
+      options(log_message.verbose = NULL)
+      verbose <- FALSE
+    } else {
+      verbose <- verbose_global
+    }
   }
 
   verbose
@@ -907,7 +937,7 @@ log_message <- function(
 #'
 #' @description
 #' Parse `{}` inline expressions and evaluate them in the current environment,
-#' while preserving outer formatting markers like `{.val ...}`.
+#' while preserving outer formatting markers like `\{.val ...\}`.
 #'
 #' @param text A character string containing inline expressions to parse.
 #' @param env Environment in which to evaluate expressions.
