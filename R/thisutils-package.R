@@ -87,7 +87,7 @@ print.thisutils_logo <- function(x, ...) {
 }
 
 .onAttach <- function(libname, pkgname) {
-  verbose <- get_verbose()
+  verbose <- thisutils::get_verbose()
   if (isTRUE(verbose)) {
     version <- utils::packageDescription(
       pkgname,
@@ -102,6 +102,8 @@ print.thisutils_logo <- function(x, ...) {
       cli::col_grey("This message can be suppressed by:"),
       "\n",
       cli::col_grey("  suppressPackageStartupMessages(library(thisutils))"),
+      "\n",
+      cli::col_grey("  or options(log_message.verbose = FALSE)"),
       "\n",
       strrep("-", 60)
     )
