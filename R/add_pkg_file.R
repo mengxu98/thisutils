@@ -28,6 +28,8 @@ add_pkg_file <- function(
     unicode = TRUE,
     verbose = TRUE) {
   desc_file <- "DESCRIPTION"
+  pkgdown_file <- "_pkgdown.yml"
+
   desc_info <- .read_description(desc_file, verbose)
 
   pkg_name <- desc_info$Package
@@ -137,6 +139,9 @@ add_pkg_file <- function(
     message_type = "success",
     verbose = verbose
   )
+  .check_dependency(desc_file, verbose)
+  .check_pkgdown(pkgdown_file, pkg_name, verbose)
+
   invisible(file_content)
 }
 
@@ -510,4 +515,148 @@ add_pkg_file <- function(
     Email = author_email,
     GitHub_URL = github_url
   )
+}
+
+.check_dependency <- function(desc_file, verbose = TRUE) {
+  if (!file.exists(desc_file)) {
+    log_message(
+      "{.file {desc_file}} not found",
+      message_type = "error"
+    )
+    return()
+  }
+
+  desc_content <- readLines(desc_file, warn = FALSE)
+
+  imports_start <- which(grepl("^Imports:", desc_content))
+  if (length(imports_start) == 0) {
+    log_message(
+      "No {.cls Imports} section found in {.file {desc_file}}",
+      message_type = "warning",
+      verbose = verbose
+    )
+    return()
+  }
+
+  imports_end <- imports_start
+  for (i in (imports_start + 1):length(desc_content)) {
+    if (grepl("^[A-Za-z]", desc_content[i]) && !grepl("^\\s", desc_content[i])) {
+      imports_end <- i - 1
+      break
+    }
+    if (i == length(desc_content)) {
+      imports_end <- length(desc_content)
+    }
+  }
+
+  imports_section <- desc_content[imports_start:imports_end]
+  has_cli <- any(grepl("\\bcli\\b", imports_section))
+
+  if (!has_cli) {
+    log_message(
+      "Adding cli dependency to DESCRIPTION file",
+      message_type = "info",
+      verbose = verbose
+    )
+
+    if (imports_end == imports_start) {
+      desc_content[imports_start] <- paste0(
+        desc_content[imports_start], "\n    cli"
+      )
+    } else {
+      desc_content[imports_end] <- paste0(
+        desc_content[imports_end], "\n    cli"
+      )
+    }
+
+    writeLines(desc_content, desc_file)
+    log_message(
+      "Successfully added {.pkg cli} to {.file {desc_file}}",
+      message_type = "success",
+      verbose = verbose
+    )
+  } else {
+    log_message(
+      "{.pkg cli} already present in {.file {desc_file}}",
+      verbose = verbose
+    )
+  }
+}
+
+.check_pkgdown <- function(pkgdown_file, pkg_name, verbose = TRUE) {
+  if (!file.exists(pkgdown_file)) {
+    log_message(
+      "{.file {pkgdown_file}} not found",
+      message_type = "warning",
+      verbose = verbose
+    )
+    return()
+  }
+
+  pkgdown_content <- readLines(pkgdown_file, warn = FALSE)
+
+  reference_start <- which(grepl("^reference:", pkgdown_content))
+  if (length(reference_start) == 0) {
+    log_message(
+      "No {.cls reference} section found in {.file {pkgdown_file}}",
+      message_type = "info",
+      verbose = verbose
+    )
+    return()
+  }
+
+  has_subtitle <- any(
+    grepl('subtitle: "Package overview"', pkgdown_content)
+  )
+  has_package_entry <- any(
+    grepl(paste0("- ", pkg_name, "-package"), pkgdown_content)
+  )
+  has_logo_entry <- any(
+    grepl(paste0("- ", tolower(pkg_name), "_logo"), pkgdown_content)
+  )
+
+  if (!has_subtitle || !has_package_entry || !has_logo_entry) {
+    log_message(
+      "Updating {.file {pkgdown_file}} with package overview section",
+      message_type = "info",
+      verbose = verbose
+    )
+
+    insert_pos <- reference_start + 1
+
+    new_content <- c()
+    if (!has_subtitle) {
+      new_content <- c(new_content, "", "- subtitle: \"Package overview\"")
+    }
+    if (!has_package_entry || !has_logo_entry) {
+      new_content <- c(new_content, "- contents:")
+      if (!has_package_entry) {
+        new_content <- c(new_content, paste0("  - ", pkg_name, "-package"))
+      }
+      if (!has_logo_entry) {
+        new_content <- c(new_content, paste0("  - ", tolower(pkg_name), "_logo"))
+      }
+    }
+
+    if (length(new_content) > 0) {
+      updated_content <- c(
+        pkgdown_content[1:insert_pos],
+        new_content,
+        pkgdown_content[(insert_pos + 1):length(pkgdown_content)]
+      )
+
+      writeLines(updated_content, pkgdown_file)
+      log_message(
+        "Successfully updated {.file {pkgdown_file}}",
+        message_type = "success",
+        verbose = verbose
+      )
+    }
+  } else {
+    log_message(
+      "Package overview section already present in {.file {pkgdown_file}}",
+      message_type = "info",
+      verbose = verbose
+    )
+  }
 }

@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.2.1
+
+* **func**:
+  * Enhance `add_pkg_file()` function: Added automatic dependency checking to ensure `cli` package is included in DESCRIPTION file, and automatic pkgdown configuration checking to ensure proper package overview section setup.
+
 # thisutils 0.2.0
 
 * **func**:
