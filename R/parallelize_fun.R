@@ -65,23 +65,46 @@ parallelize_fun <- function(
     ),
     verbose = TRUE) {
   total <- length(x)
+  has_names <- !is.null(names(x)) && any(names(x) != "")
+  is_vector <- is.vector(x) && !is.list(x)
+  show_values <- !has_names && is_vector
+
   if (verbose) {
     options(cli.progress_show_after = 0)
     options(cli.progress_clear = FALSE)
-    pb <- cli::cli_progress_bar(
-      format = paste0(
-        "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
-        "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
-        "ETA: {cli::pb_eta}"
-      ),
-      format_done = paste0(
-        "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
-        "Completed {.pkg {cli::pb_total}} tasks ",
-        "in {cli::pb_elapsed}"
-      ),
-      total = total,
-      clear = FALSE
-    )
+
+    if (has_names || show_values) {
+      pb <- cli::cli_progress_bar(
+        format = paste0(
+          "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
+          "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
+          "Processing: {.pkg {cli::pb_status}} ",
+          "ETA: {cli::pb_eta}"
+        ),
+        format_done = paste0(
+          "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
+          "Completed {.pkg {cli::pb_total}} tasks ",
+          "in {cli::pb_elapsed}"
+        ),
+        total = total,
+        clear = FALSE
+      )
+    } else {
+      pb <- cli::cli_progress_bar(
+        format = paste0(
+          "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
+          "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
+          "ETA: {cli::pb_eta}"
+        ),
+        format_done = paste0(
+          "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
+          "Completed {.pkg {cli::pb_total}} tasks ",
+          "in {cli::pb_elapsed}"
+        ),
+        total = total,
+        clear = FALSE
+      )
+    }
   }
 
   if (cores == 1) {
@@ -108,7 +131,14 @@ parallelize_fun <- function(
             )
           }
         )
-        cli::cli_progress_update(id = pb)
+
+        if (has_names) {
+          cli::cli_progress_update(id = pb, status = names(x)[i])
+        } else if (show_values) {
+          cli::cli_progress_update(id = pb, status = as.character(x[[i]]))
+        } else {
+          cli::cli_progress_update(id = pb)
+        }
       }
 
       cli::cli_progress_done(id = pb)
@@ -177,7 +207,24 @@ parallelize_fun <- function(
         }
 
         output_chunks[[chunk_idx]] <- chunk_results
-        cli::cli_progress_update(id = pb, inc = length(chunk))
+
+        if (has_names) {
+          chunk_names <- names(x)[chunk]
+          cli::cli_progress_update(
+            id = pb,
+            inc = length(chunk),
+            status = paste(chunk_names, collapse = ", ")
+          )
+        } else if (show_values) {
+          chunk_values <- as.character(x[chunk])
+          cli::cli_progress_update(
+            id = pb,
+            inc = length(chunk),
+            status = paste(chunk_values, collapse = ", ")
+          )
+        } else {
+          cli::cli_progress_update(id = pb, inc = length(chunk))
+        }
       }
 
       cli::cli_progress_done(id = pb)
