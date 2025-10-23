@@ -95,7 +95,7 @@ print.thisutils_logo <- function(x, ...) {
     )
 
     msg <- paste0(
-      strrep("-", 60),
+      cli::col_grey(strrep("-", 60)),
       "\n",
       cli::col_blue(pkgname, " version ", version),
       "\n",
@@ -105,7 +105,7 @@ print.thisutils_logo <- function(x, ...) {
       "\n",
       cli::col_grey("  or options(log_message.verbose = FALSE)"),
       "\n",
-      strrep("-", 60)
+      cli::col_grey(strrep("-", 60))
     )
 
     packageStartupMessage(thisutils_logo())
