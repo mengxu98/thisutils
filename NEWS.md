@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.2.2
+
+* **func**:
+  * Enhance `parallelize_fun()` function: Added support for named vectors and vectors in progress display, showing current processing item names or values in the progress bar. Improved progress bar formatting with status information and enhanced parallel processing progress updates.
+  * Improve visual formatting in `add_pkg_file()` and `thisutils-package.R`: Enhanced separator line display with grey color styling using `cli::col_grey()` for better visual consistency.
+
 # thisutils 0.2.1
 
 * **func**:
