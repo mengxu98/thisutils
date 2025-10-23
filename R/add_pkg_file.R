@@ -261,7 +261,7 @@ add_pkg_file <- function(
     "    )",
     "",
     "    msg <- paste0(",
-    "      strrep(\"-\", 60),",
+    "      cli::col_grey(strrep(\"-\", 60)),",
     "      \"\\n\",",
     "      cli::col_blue(pkgname, \" version \", version),",
     "      \"\\n\",",
@@ -276,7 +276,7 @@ add_pkg_file <- function(
       "      cli::col_grey(\"  or options(log_message.verbose = FALSE)\"),"
     ),
     "      \"\\n\",",
-    "      strrep(\"-\", 60)",
+    "      cli::col_grey(strrep(\"-\", 60))",
     "    )",
     "",
     paste0(
