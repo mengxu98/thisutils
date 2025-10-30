@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,14 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.3" id="thisutils-023">thisutils 0.2.3<a class="anchor" aria-label="anchor" href="#thisutils-023"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Rewrite <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> C++ implementation to iterate <code>dgCMatrix</code> slots directly, avoiding dense conversion and reducing memory/time cost on large sparse matrices.</li>
+<li>Align <code>keep_zero</code>/<code>threshold</code> semantics across C++/R: retain entries if <code>abs(value) &gt;= threshold</code>; zeros are retained only when <code>keep_zero = TRUE</code> and <code>threshold == 0</code>.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="thisutils-022">thisutils 0.2.2<a class="anchor" aria-label="anchor" href="#thisutils-022"></a></h2>
 <ul><li>
