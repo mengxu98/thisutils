@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <algorithm>
+#include <unordered_set>
 
 using namespace Rcpp;
 
@@ -44,93 +45,144 @@ DataFrame matrix_to_table(SEXP matrix,
                           bool keep_zero = false)
 {
   // Handle different matrix types
-  int nrow, ncol;
+  int nrow = 0, ncol = 0;
   CharacterVector matrix_row_names, matrix_col_names;
-  NumericMatrix dense_matrix;
+
+  // Filters as unordered_set for O(1) lookup
+  std::unordered_set<std::string> row_filter_set;
+  std::unordered_set<std::string> col_filter_set;
+  bool use_row_filter = false;
+  bool use_col_filter = false;
+  if (row_names.isNotNull())
+  {
+    CharacterVector rf = as<CharacterVector>(row_names);
+    for (auto it = rf.begin(); it != rf.end(); ++it)
+    {
+      row_filter_set.insert(std::string(as<std::string>(*it)));
+    }
+    use_row_filter = rf.size() > 0;
+  }
+  if (col_names.isNotNull())
+  {
+    CharacterVector cf = as<CharacterVector>(col_names);
+    for (auto it = cf.begin(); it != cf.end(); ++it)
+    {
+      col_filter_set.insert(std::string(as<std::string>(*it)));
+    }
+    use_col_filter = cf.size() > 0;
+  }
+
+  std::vector<std::string> out_rows;
+  std::vector<std::string> out_cols;
+  std::vector<double> out_vals;
 
   if (Rf_isMatrix(matrix))
   {
-    // Dense matrix
-    dense_matrix = as<NumericMatrix>(matrix);
+    // Dense matrix path
+    NumericMatrix dense_matrix = as<NumericMatrix>(matrix);
     nrow = dense_matrix.nrow();
     ncol = dense_matrix.ncol();
     matrix_row_names = rownames(dense_matrix);
     matrix_col_names = colnames(dense_matrix);
+
+    if (matrix_row_names.length() == 0 || matrix_col_names.length() == 0)
+    {
+      stop("Input matrix must have both row and column names");
+    }
+
+    out_rows.reserve(static_cast<size_t>(nrow) * 4);
+    out_cols.reserve(static_cast<size_t>(ncol) * 4);
+    out_vals.reserve(static_cast<size_t>(nrow) * 4);
+
+    for (int i = 0; i < nrow; ++i)
+    {
+      std::string rname = as<std::string>(matrix_row_names[i]);
+      if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
+      {
+        continue;
+      }
+      for (int j = 0; j < ncol; ++j)
+      {
+        std::string cname = as<std::string>(matrix_col_names[j]);
+        if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
+        {
+          continue;
+        }
+        double v = dense_matrix(i, j);
+        if (std::abs(v) >= threshold && (keep_zero || v != 0.0))
+        {
+          out_rows.push_back(rname);
+          out_cols.push_back(cname);
+          out_vals.push_back(v);
+        }
+      }
+    }
   }
   else if (Rf_inherits(matrix, "dgCMatrix"))
   {
-    // Sparse matrix from Matrix package
-    Environment Matrix_env = Environment::namespace_env("Matrix");
-    Function as_matrix = Matrix_env["as.matrix"];
-    dense_matrix = as<NumericMatrix>(as_matrix(matrix));
-    nrow = dense_matrix.nrow();
-    ncol = dense_matrix.ncol();
-    matrix_row_names = rownames(dense_matrix);
-    matrix_col_names = colnames(dense_matrix);
+    // Sparse dgCMatrix path without densifying
+    S4 spmat(matrix);
+    IntegerVector Dim = spmat.slot("Dim");
+    nrow = Dim[0];
+    ncol = Dim[1];
+
+    List Dimnames = spmat.slot("Dimnames");
+    CharacterVector rnames = Dimnames[0];
+    CharacterVector cnames = Dimnames[1];
+    if (rnames.size() == 0 || cnames.size() == 0)
+    {
+      stop("Input matrix must have both row and column names");
+    }
+    matrix_row_names = rnames;
+    matrix_col_names = cnames;
+
+    IntegerVector p = spmat.slot("p"); // column pointers (size ncol+1)
+    IntegerVector i = spmat.slot("i"); // row indices (0-based)
+    NumericVector x = spmat.slot("x"); // non-zero values
+
+    // Reserve approximate capacity
+    out_rows.reserve(x.size());
+    out_cols.reserve(x.size());
+    out_vals.reserve(x.size());
+
+    for (int col = 0; col < ncol; ++col)
+    {
+      std::string cname = as<std::string>(matrix_col_names[col]);
+      if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
+      {
+        continue;
+      }
+      int start = p[col];
+      int end = p[col + 1];
+      for (int idx = start; idx < end; ++idx)
+      {
+        int row = i[idx]; // 0-based
+        std::string rname = as<std::string>(matrix_row_names[row]);
+        if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
+        {
+          continue;
+        }
+        double v = x[idx];
+        if (std::abs(v) >= threshold && (keep_zero || v != 0.0))
+        {
+          out_rows.push_back(rname);
+          out_cols.push_back(cname);
+          out_vals.push_back(v);
+        }
+      }
+    }
   }
   else
   {
     stop("Input must be a matrix or dgCMatrix");
   }
 
-  if (matrix_row_names.length() == 0 || matrix_col_names.length() == 0)
+  // If no matches after filtering
+  if (out_rows.empty())
   {
-    stop("Input matrix must have both row and column names");
-  }
-
-  CharacterVector row_filter;
-  CharacterVector col_filter;
-  bool use_row_filter = false;
-  bool use_col_filter = false;
-
-  if (row_names.isNotNull())
-  {
-    row_filter = as<CharacterVector>(row_names);
-    use_row_filter = true;
-  }
-  if (col_names.isNotNull())
-  {
-    col_filter = as<CharacterVector>(col_names);
-    use_col_filter = true;
-  }
-
-  // Check if there are any valid matches when filters are applied
-  bool has_valid_matches = false;
-  for (int i = 0; i < nrow; ++i)
-  {
-    if (use_row_filter && !std::any_of(row_filter.begin(), row_filter.end(),
-                                       [&matrix_row_names, i](const String &row)
-                                       {
-                                         return std::string(row) == std::string(matrix_row_names[i]);
-                                       }))
-    {
-      continue;
-    }
-
-    for (int j = 0; j < ncol; ++j)
-    {
-      if (use_col_filter && !std::any_of(col_filter.begin(), col_filter.end(),
-                                         [&matrix_col_names, j](const String &col)
-                                         {
-                                           return std::string(col) == std::string(matrix_col_names[j]);
-                                         }))
-      {
-        continue;
-      }
-      has_valid_matches = true;
-      break;
-    }
-    if (has_valid_matches)
-      break;
-  }
-
-  if (!has_valid_matches)
-  {
-    warning("No matching row/column names found with the provided filters. Returning empty table.");
     CharacterVector empty_rows(0);
     CharacterVector empty_cols(0);
     NumericVector empty_values(0);
-
     DataFrame empty_result = DataFrame::create(
         Rcpp::Named("row") = empty_rows,
         Rcpp::Named("col") = empty_cols,
@@ -138,98 +190,28 @@ DataFrame matrix_to_table(SEXP matrix,
     return empty_result;
   }
 
-  // First count elements that pass threshold using absolute values
-  int valid_count = 0;
-  for (int i = 0; i < nrow; ++i)
+  // Indices for sorting by |value| desc
+  IntegerVector order_idx(out_vals.size());
+  for (R_xlen_t k = 0; k < order_idx.size(); ++k)
+    order_idx[k] = k;
+  std::sort(order_idx.begin(), order_idx.end(), [&out_vals](int a, int b)
+            { return std::abs(out_vals[a]) > std::abs(out_vals[b]); });
+
+  CharacterVector sorted_rows(order_idx.size());
+  CharacterVector sorted_cols(order_idx.size());
+  NumericVector sorted_values(order_idx.size());
+  for (R_xlen_t k = 0; k < order_idx.size(); ++k)
   {
-    if (use_row_filter && !std::any_of(row_filter.begin(), row_filter.end(),
-                                       [&matrix_row_names, i](const String &row)
-                                       {
-                                         return std::string(row) == std::string(matrix_row_names[i]);
-                                       }))
-    {
-      continue;
-    }
-
-    for (int j = 0; j < ncol; ++j)
-    {
-      if (use_col_filter && !std::any_of(col_filter.begin(), col_filter.end(),
-                                         [&matrix_col_names, j](const String &col)
-                                         {
-                                           return std::string(col) == std::string(matrix_col_names[j]);
-                                         }))
-      {
-        continue;
-      }
-
-      double weight = dense_matrix(i, j);
-      if ((keep_zero || weight != 0) && std::abs(weight) >= threshold)
-      {
-        valid_count++;
-      }
-    }
+    int idx = order_idx[k];
+    sorted_rows[k] = out_rows[idx];
+    sorted_cols[k] = out_cols[idx];
+    sorted_values[k] = out_vals[idx];
   }
 
-  // Pre-allocate vectors with exact size needed
-  CharacterVector row_names_out(valid_count);
-  CharacterVector col_names_out(valid_count);
-  NumericVector values(valid_count);
-  IntegerVector indices(valid_count);
-
-  // Fill vectors using absolute values for threshold comparison
-  int idx = 0;
-  for (int i = 0; i < nrow; ++i)
-  {
-    if (use_row_filter && !std::any_of(row_filter.begin(), row_filter.end(),
-                                       [&matrix_row_names, i](const String &row)
-                                       {
-                                         return std::string(row) == std::string(matrix_row_names[i]);
-                                       }))
-    {
-      continue;
-    }
-
-    for (int j = 0; j < ncol; ++j)
-    {
-      if (use_col_filter && !std::any_of(col_filter.begin(), col_filter.end(),
-                                         [&matrix_col_names, j](const String &col)
-                                         {
-                                           return std::string(col) == std::string(matrix_col_names[j]);
-                                         }))
-      {
-        continue;
-      }
-
-      double weight = dense_matrix(i, j);
-      if ((keep_zero || weight != 0) && std::abs(weight) >= threshold)
-      {
-        row_names_out[idx] = matrix_row_names[i];
-        col_names_out[idx] = matrix_col_names[j];
-        values[idx] = weight;
-        indices[idx] = idx;
-        idx++;
-      }
-    }
-  }
-
-  std::sort(indices.begin(), indices.end(), [&values](int i1, int i2)
-            { return std::abs(values[i1]) > std::abs(values[i2]); });
-
-  CharacterVector sorted_rows(valid_count);
-  CharacterVector sorted_cols(valid_count);
-  NumericVector sorted_values(valid_count);
-
-  for (int i = 0; i < valid_count; i++)
-  {
-    sorted_rows[i] = row_names_out[indices[i]];
-    sorted_cols[i] = col_names_out[indices[i]];
-    sorted_values[i] = values[indices[i]];
-  }
-
-  DataFrame result =
-      DataFrame::create(Rcpp::Named("row") = sorted_rows,
-                        Rcpp::Named("col") = sorted_cols,
-                        Rcpp::Named("value") = sorted_values);
+  DataFrame result = DataFrame::create(
+      Rcpp::Named("row") = sorted_rows,
+      Rcpp::Named("col") = sorted_cols,
+      Rcpp::Named("value") = sorted_values);
 
   return result;
 }

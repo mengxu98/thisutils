@@ -174,7 +174,7 @@ SEXP table_to_matrix(DataFrame table,
       if (row_it != row_indices.end() && col_it != col_indices.end())
       {
         double value = values[i];
-        if (std::abs(value) >= threshold && value != 0.0)
+        if (std::abs(value) >= threshold)
         {
           sparse_i.push_back(row_it->second + 1); // R uses 1-based indexing
           sparse_j.push_back(col_it->second + 1);
