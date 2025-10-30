@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.2.3
+
+* **func**:
+  * Rewrite `matrix_to_table()` C++ implementation to iterate `dgCMatrix` slots directly, avoiding dense conversion and reducing memory/time cost on large sparse matrices.
+  * Align `keep_zero`/`threshold` semantics across C++/R: retain entries if `abs(value) >= threshold`; zeros are retained only when `keep_zero = TRUE` and `threshold == 0`.
+
 # thisutils 0.2.2
 
 * **func**:
