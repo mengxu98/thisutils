@@ -1,0 +1,651 @@
+---
+title: "Advanced Usage and Best Practices"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced Usage and Best Practices}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+This vignette covers advanced features and best practices for using `thisutils` in production environments, complex workflows, and performance-critical applications.
+
+```{r setup, eval=FALSE}
+library(thisutils)
+```
+
+## Advanced Parallel Processing
+
+### Exporting Functions to Workers
+
+When using custom functions in parallel workers, you may need to explicitly export them:
+
+```{r eval=FALSE}
+# Define helper functions
+calculate_metrics <- function(x) {
+  list(
+    mean = mean(x),
+    sd = sd(x),
+    median = median(x)
+  )
+}
+
+# Use in parallel processing
+results <- parallelize_fun(
+  x = list(rnorm(100), rnorm(100), rnorm(100)),
+  fun = function(data) calculate_metrics(data),
+  cores = 3,
+  export_fun = "calculate_metrics"  # Export to workers
+)
+```
+
+### Nested Parallel Processing
+
+Be careful with nested parallelization to avoid creating too many processes:
+
+```{r eval=FALSE}
+# Outer parallelization
+outer_results <- parallelize_fun(
+  x = 1:5,
+  fun = function(i) {
+    # Inner computation (sequential within each parallel task)
+    sapply(1:10, function(j) {
+      i * j
+    })
+  },
+  cores = 3
+)
+```
+
+### Progress Tracking with Large Jobs
+
+```{r eval=FALSE}
+# Process large number of items with progress tracking
+data_list <- as.list(1:1000)
+
+results <- parallelize_fun(
+  x = data_list,
+  fun = function(x) {
+    # Simulate computation
+    Sys.sleep(0.01)
+    x^2
+  },
+  cores = 8,
+  verbose = TRUE  # Shows progress bar
+)
+```
+
+### Chunk-Based Processing for Memory Efficiency
+
+```{r eval=FALSE}
+# Process very large datasets in chunks
+process_in_chunks <- function(data, chunk_size = 1000, cores = 4) {
+  n <- nrow(data)
+  chunks <- split(1:n, ceiling(seq_along(1:n) / chunk_size))
+  
+  results <- parallelize_fun(
+    x = chunks,
+    fun = function(indices) {
+      chunk_data <- data[indices, ]
+      # Process chunk
+      colMeans(chunk_data)
+    },
+    cores = cores
+  )
+  
+  # Combine results
+  do.call(rbind, results)
+}
+
+# Example usage
+# large_data <- matrix(rnorm(1e7), ncol = 100)
+# result <- process_in_chunks(large_data, chunk_size = 10000, cores = 4)
+```
+
+## Advanced Logging Techniques
+
+### Creating Custom Log Levels
+
+```{r eval=FALSE}
+# Define custom logging functions
+log_debug <- function(msg, ...) {
+  log_message(msg, ..., 
+              text_color = "grey", 
+              message_type = "info",
+              symbol = "[DEBUG]")
+}
+
+log_trace <- function(msg, ...) {
+  log_message(msg, ..., 
+              text_color = "cyan", 
+              message_type = "info",
+              symbol = "[TRACE]")
+}
+
+# Usage
+log_debug("Entering function calculate_metrics")
+log_trace("Variable x = {.val {x}}")
+```
+
+### Conditional Logging Based on Environment
+
+```{r eval=FALSE}
+# Set verbosity based on environment
+is_production <- Sys.getenv("R_ENV") == "production"
+options(log_message.verbose = !is_production)
+
+# Or use custom control
+log_if <- function(condition, msg, ...) {
+  if (condition) {
+    log_message(msg, ...)
+  }
+}
+
+DEBUG <- FALSE
+log_if(DEBUG, "Debug information")
+```
+
+### Structured Logging
+
+```{r eval=FALSE}
+# Create structured log entries
+log_structured <- function(level, component, message, ...) {
+  log_message(
+    "[{.field {level}}] [{.pkg {component}}] {message}",
+    ...,
+    timestamp = TRUE
+  )
+}
+
+# Usage
+log_structured("INFO", "DataLoader", "Loading data from {.file data.csv}")
+log_structured("ERROR", "Validator", "Invalid data format detected")
+```
+
+### Log File Output
+
+```{r eval=FALSE}
+# Redirect logs to file
+log_to_file <- function(msg, file = "analysis.log", ...) {
+  # Create formatted message
+  formatted <- capture.output({
+    log_message(msg, ..., cli_model = FALSE)
+  })
+  
+  # Append to file
+  cat(formatted, "\n", file = file, append = TRUE)
+}
+
+# Usage
+log_to_file("Analysis started")
+log_to_file("Processing complete", message_type = "success")
+```
+
+## Advanced Matrix Operations
+
+### Efficient Sparse Matrix Operations
+
+```{r eval=FALSE}
+# Work with large sparse matrices efficiently
+library(Matrix)
+
+# Generate large sparse matrix
+large_sparse <- simulate_sparse_matrix(
+  nrow = 10000,
+  ncol = 5000,
+  sparsity = 0.99
+)
+
+# Efficient operations
+# 1. Row/column operations
+row_means <- Matrix::rowMeans(large_sparse)
+col_sums <- Matrix::colSums(large_sparse)
+
+# 2. Subsetting
+subset <- large_sparse[1:1000, 1:100]
+
+# 3. Sparse correlation
+cor_result <- sparse_cor(large_sparse)
+
+# 4. Keep it sparse
+processed <- matrix_process(large_sparse, method = "log1p")
+# Note: some operations like zscore may densify the matrix
+```
+
+### Custom Matrix Processing Functions
+
+```{r eval=FALSE}
+# Define custom processing function
+robust_scale <- function(mat) {
+  # Center by median, scale by MAD
+  center <- apply(mat, 1, median)
+  scale <- apply(mat, 1, mad)
+  (mat - center) / scale
+}
+
+# Use with matrix_process
+processed <- matrix_process(sparse_mat, method = robust_scale)
+```
+
+### Batch Processing of Matrices
+
+```{r eval=FALSE}
+# Process multiple matrices in parallel
+matrix_list <- list(
+  mat1 = simulate_sparse_matrix(1000, 100),
+  mat2 = simulate_sparse_matrix(1000, 100),
+  mat3 = simulate_sparse_matrix(1000, 100)
+)
+
+processed_matrices <- parallelize_fun(
+  x = matrix_list,
+  fun = function(mat) {
+    # Multi-step processing
+    mat <- matrix_process(mat, method = "log1p")
+    mat <- matrix_process(mat, method = "zscore")
+    mat
+  },
+  cores = 3
+)
+```
+
+## Advanced Statistical Analysis
+
+### Monte Carlo Simulations
+
+```{r eval=FALSE}
+# Run Monte Carlo simulation in parallel
+run_simulation <- function(n_sim = 1000, n_obs = 100, cores = 4) {
+  log_message("Running {.val {n_sim}} simulations with {.val {n_obs}} observations each")
+  
+  results <- parallelize_fun(
+    x = 1:n_sim,
+    fun = function(i) {
+      # Generate data
+      x <- rnorm(n_obs)
+      y <- 2 * x + rnorm(n_obs)
+      
+      # Fit model
+      model <- lm(y ~ x)
+      
+      # Return coefficients
+      list(
+        intercept = coef(model)[1],
+        slope = coef(model)[2],
+        r_squared = r_square(y, fitted(model))
+      )
+    },
+    cores = cores,
+    verbose = TRUE
+  )
+  
+  # Extract and summarize
+  slopes <- sapply(results, function(x) x$slope)
+  r_squared <- sapply(results, function(x) x$r_squared)
+  
+  list(
+    mean_slope = mean(slopes),
+    sd_slope = sd(slopes),
+    mean_r2 = mean(r_squared)
+  )
+}
+
+# Run simulation
+# sim_results <- run_simulation(n_sim = 1000, cores = 4)
+```
+
+### Bootstrap Analysis
+
+```{r eval=FALSE}
+# Parallel bootstrap
+bootstrap_analysis <- function(data, statistic_fun, n_bootstrap = 1000, cores = 4) {
+  n <- nrow(data)
+  
+  boot_results <- parallelize_fun(
+    x = 1:n_bootstrap,
+    fun = function(i) {
+      # Resample with replacement
+      indices <- sample(1:n, n, replace = TRUE)
+      boot_sample <- data[indices, ]
+      
+      # Calculate statistic
+      statistic_fun(boot_sample)
+    },
+    cores = cores
+  )
+  
+  # Calculate confidence intervals
+  boot_stats <- unlist(boot_results)
+  list(
+    estimate = mean(boot_stats),
+    ci_lower = quantile(boot_stats, 0.025),
+    ci_upper = quantile(boot_stats, 0.975),
+    se = sd(boot_stats)
+  )
+}
+
+# Example usage
+# data <- data.frame(x = rnorm(100), y = rnorm(100))
+# result <- bootstrap_analysis(
+#   data = data,
+#   statistic_fun = function(df) cor(df$x, df$y),
+#   n_bootstrap = 1000,
+#   cores = 4
+# )
+```
+
+### Cross-Validation
+
+```{r eval=FALSE}
+# Parallel cross-validation
+cv_parallel <- function(data, model_fun, k_folds = 5, cores = 4) {
+  n <- nrow(data)
+  fold_size <- ceiling(n / k_folds)
+  indices <- sample(1:n)
+  folds <- split(indices, ceiling(seq_along(indices) / fold_size))
+  
+  cv_results <- parallelize_fun(
+    x = folds,
+    fun = function(test_indices) {
+      train_indices <- setdiff(1:n, test_indices)
+      
+      train_data <- data[train_indices, ]
+      test_data <- data[test_indices, ]
+      
+      # Fit model
+      model <- model_fun(train_data)
+      
+      # Predict and evaluate
+      predictions <- predict(model, test_data)
+      actual <- test_data$y
+      
+      # Calculate metrics
+      list(
+        rmse = sqrt(mean((actual - predictions)^2)),
+        r2 = r_square(actual, predictions)
+      )
+    },
+    cores = cores
+  )
+  
+  # Aggregate results
+  list(
+    mean_rmse = mean(sapply(cv_results, function(x) x$rmse)),
+    mean_r2 = mean(sapply(cv_results, function(x) x$r2))
+  )
+}
+```
+
+## Performance Optimization
+
+### Memory Profiling
+
+```{r eval=FALSE}
+# Profile memory usage
+profile_memory <- function(expr) {
+  gc()  # Garbage collection before
+  mem_before <- sum(gc()[, 2])
+  
+  result <- expr
+  
+  gc()  # Garbage collection after
+  mem_after <- sum(gc()[, 2])
+  
+  mem_used <- mem_after - mem_before
+  log_message("Memory used: {.val {round(mem_used, 2)}} MB")
+  
+  result
+}
+
+# Usage
+# result <- profile_memory({
+#   large_matrix <- simulate_sparse_matrix(10000, 1000)
+#   processed <- matrix_process(large_matrix, method = "zscore")
+# })
+```
+
+### Benchmarking
+
+```{r eval=FALSE}
+# Compare sequential vs parallel performance
+benchmark_parallel <- function(n_items, computation_fun, cores_options = c(1, 2, 4, 8)) {
+  results <- list()
+  
+  for (cores in cores_options) {
+    log_message("Testing with {.val {cores}} core{?s}")
+    
+    start_time <- Sys.time()
+    
+    result <- parallelize_fun(
+      x = 1:n_items,
+      fun = computation_fun,
+      cores = cores,
+      verbose = FALSE
+    )
+    
+    end_time <- Sys.time()
+    elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
+    
+    results[[as.character(cores)]] <- list(
+      cores = cores,
+      time = elapsed,
+      speedup = if (cores > 1) results[["1"]]$time / elapsed else 1
+    )
+    
+    log_message("Completed in {.val {round(elapsed, 2)}} seconds", 
+                message_type = "success")
+  }
+  
+  results
+}
+
+# Example
+# benchmark_results <- benchmark_parallel(
+#   n_items = 100,
+#   computation_fun = function(x) {
+#     Sys.sleep(0.1)
+#     x^2
+#   },
+#   cores_options = c(1, 2, 4)
+# )
+```
+
+### Optimizing Data Processing Pipelines
+
+```{r eval=FALSE}
+# Efficient pipeline design
+create_pipeline <- function(data, steps, cores = 4) {
+  log_message("Starting pipeline with {.val {length(steps)}} steps")
+  
+  result <- data
+  
+  for (i in seq_along(steps)) {
+    step_name <- names(steps)[i]
+    step_fun <- steps[[i]]
+    
+    log_message("Step {.val {i}}: {.field {step_name}}", message_type = "running")
+    
+    start <- Sys.time()
+    result <- step_fun(result, cores = cores)
+    elapsed <- difftime(Sys.time(), start, units = "secs")
+    
+    log_message("Completed in {.val {round(elapsed, 2)}} seconds", 
+                message_type = "success")
+  }
+  
+  log_message("Pipeline completed successfully!", message_type = "success")
+  result
+}
+
+# Define pipeline steps
+# pipeline <- list(
+#   "Load and validate" = function(data, cores) {
+#     # Validation logic
+#     data
+#   },
+#   "Normalize" = function(data, cores) {
+#     matrix_process(data, method = "zscore")
+#   },
+#   "Compute correlations" = function(data, cores) {
+#     sparse_cor(data)
+#   }
+# )
+#
+# result <- create_pipeline(sparse_matrix, pipeline, cores = 4)
+```
+
+## Error Handling and Debugging
+
+### Comprehensive Error Handling
+
+```{r eval=FALSE}
+# Robust data processing with error handling
+process_safely <- function(data, processing_fun, fallback = NULL) {
+  tryCatch(
+    {
+      result <- processing_fun(data)
+      log_message("Processing successful", message_type = "success")
+      result
+    },
+    error = function(e) {
+      log_message("Error: {.emph {e$message}}", message_type = "error")
+      
+      if (!is.null(fallback)) {
+        log_message("Using fallback method", message_type = "warning")
+        return(fallback(data))
+      }
+      
+      NULL
+    }
+  )
+}
+```
+
+### Debugging Parallel Code
+
+```{r eval=FALSE}
+# Test function sequentially first
+debug_parallel <- function(x, fun, cores = 1) {
+  # Run sequentially with verbose output
+  log_message("Testing function sequentially first", message_type = "info")
+  
+  test_result <- fun(x[[1]])
+  log_message("Test passed, proceeding with parallel execution", 
+              message_type = "success")
+  
+  # Now run in parallel
+  parallelize_fun(x, fun, cores = cores)
+}
+```
+
+## Integration with Other Packages
+
+### Integration with dplyr
+
+```{r eval=FALSE}
+# Process grouped data frames in parallel
+process_grouped_data <- function(df, group_var, fun, cores = 4) {
+  # Split by group
+  groups <- split(df, df[[group_var]])
+  
+  # Process each group in parallel
+  results <- parallelize_fun(
+    x = groups,
+    fun = fun,
+    cores = cores
+  )
+  
+  # Combine results
+  do.call(rbind, results)
+}
+
+# Example
+# library(dplyr)
+# data <- data.frame(
+#   group = rep(LETTERS[1:5], each = 100),
+#   value = rnorm(500)
+# )
+#
+# result <- process_grouped_data(
+#   df = data,
+#   group_var = "group",
+#   fun = function(df) {
+#     data.frame(
+#       group = df$group[1],
+#       mean = mean(df$value),
+#       sd = sd(df$value)
+#     )
+#   },
+#   cores = 4
+# )
+```
+
+### Integration with data.table
+
+```{r eval=FALSE}
+# Parallel processing with data.table
+library(data.table)
+
+process_dt_parallel <- function(dt, by_col, fun, cores = 4) {
+  # Convert to list of data.tables by group
+  groups <- split(dt, by = by_col)
+  
+  # Process in parallel
+  results <- parallelize_fun(
+    x = groups,
+    fun = fun,
+    cores = cores
+  )
+  
+  # Combine back to data.table
+  rbindlist(results)
+}
+```
+
+## Best Practices Summary
+
+### Do's ✅
+
+1. **Profile before parallelizing**: Not all code benefits from parallelization
+2. **Use appropriate number of cores**: Leave cores for system (use `detectCores() - 1`)
+3. **Handle errors gracefully**: Use `clean_result` and `try_get()`
+4. **Log strategically**: Use appropriate message types and verbosity
+5. **Keep sparse matrices sparse**: Avoid unnecessary densification
+6. **Test sequentially first**: Debug parallel code by testing with `cores = 1`
+7. **Monitor memory**: Large parallel jobs can consume significant memory
+
+### Don'ts ❌
+
+1. **Don't over-parallelize**: Too many cores can hurt performance
+2. **Don't ignore errors**: Always check for failed results
+3. **Don't densify unnecessarily**: Convert sparse to dense only when needed
+4. **Don't nest parallel calls**: Avoid parallelizing within parallel workers
+5. **Don't forget cleanup**: Close parallel clusters when done
+6. **Don't ignore warnings**: They often indicate real issues
+
+## Conclusion
+
+This vignette covered advanced techniques for:
+
+- Efficient parallel processing with error handling
+- Advanced logging and debugging strategies  
+- Optimizing matrix operations
+- Building robust data processing pipelines
+- Performance profiling and optimization
+- Integration with other packages
+
+For more information:
+
+- [Function Reference](https://mengxu98.github.io/thisutils/reference/index.html)
+- [GitHub Issues](https://github.com/mengxu98/thisutils/issues)
+- [Getting Started Guide](getting-started.html)
+
+Happy advanced R computing!

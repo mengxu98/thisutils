@@ -1,0 +1,425 @@
+---
+title: "Quick Reference Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Reference Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# thisutils Quick Reference
+
+This is a quick reference guide for the most commonly used functions in `thisutils`.
+
+## Package Loading
+
+```{r eval=FALSE}
+library(thisutils)
+
+# Suppress startup message
+suppressPackageStartupMessages(library(thisutils))
+
+# Or set option
+options(log_message.verbose = FALSE)
+library(thisutils)
+```
+
+## Parallel Processing
+
+### `parallelize_fun()` - Run functions in parallel
+
+```{r eval=FALSE}
+# Basic usage - Sequential (1 core)
+result <- parallelize_fun(1:10, function(x) x^2)
+
+# Parallel execution (4 cores)
+result <- parallelize_fun(1:10, function(x) x^2, cores = 4)
+
+# With error handling
+result <- parallelize_fun(
+  x = 1:5,
+  fun = function(x) {
+    if (x == 3) stop("Error")
+    x^2
+  },
+  clean_result = TRUE,      # Remove errors
+  throw_error = FALSE        # Suppress error details
+)
+
+# Control verbosity
+result <- parallelize_fun(1:10, function(x) x^2, cores = 4, verbose = FALSE)
+```
+
+## Logging and Messages
+
+### `log_message()` - Enhanced console output
+
+```{r eval=FALSE}
+# Basic messages
+log_message("Starting process")
+log_message("Success!", message_type = "success")
+log_message("Warning!", message_type = "warning")
+log_message("Running...", message_type = "running")
+
+# Colored and styled
+log_message("Error!", text_color = "red", text_style = "bold")
+log_message("Info", text_color = "#FF5733")
+
+# CLI inline markup
+log_message("Loading {.pkg dplyr}")
+log_message("Reading {.file data.csv}")
+log_message("Calling {.fn mean}")
+log_message("Processed {.val 100} records")
+
+# Control timestamp
+log_message("Message", timestamp = FALSE)
+```
+
+### `get_verbose()` - Check verbosity settings
+
+```{r eval=FALSE}
+# Check current setting
+get_verbose()
+
+# Set globally
+options(log_message.verbose = FALSE)
+options(log_message.verbose = TRUE)
+```
+
+## Matrix Operations
+
+### Sparse Matrix Generation
+
+```{r eval=FALSE}
+# Generate sparse matrix
+sparse_mat <- simulate_sparse_matrix(
+  nrow = 1000,
+  ncol = 500,
+  sparsity = 0.95,    # 95% zeros
+  decimal = 0         # Integer values
+)
+
+# Check sparsity
+check_sparsity(sparse_mat)
+```
+
+### Matrix Processing
+
+```{r eval=FALSE}
+# Process matrices
+matrix_process(mat, method = "raw")        # No change
+matrix_process(mat, method = "zscore")     # Z-score normalization
+matrix_process(mat, method = "fc")         # Fold change
+matrix_process(mat, method = "log2fc")     # Log2 fold change
+matrix_process(mat, method = "log1p")      # Log(1 + x)
+
+# Custom function
+matrix_process(mat, method = function(x) x / rowMeans(x))
+```
+
+### Matrix Conversion
+
+```{r eval=FALSE}
+# Convert to dense/sparse
+as_matrix(sparse_mat)                      # To dense
+as_matrix(dense_mat, return_sparse = TRUE) # To sparse
+
+# Convert between formats
+df <- matrix_to_table(mat)
+mat <- table_to_matrix(df)
+```
+
+### Normalization
+
+```{r eval=FALSE}
+x <- c(1, 2, 3, 4, 5, NA)
+
+normalization(x, method = "max_min")      # Min-max [0, 1]
+normalization(x, method = "z_score")      # Z-score
+normalization(x, method = "maximum")      # Divide by max
+normalization(x, method = "sum")          # Divide by sum
+normalization(x, method = "softmax")      # Softmax
+normalization(x, method = "unit_vector")  # Unit vector
+normalization(x, method = "mad")          # Median absolute deviation
+```
+
+## Correlation Functions
+
+### `sparse_cor()` - Efficient sparse correlation
+
+```{r eval=FALSE}
+# Single matrix correlation
+cor_mat <- sparse_cor(sparse_mat)
+cor_mat <- sparse_cor(sparse_mat, method = "pearson")
+
+# Two matrix correlation
+cor_mat <- sparse_cor(mat1, mat2)
+
+# Options
+sparse_cor(mat, 
+           method = "pearson",    # or "spearman", "kendall"
+           allow_neg = TRUE,      # Keep negative correlations
+           remove_na = TRUE,      # Replace NA with 0
+           remove_inf = TRUE)     # Replace Inf with 1
+```
+
+### `pearson_correlation()` - Covariance and correlation
+
+```{r eval=FALSE}
+result <- pearson_correlation(sparse_mat)
+result$cov  # Covariance matrix
+result$cor  # Correlation matrix
+
+# Two matrices
+result <- pearson_correlation(mat1, mat2)
+```
+
+## Statistical Functions
+
+### R-squared
+
+```{r eval=FALSE}
+r_square(y_true, y_pred)
+```
+
+### P-value Combinations
+
+```{r eval=FALSE}
+p <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+
+wilkinsonp(p, r = 2)      # Wilkinson's method
+minimump(p)               # Minimum p-value
+maximump(p)               # Maximum p-value
+meanp(p)                  # Mean p-value
+sump(p)                   # Sum of p-values
+votep(p, alpha = 0.05)    # Vote counting
+```
+
+## Utility Functions
+
+### Null Coalescing
+
+```{r eval=FALSE}
+# Return first non-NULL value
+NULL %ss% "default"     # Returns "default"
+5 %ss% "default"        # Returns 5
+
+# Use in functions
+value <- input %ss% default_value
+```
+
+### Text Processing
+
+```{r eval=FALSE}
+# Capitalize
+capitalize("hello world")                    # "Hello world"
+capitalize("hello world", force_tolower = TRUE)
+
+# Remove spaces
+remove_space("  hello   world  ")           # "hello world"
+remove_space("  text  ", trim_start = TRUE, trim_end = TRUE)
+```
+
+### Function Invocation
+
+```{r eval=FALSE}
+# Invoke function with list of arguments
+invoke_fun(mean, list(x = 1:10, na.rm = TRUE))
+invoke_fun("mean", list(x = 1:10))
+invoke_fun("mean", x = 1:10, na.rm = TRUE)
+```
+
+### Downloads with Retry
+
+```{r eval=FALSE}
+download(
+  url = "https://example.com/file.csv",
+  destfile = "file.csv",
+  max_tries = 3,
+  quiet = FALSE
+)
+```
+
+### Retry Function Execution
+
+```{r eval=FALSE}
+result <- try_get(
+  expr = unreliable_function(),
+  max_tries = 5,
+  error_message = "Custom error message",
+  retry_message = "Retrying..."
+)
+```
+
+### List Operations
+
+```{r eval=FALSE}
+# Unnest list columns
+data <- data.frame(id = 1:3, x = c("a", "b", "c"))
+data$data <- list(c(1, 2), c(3, 4, 5), c(6))
+unnest_fun(data, cols = "data")
+
+# Maximum depth of list
+max_depth(nested_list)
+```
+
+### Split Indices
+
+```{r eval=FALSE}
+# Split indices for parallel processing
+indices <- split_indices(100, n_split = 4)
+```
+
+## ASCII Art
+
+### Package Logo
+
+```{r eval=FALSE}
+thisutils_logo()
+thisutils_logo(unicode = FALSE)
+```
+
+### Figlet Text Art
+
+```{r eval=FALSE}
+# Create ASCII art
+figlet("Hello")
+figlet("R Stats", font = "standard")
+
+# List available fonts
+figlet_font()
+
+# Add custom font files
+add_pkg_file("path/to/font.flf", "inst/fonts/")
+```
+
+## Global Options
+
+```{r eval=FALSE}
+# Control message verbosity
+options(log_message.verbose = TRUE)   # Enable messages
+options(log_message.verbose = FALSE)  # Disable messages
+getOption("log_message.verbose")      # Check current setting
+```
+
+## Common Patterns
+
+### Parallel Data Processing
+
+```{r eval=FALSE}
+# Process list of data frames
+data_list <- list(df1 = data.frame(...), df2 = data.frame(...))
+
+results <- parallelize_fun(
+  x = data_list,
+  fun = function(df) {
+    # Your processing logic
+    summary(df)
+  },
+  cores = 4
+)
+```
+
+### Error-Tolerant Pipeline
+
+```{r eval=FALSE}
+# Fetch data with retries
+fetch_data <- function(id) {
+  try_get(
+    expr = download_from_api(id),
+    max_tries = 3
+  )
+}
+
+# Process with error handling
+results <- parallelize_fun(
+  x = 1:100,
+  fun = fetch_data,
+  cores = 4,
+  clean_result = TRUE  # Remove failures
+)
+```
+
+### Analysis Pipeline
+
+```{r eval=FALSE}
+# Step-by-step with logging
+log_message("Step 1: Load data", message_type = "running")
+data <- load_data()
+
+log_message("Step 2: Process", message_type = "running")
+processed <- matrix_process(data, method = "zscore")
+
+log_message("Step 3: Analyze", message_type = "running")
+results <- sparse_cor(processed)
+
+log_message("Complete!", message_type = "success")
+```
+
+## Performance Tips
+
+1. **Parallel Processing**: Use when tasks take > 0.1s each
+2. **Sparse Matrices**: Use `sparse_cor()`, avoid unnecessary conversion to dense
+3. **Verbosity**: Disable in production: `options(log_message.verbose = FALSE)`
+4. **Memory**: Reduce cores if memory limited
+5. **Batch Processing**: Process large datasets in chunks
+
+## Function Categories
+
+### Parallel Processing
+- `parallelize_fun()` - Run functions in parallel
+
+### Logging
+- `log_message()` - Enhanced console messages
+- `get_verbose()` - Check verbosity settings
+- `parse_inline_expressions()` - Parse CLI markup
+
+### Matrix Operations
+- `simulate_sparse_matrix()` - Generate sparse matrices
+- `check_sparsity()` - Check matrix sparsity
+- `matrix_process()` - Process matrices
+- `as_matrix()` - Convert matrix formats
+- `matrix_to_table()`, `table_to_matrix()` - Matrix/table conversion
+- `normalization()` - Normalize vectors
+
+### Correlation
+- `sparse_cor()` - Sparse matrix correlation
+- `pearson_correlation()` - Pearson correlation and covariance
+
+### Statistics
+- `r_square()` - Coefficient of determination
+- `wilkinsonp()`, `minimump()`, `maximump()`, `meanp()`, `sump()`, `votep()` - P-value combinations
+
+### Utilities
+- `%ss%` - Null coalescing operator
+- `capitalize()` - Capitalize text
+- `remove_space()` - Remove/normalize spaces
+- `invoke_fun()` - Invoke function with arguments
+- `download()` - Download with retry
+- `try_get()` - Retry function execution
+- `unnest_fun()` - Unnest list columns
+- `max_depth()` - Maximum list depth
+- `split_indices()` - Split indices for processing
+
+### ASCII Art
+- `thisutils_logo()` - Display package logo
+- `figlet()` - Create ASCII text art
+- `figlet_font()` - List available fonts
+- `add_pkg_file()` - Add custom font files
+
+## See Also
+
+- [Getting Started Guide](getting-started.html)
+- [Advanced Usage](advanced-usage.html)
+- [Function Reference](../reference/index.html)
+
+---
+
+*For detailed documentation, use `?function_name` or visit the [online documentation](https://mengxu98.github.io/thisutils/).*
