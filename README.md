@@ -313,6 +313,176 @@ results <- parallelize_fun(
 3. **Suppress verbose output** in production with `options(log_message.verbose = FALSE)`
 4. **Use vectorized operations** where possible before parallelizing
 
+## **Troubleshooting**
+
+### Common Issues and Solutions
+
+#### Parallel Processing Issues
+
+**Problem**: Parallel processing is slower than sequential processing
+
+**Solutions**:
+- Ensure each task takes enough time to justify parallelization overhead (typically > 0.1 seconds)
+- Reduce the number of cores if you have too many small tasks
+- Check if you're limited by I/O rather than CPU
+
+```r
+# Bad: Tasks are too small
+parallelize_fun(1:1000, function(x) x^2, cores = 4)  # Overhead dominates
+
+# Good: Tasks are substantial
+parallelize_fun(1:100, function(x) {
+  Sys.sleep(0.1)
+  complex_computation(x)
+}, cores = 4)
+```
+
+**Problem**: "Cannot allocate vector of size..." error in parallel processing
+
+**Solutions**:
+- Reduce the number of cores to lower memory usage
+- Process data in smaller chunks
+- Close other applications to free up memory
+
+```r
+# Process in chunks
+chunk_size <- 100
+for (i in seq(1, length(data), chunk_size)) {
+  chunk <- data[i:min(i + chunk_size - 1, length(data))]
+  result <- parallelize_fun(chunk, fun, cores = 2)
+}
+```
+
+#### Matrix Operation Issues
+
+**Problem**: Matrix operations are consuming too much memory
+
+**Solutions**:
+- Keep matrices sparse when possible
+- Use `as_matrix()` only when absolutely necessary
+- Process matrices in batches
+
+```r
+# Bad: Converting large sparse matrix to dense
+dense <- as.matrix(large_sparse_matrix)
+
+# Good: Keep it sparse
+result <- sparse_cor(large_sparse_matrix)
+```
+
+**Problem**: Matrix operations fail with "non-conformable arrays"
+
+**Solution**: Check dimensions before operations
+
+```r
+# Check dimensions
+log_message("Matrix dimensions: {.val {nrow(mat)}} x {.val {ncol(mat)}}")
+
+# Ensure compatibility
+if (ncol(mat1) == nrow(mat2)) {
+  result <- mat1 %*% mat2
+}
+```
+
+#### Logging Issues
+
+**Problem**: Log messages are not appearing
+
+**Solutions**:
+- Check if verbose output is disabled: `getOption("log_message.verbose")`
+- Enable it: `options(log_message.verbose = TRUE)`
+- Ensure you're not suppressing messages: `suppressMessages()`
+
+```r
+# Check current setting
+getOption("log_message.verbose")
+
+# Enable globally
+options(log_message.verbose = TRUE)
+```
+
+**Problem**: CLI inline markup not rendering correctly
+
+**Solution**: Ensure `cli_model = TRUE` (default)
+
+```r
+# This works
+log_message("Processing {.file data.csv}", cli_model = TRUE)
+
+# This won't render markup
+log_message("Processing {.file data.csv}", cli_model = FALSE)
+```
+
+#### Installation Issues
+
+**Problem**: Package fails to install due to compilation errors
+
+**Solutions**:
+- Ensure you have a C++ compiler installed (Rtools on Windows, Xcode on macOS)
+- Update R to the latest version
+- Try installing from CRAN instead of GitHub
+
+```r
+# Install from CRAN (pre-compiled binaries available)
+install.packages("thisutils")
+```
+
+**Problem**: Dependencies fail to install
+
+**Solution**: Install dependencies manually
+
+```r
+# Install required packages
+install.packages(c("cli", "doParallel", "foreach", "Matrix", "Rcpp", "rlang"))
+
+# Then install thisutils
+install.packages("thisutils")
+```
+
+### Performance Optimization
+
+If you're experiencing performance issues:
+
+1. **Profile your code** to identify bottlenecks
+   ```r
+   system.time({
+     result <- your_function()
+   })
+   ```
+
+2. **Test with small data first** before scaling up
+   ```r
+   # Test with subset
+   small_test <- data[1:100, ]
+   result <- process_data(small_test, cores = 1)
+   ```
+
+3. **Monitor resource usage** during execution
+   - Use `htop` or Task Manager to check CPU and memory
+   - Adjust `cores` parameter based on available resources
+
+4. **Consider batch processing** for very large datasets
+   ```r
+   batch_process <- function(data, batch_size = 1000, cores = 4) {
+     n_batches <- ceiling(nrow(data) / batch_size)
+     
+     results <- list()
+     for (i in 1:n_batches) {
+       start <- (i - 1) * batch_size + 1
+       end <- min(i * batch_size, nrow(data))
+       batch <- data[start:end, ]
+       
+       results[[i]] <- parallelize_fun(
+         as.list(1:nrow(batch)),
+         function(j) process_row(batch[j, ]),
+         cores = cores
+       )
+     }
+     
+     do.call(c, results)
+   }
+   ```
+
 ## **Contributing**
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.

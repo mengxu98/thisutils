@@ -41,6 +41,7 @@ articles:
   navbar: ~
   contents:
   - getting-started
+  - quick-reference
   
 - title: "Advanced Topics"
   navbar: ~
