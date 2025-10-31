@@ -12,10 +12,14 @@ template:
 
 navbar:
   structure:
-    left:  [articles, reference, tutorials, news]
+    left:  [intro, articles, reference, tutorials, news]
     right: [github, mengxu, lightswitch]
 
   components:
+    intro:
+      text: Get started
+      href: articles/getting-started.html
+    
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/mengxu98/thisutils
@@ -31,6 +35,17 @@ navbar:
     reference:
       text: Reference
       href: reference/index.html
+
+articles:
+- title: "Getting Started"
+  navbar: ~
+  contents:
+  - getting-started
+  
+- title: "Advanced Topics"
+  navbar: ~
+  contents:
+  - advanced-usage
 
 reference:
 

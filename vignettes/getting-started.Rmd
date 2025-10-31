@@ -1,0 +1,466 @@
+---
+title: "Getting Started with thisutils"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with thisutils}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The `thisutils` package is a comprehensive toolkit for R users, providing utilities for parallel processing, logging, matrix operations, and much more. This guide will walk you through the essential features and help you get started quickly.
+
+## Installation
+
+Install the package from CRAN:
+
+```{r eval=FALSE}
+install.packages("thisutils")
+```
+
+Or install the development version from GitHub:
+
+```{r eval=FALSE}
+# Using pak
+pak::pak("mengxu98/thisutils")
+```
+
+Load the package:
+
+```{r setup, eval=FALSE}
+library(thisutils)
+```
+
+## Core Features
+
+### 1. Enhanced Logging with `log_message()`
+
+The `log_message()` function provides a powerful way to create formatted console output with timestamps, colors, and styles.
+
+#### Basic Usage
+
+```{r eval=FALSE}
+# Simple info message
+log_message("Starting data processing")
+
+# Success message
+log_message("Data loaded successfully", message_type = "success")
+
+# Warning message
+log_message("Missing values detected", message_type = "warning")
+```
+
+#### Colored and Styled Messages
+
+```{r eval=FALSE}
+# Red text
+log_message("Critical error", text_color = "red")
+
+# Bold text
+log_message("Important note", text_style = "bold")
+
+# Combined styling
+log_message("Attention required", 
+            text_color = "yellow", 
+            text_style = c("bold", "underline"))
+```
+
+#### CLI Inline Markup
+
+`log_message()` supports `cli` package markup for semantic formatting:
+
+```{r eval=FALSE}
+# Highlight packages
+log_message("Loading {.pkg dplyr} package")
+
+# Show file names
+log_message("Reading {.file data.csv}")
+
+# Display function names
+log_message("Calling {.fn mean} function")
+
+# Show values
+log_message("Processed {.val 100} records")
+```
+
+#### Control Verbosity
+
+```{r eval=FALSE}
+# Suppress messages globally
+options(log_message.verbose = FALSE)
+log_message("This won't be printed")
+
+# Re-enable messages
+options(log_message.verbose = TRUE)
+log_message("This will be printed")
+
+# Or control per message
+log_message("Hidden message", verbose = FALSE)
+```
+
+### 2. Parallel Processing with `parallelize_fun()`
+
+Process lists or vectors in parallel across multiple cores for faster computation.
+
+#### Basic Parallel Processing
+
+```{r eval=FALSE}
+# Sequential processing (1 core)
+result <- parallelize_fun(
+  x = 1:5,
+  fun = function(x) {
+    Sys.sleep(0.1)
+    x^2
+  },
+  cores = 1
+)
+
+# Parallel processing (4 cores)
+result <- parallelize_fun(
+  x = 1:100,
+  fun = function(x) {
+    Sys.sleep(0.01)
+    x^2
+  },
+  cores = 4
+)
+```
+
+#### Error Handling
+
+```{r eval=FALSE}
+# Keep error objects in results
+result <- parallelize_fun(
+  x = 1:5,
+  fun = function(x) {
+    if (x == 3) stop("Error on element 3")
+    x^2
+  },
+  clean_result = FALSE  # Default
+)
+
+# Remove failed results
+result <- parallelize_fun(
+  x = 1:5,
+  fun = function(x) {
+    if (x == 3) stop("Error on element 3")
+    x^2
+  },
+  clean_result = TRUE  # Only successful results
+)
+```
+
+#### Processing Named Lists
+
+```{r eval=FALSE}
+data_list <- list(
+  dataset1 = data.frame(x = rnorm(100)),
+  dataset2 = data.frame(x = rnorm(100)),
+  dataset3 = data.frame(x = rnorm(100))
+)
+
+results <- parallelize_fun(
+  x = data_list,
+  fun = function(df) {
+    list(
+      mean = mean(df$x),
+      sd = sd(df$x)
+    )
+  },
+  cores = 2
+)
+```
+
+### 3. Matrix Operations
+
+#### Sparse Matrix Generation
+
+```{r eval=FALSE}
+# Generate a sparse matrix
+sparse_mat <- simulate_sparse_matrix(
+  nrow = 1000,
+  ncol = 500,
+  sparsity = 0.95  # 95% zeros
+)
+
+# Check actual sparsity
+sparsity <- check_sparsity(sparse_mat)
+log_message("Matrix sparsity: {.val {round(sparsity * 100, 2)}%}")
+```
+
+#### Matrix Processing
+
+```{r eval=FALSE}
+# Z-score normalization
+zscore_mat <- matrix_process(sparse_mat, method = "zscore")
+
+# Log transformation
+log_mat <- matrix_process(sparse_mat, method = "log1p")
+
+# Fold change
+fc_mat <- matrix_process(sparse_mat, method = "fc")
+
+# Custom processing
+custom_mat <- matrix_process(sparse_mat, method = function(x) x / rowMeans(x))
+```
+
+#### Vector Normalization
+
+```{r eval=FALSE}
+x <- c(1, 2, 3, 4, 5, NA)
+
+# Min-max normalization
+normalization(x, method = "max_min")
+
+# Z-score normalization
+normalization(x, method = "z_score")
+
+# Maximum absolute scaling
+normalization(x, method = "maximum")
+
+# Unit vector normalization
+normalization(x, method = "unit_vector")
+```
+
+### 4. Statistical Functions
+
+#### R-squared Calculation
+
+```{r eval=FALSE}
+# Generate data
+y_true <- rnorm(100)
+y_pred <- y_true + rnorm(100, sd = 0.5)
+
+# Calculate R²
+r2 <- r_square(y_true, y_pred)
+log_message("R² = {.val {round(r2, 4)}}")
+```
+
+#### Combining P-values
+
+```{r eval=FALSE}
+p_values <- c(0.01, 0.02, 0.03, 0.04, 0.05)
+
+# Wilkinson's method
+wilkinson_result <- wilkinsonp(p_values, r = 2)
+
+# Minimum p-value
+min_result <- minimump(p_values)
+
+# Maximum p-value
+max_result <- maximump(p_values)
+
+# Mean p-value
+mean_result <- meanp(p_values)
+
+# Vote counting
+vote_result <- votep(p_values, alpha = 0.05)
+```
+
+### 5. Utility Functions
+
+#### Null Coalescing Operator
+
+```{r eval=FALSE}
+# Returns first non-NULL value
+value1 <- NULL %ss% "default"  # Returns "default"
+value2 <- 42 %ss% "default"    # Returns 42
+```
+
+#### Text Processing
+
+```{r eval=FALSE}
+# Capitalize first letter
+capitalize(c("hello world", "data science"))
+
+# Remove extra spaces
+remove_space("  hello   world  ")
+remove_space("  text  ", trim_start = TRUE, trim_end = TRUE)
+```
+
+#### File Download with Retry
+
+```{r eval=FALSE}
+download(
+  url = "https://example.com/data.csv",
+  destfile = "data.csv",
+  max_tries = 3,
+  quiet = FALSE
+)
+```
+
+#### Retry Function Execution
+
+```{r eval=FALSE}
+# Try unreliable function multiple times
+result <- try_get(
+  expr = {
+    # Function that might fail
+    if (runif(1) < 0.5) stop("Random failure")
+    "Success!"
+  },
+  max_tries = 5,
+  retry_message = "Retrying..."
+)
+```
+
+## Practical Examples
+
+### Example 1: Parallel Data Analysis
+
+```{r eval=FALSE}
+# Simulate multiple datasets
+datasets <- lapply(1:10, function(i) {
+  data.frame(
+    x = rnorm(1000),
+    y = rnorm(1000),
+    group = sample(LETTERS[1:5], 1000, replace = TRUE)
+  )
+})
+
+# Analyze each dataset in parallel
+results <- parallelize_fun(
+  x = datasets,
+  fun = function(df) {
+    list(
+      n_obs = nrow(df),
+      mean_x = mean(df$x),
+      mean_y = mean(df$y),
+      cor_xy = cor(df$x, df$y),
+      groups = length(unique(df$group))
+    )
+  },
+  cores = 4,
+  verbose = TRUE
+)
+
+# Combine results
+summary_df <- do.call(rbind, lapply(results, as.data.frame))
+```
+
+### Example 2: Building an Analysis Pipeline
+
+```{r eval=FALSE}
+# Step 1: Load data
+log_message("Step 1: Loading data...", message_type = "running")
+data_matrix <- simulate_sparse_matrix(500, 100, sparsity = 0.9)
+log_message("Loaded matrix: {.val {nrow(data_matrix)}} x {.val {ncol(data_matrix)}}", 
+            message_type = "success")
+
+# Step 2: Check data quality
+log_message("Step 2: Checking data quality...", message_type = "running")
+sparsity <- check_sparsity(data_matrix)
+log_message("Sparsity: {.val {round(sparsity * 100, 2)}%}", message_type = "success")
+
+# Step 3: Process data
+log_message("Step 3: Processing data...", message_type = "running")
+processed <- matrix_process(data_matrix, method = "zscore")
+log_message("Applied z-score normalization", message_type = "success")
+
+# Step 4: Compute correlations
+log_message("Step 4: Computing correlations...", message_type = "running")
+cor_matrix <- sparse_cor(processed)
+log_message("Correlation matrix computed", message_type = "success")
+
+log_message("Pipeline complete!", message_type = "success")
+```
+
+### Example 3: Custom Error Handling
+
+```{r eval=FALSE}
+# Simulate an API with intermittent failures
+fetch_from_api <- function(id) {
+  log_message("Fetching data for ID: {.val {id}}")
+  
+  try_get(
+    expr = {
+      # Simulate 30% failure rate
+      if (runif(1) < 0.3) {
+        stop("API connection timeout")
+      }
+      
+      # Return simulated data
+      data.frame(
+        id = id,
+        value = rnorm(1),
+        timestamp = Sys.time()
+      )
+    },
+    max_tries = 3,
+    error_message = "Failed to fetch from API"
+  )
+}
+
+# Fetch data for multiple IDs in parallel
+ids <- 1:20
+results <- parallelize_fun(
+  x = ids,
+  fun = fetch_from_api,
+  cores = 4,
+  clean_result = TRUE  # Remove failures
+)
+
+log_message("Successfully fetched {.val {length(results)}} out of {.val {length(ids)}} records")
+```
+
+## Best Practices
+
+1. **Use parallel processing wisely**: Parallelization has overhead. It's most beneficial for:
+   - Large numbers of independent tasks
+   - Computationally intensive operations
+   - I/O-bound operations (with proper setup)
+
+2. **Log strategically**: 
+   - Use `message_type` to categorize messages
+   - Disable verbose output in production: `options(log_message.verbose = FALSE)`
+   - Use inline markup for better readability
+
+3. **Handle errors gracefully**:
+   - Use `clean_result = TRUE` to remove failed operations
+   - Set `throw_error = FALSE` to suppress detailed error messages
+   - Use `try_get()` for retry logic
+
+4. **Optimize matrix operations**:
+   - Keep sparse matrices sparse when possible
+   - Use `sparse_cor()` for sparse correlation
+   - Convert to dense only when necessary
+
+5. **Memory management**:
+   - Be cautious with large datasets in parallel processing
+   - Monitor memory usage with multiple cores
+   - Consider chunk-based processing for very large datasets
+
+## Next Steps
+
+- Explore the [function reference](https://mengxu98.github.io/thisutils/reference/index.html) for complete documentation
+- Read about advanced features in the "Advanced Usage" vignette
+- Check out specific function examples in the documentation
+- Visit the [GitHub repository](https://github.com/mengxu98/thisutils) for the latest updates
+
+## Getting Help
+
+If you encounter issues or have questions:
+
+1. Check the function documentation: `?function_name`
+2. Browse existing issues: https://github.com/mengxu98/thisutils/issues
+3. Create a new issue with a reproducible example
+
+## Summary
+
+This guide covered the essential features of `thisutils`:
+
+- ✅ Enhanced logging with `log_message()`
+- ✅ Parallel processing with `parallelize_fun()`
+- ✅ Matrix operations and normalization
+- ✅ Statistical functions
+- ✅ Utility functions for common tasks
+
+The package is designed to make your R workflows more efficient and your code more readable. Happy coding!
