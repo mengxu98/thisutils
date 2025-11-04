@@ -1,8 +1,8 @@
 Type: Package
 Package: thisutils
 Title: Collection of Utility Functions for Data Analysis and Computing
-Version: 0.2.3
-Date: 2025-10-30
+Version: 0.2.4
+Date: 2025-11-04
 Authors@R:
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054"))
 Maintainer: Meng Xu <mengxu98@qq.com>
@@ -20,7 +20,8 @@ Imports:
     parallel,
     Rcpp,
     rlang,
-    stats
+    stats,
+    utils
 LinkingTo:
     Rcpp
 Config/Needs/website: mengxu98/thistemplate

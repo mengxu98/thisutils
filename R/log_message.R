@@ -308,6 +308,15 @@
 #'   log_message("{.val {x + 1}}")
 #' }
 #' fun()
+#'
+#'
+#' # print objects directly
+#' df <- data.frame(
+#'   x = 1:3,
+#'   y = letters[1:3],
+#'   z = c(" a", "b  ", "c")
+#' )
+#' log_message("Content:\n", df)
 log_message <- function(
     ...,
     verbose = TRUE,
@@ -436,7 +445,35 @@ get_verbose <- function(verbose = NULL) {
     return("")
   }
 
-  msg <- paste0(...)
+  processed_args <- lapply(
+    args, function(arg) {
+      if (is.character(arg) && length(arg) == 1) {
+        return(arg)
+      } else if (is.character(arg)) {
+        return(paste(arg, collapse = ""))
+      } else {
+        tryCatch(
+          {
+            output <- utils::capture.output(print(arg))
+            if (length(output) > 0) {
+              return(paste(output, collapse = "\n"))
+            } else {
+              return(as.character(arg))
+            }
+          },
+          error = function(e) {
+            return(as.character(arg))
+          }
+        )
+      }
+    }
+  )
+
+  msg <- paste0(processed_args, collapse = "")
+
+  if (length(msg) != 1) {
+    msg <- paste(msg, collapse = "")
+  }
 
   capitalize(msg)
 }
@@ -593,7 +630,7 @@ get_verbose <- function(verbose = NULL) {
     multiline_indent,
     timestamp_style,
     .envir = parent.frame()) {
-  if (cli_model && grepl("\n", msg)) {
+  if (cli_model && length(msg) == 1 && grepl("\n", msg)) {
     lines <- strsplit(msg, "\n", fixed = TRUE)[[1]]
 
     for (i in seq_along(lines)) {
