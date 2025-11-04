@@ -17,7 +17,6 @@ Capitalize the first letter of each word
 \examples{
 x <- c(
   "hello world",
-  "Hello world",
   "hello World"
 )
 capitalize(x)

@@ -341,6 +341,15 @@ fun <- function(x = 1) {
   log_message("{.val {x + 1}}")
 }
 fun()
+
+
+# print objects directly
+df <- data.frame(
+  x = 1:3,
+  y = letters[1:3],
+  z = c(" a", "b  ", "c")
+)
+log_message("Content:\n", df)
 }
 \references{
 \url{https://cli.r-lib.org/articles/index.html}

@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.2.4
+
+* **func**:
+  * Enhance `log_message()` function: Now automatically handles non-character objects (e.g., `data.table`, `data.frame`) by formatting them with `capture.output(print(...))`, allowing direct object input without manual string conversion.
+
 # thisutils 0.2.3
 
 * **func**:
