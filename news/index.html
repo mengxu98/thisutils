@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,19 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.5" id="thisutils-025">thisutils 0.2.5<a class="anchor" aria-label="anchor" href="#thisutils-025"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Optimize <code><a href="../reference/check_sparsity.html">check_sparsity()</a></code> function: Improved calculation logic by computing total counts upfront, avoiding redundant calculations for sparse and non-sparse matrices.</li>
+<li>Optimize <code><a href="../reference/normalization.html">normalization()</a></code> function: Enhanced <code>max_min</code> and <code>maximum</code> methods by caching min/max values to avoid repeated calculations.</li>
+<li>Improve code quality in <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code>: Replaced <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply()</a></code> with <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code> for type-safe return values and optimized error handling logic.</li>
+<li>Optimize P-value combination functions (<code><a href="../reference/meanp.html">meanp()</a></code>, <code><a href="../reference/sump.html">sump()</a></code>, <code><a href="../reference/votep.html">votep()</a></code>): Extracted <code>validp</code> variable to avoid repeated indexing and improved code efficiency.</li>
+<li>Enhance <code><a href="../reference/sump.html">sump()</a></code> function: Replaced loop-based calculation with vectorized operations for better performance.</li>
+<li>Improve <code><a href="../reference/capitalize.html">capitalize()</a></code> and <code><a href="../reference/unnest_fun.html">unnest_fun()</a></code> functions: Replaced <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply()</a></code> with <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code> for type safety.</li>
+<li>Enhance <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function: Now automatically checks for the existence of <code>src</code> directory and only adds <code>@useDynLib</code> directive when <code>src</code> folder is present in the package environment.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.4" id="thisutils-024">thisutils 0.2.4<a class="anchor" aria-label="anchor" href="#thisutils-024"></a></h2>
 <ul><li>
