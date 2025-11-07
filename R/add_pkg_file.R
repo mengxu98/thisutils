@@ -118,6 +118,8 @@ add_pkg_file <- function(
     )
   }
 
+  has_src_dir <- dir.exists("src")
+  
   file_content <- .generate_content(
     pkg_name = pkg_name,
     title = title,
@@ -127,7 +129,8 @@ add_pkg_file <- function(
     github_url = github_url,
     ascii_lines = ascii_lines,
     colors = colors,
-    unicode = unicode
+    unicode = unicode,
+    has_src_dir = has_src_dir
   )
 
   output_file <- file.path(
@@ -154,19 +157,28 @@ add_pkg_file <- function(
     github_url,
     ascii_lines,
     colors,
-    unicode) {
+    unicode,
+    has_src_dir = FALSE) {
   ascii_with_numbers <- .add_color_numbers(
     ascii_lines,
     length(colors)
   )
 
+  use_dynlib_line <- if (has_src_dir) {
+    c(
+      paste0("#' @useDynLib ", pkg_name),
+      "#'"
+    )
+  } else {
+    NULL
+  }
+  
   content <- c(
     "# -*- coding: utf-8 -*-",
     "",
     paste0("#' @title ", title),
     "#'",
-    paste0("#' @useDynLib ", pkg_name),
-    "#'",
+    use_dynlib_line,
     "#' @description",
     paste0("#' ", pkg_description),
     "#'",
