@@ -266,13 +266,12 @@ parallelize_fun <- function(
     options(cli.progress_clear = NULL)
   }
 
-  error_indices <- sapply(
-    output_list, function(x) inherits(x, "parallelize_error")
+  error_indices <- vapply(
+    output_list, function(x) inherits(x, "parallelize_error"), logical(1)
   )
   if (any(error_indices)) {
-    error_count <- sum(error_indices)
     log_message(
-      "Found {.pkg {error_count}} failed result{?s}",
+      "Found {.pkg {sum(error_indices)}} failed result{?s}",
       timestamp_format = timestamp_format,
       message_type = "warning",
       verbose = verbose
@@ -309,7 +308,7 @@ parallelize_fun <- function(
       output_list <- output_list[!error_indices]
       x <- x[!error_indices]
       log_message(
-        "Removed {.pkg {error_count}} failed result{?s}",
+        "Removed {.pkg {sum(error_indices)}} failed result{?s}",
         timestamp_format = timestamp_format,
         verbose = verbose
       )
