@@ -1,5 +1,16 @@
 # thisutils
 
+# thisutils 0.2.5
+
+* **func**:
+  * Optimize `check_sparsity()` function: Improved calculation logic by computing total counts upfront, avoiding redundant calculations for sparse and non-sparse matrices.
+  * Optimize `normalization()` function: Enhanced `max_min` and `maximum` methods by caching min/max values to avoid repeated calculations.
+  * Improve code quality in `parallelize_fun()`: Replaced `sapply()` with `vapply()` for type-safe return values and optimized error handling logic.
+  * Optimize P-value combination functions (`meanp()`, `sump()`, `votep()`): Extracted `validp` variable to avoid repeated indexing and improved code efficiency.
+  * Enhance `sump()` function: Replaced loop-based calculation with vectorized operations for better performance.
+  * Improve `capitalize()` and `unnest_fun()` functions: Replaced `sapply()` with `vapply()` for type safety.
+  * Enhance `add_pkg_file()` function: Now automatically checks for the existence of `src` directory and only adds `@useDynLib` directive when `src` folder is present in the package environment.
+
 # thisutils 0.2.4
 
 * **func**:
