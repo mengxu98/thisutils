@@ -78,12 +78,12 @@ simulate_sparse_matrix <- function(
 #'
 #' @export
 check_sparsity <- function(x) {
+  total_counts <- prod(dim(x))
+  
   if (inherits(x, "sparseMatrix")) {
     non_zero_count <- Matrix::nnzero(x)
-    total_counts <- prod(dim(x))
   } else {
     non_zero_count <- sum(x != 0)
-    total_counts <- length(x)
   }
 
   sparsity_ratio <- non_zero_count / total_counts
@@ -170,10 +170,13 @@ normalization <- function(
   x <- switch(
     EXPR = method,
     "max_min" = {
-      (x - min(x)) / (max(x) - min(x))
+      min_x <- min(x)
+      max_x <- max(x)
+      (x - min_x) / (max_x - min_x)
     },
     "maximum" = {
-      x / max(abs(x))
+      max_abs_x <- max(abs(x))
+      x / max_abs_x
     },
     "sum" = {
       x / sum(abs(x))
