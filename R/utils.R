@@ -87,7 +87,6 @@ invoke_fun <- function(
 #' @examples
 #' x <- c(
 #'   "hello world",
-#'   "Hello world",
 #'   "hello World"
 #' )
 #' capitalize(x)
@@ -111,7 +110,7 @@ capitalize <- function(x, force_tolower = FALSE) {
       sep = ""
     )
   } else {
-    first_word <- sapply(strsplit(x, "\\s|-"), function(s) s[1])
+    first_word <- vapply(strsplit(x, "\\s|-"), function(s) s[1], character(1))
     index <- which(first_word == tolower(first_word))
     x[index] <- paste(
       toupper(substr(x[index], 1, 1)),
@@ -170,7 +169,7 @@ unnest_fun <- function(
   }
   for (col in cols) {
     col_expand <- unlist(data[[col]])
-    expand_times <- sapply(data[[col]], length)
+    expand_times <- vapply(data[[col]], length, integer(1))
     if (isTRUE(keep_empty)) {
       data[[col]][expand_times == 0] <- NA
       col_expand <- unlist(data[[col]])
@@ -532,6 +531,7 @@ minimump <- function(p, alpha = 0.05, log.p = FALSE) {
 meanp <- function(p) {
   keep <- (p >= 0) & (p <= 1)
   invalid <- sum(1L * keep) < 4
+  validp <- p[keep]
   if (invalid) {
     log_message(
       "Must have at least four valid P-values",
@@ -540,11 +540,11 @@ meanp <- function(p) {
     res <- list(
       z = NA_real_,
       p = NA_real_,
-      validp = p[keep]
+      validp = validp
     )
   } else {
-    pi <- mean(p[keep])
-    k <- length(p[keep])
+    pi <- mean(validp)
+    k <- length(validp)
     z <- (0.5 - pi) * sqrt(12 * k)
     if (k != length(p)) {
       log_message(
@@ -555,7 +555,7 @@ meanp <- function(p) {
     res <- list(
       z = z,
       p = stats::pnorm(z, lower.tail = FALSE),
-      validp = p[keep]
+      validp = validp
     )
   }
   res
@@ -583,25 +583,18 @@ sump <- function(p) {
       validp = p[keep]
     )
   } else {
-    sigmap <- sum(p[keep])
-    k <- length(p[keep])
+    validp <- p[keep]
+    sigmap <- sum(validp)
+    k <- length(validp)
     conservativep <- exp(k * log(sigmap) - lgamma(k + 1))
     nterm <- floor(sigmap) + 1
     denom <- lfactorial(k)
-    psum <- 0
-    terms <- vector("numeric", nterm)
-    for (i in 1:nterm) {
-      terms[i] <- lchoose(k, i - 1) +
-        k *
-          log(
-            sigmap -
-              i +
-              1
-          ) -
-        denom
-      pm <- 2 * (i %% 2) - 1
-      psum <- psum + pm * exp(terms[i])
-    }
+    i_vec <- 1:nterm
+    terms <- lchoose(k, i_vec - 1) +
+      k * log(sigmap - i_vec + 1) -
+      denom
+    pm_vec <- 2 * ((i_vec %% 2) == 1) - 1
+    psum <- sum(pm_vec * exp(terms))
     if (k != length(p)) {
       log_message(
         "Some studies omitted",
@@ -617,7 +610,7 @@ sump <- function(p) {
     res <- list(
       p = psum,
       conservativep = conservativep,
-      validp = p[keep]
+      validp = validp
     )
   }
   res
@@ -658,10 +651,10 @@ votep <- function(p, alpha = 0.5) {
       validp = p[keep]
     )
   } else {
-    pi <- p[keep]
-    k <- length(pi)
-    pos <- sum(1L * (pi < alp[1]))
-    neg <- sum(1L * (pi > alp[2]))
+    validp <- p[keep]
+    k <- length(validp)
+    pos <- sum(1L * (validp < alp[1]))
+    neg <- sum(1L * (validp > alp[2]))
     if (k != length(p)) {
       log_message(
         "Some studies omitted",
@@ -685,7 +678,7 @@ votep <- function(p, alpha = 0.5) {
       pos = pos,
       neg = neg,
       alpha = alpha,
-      validp = pi
+      validp = validp
     )
   }
   res
