@@ -18,6 +18,7 @@ log_message(
   timestamp = TRUE,
   timestamp_format = paste0("[", format(Sys.time(), "\%Y-\%m-\%d \%H:\%M:\%S"), "] "),
   timestamp_style = TRUE,
+  plain_text = FALSE,
   .envir = parent.frame(),
   .frame = .envir
 )
@@ -76,6 +77,10 @@ Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
 When \code{TRUE}, timestamp formatting matches the message;
 when \code{FALSE}, timestamp keeps its default appearance.
 Default is \code{TRUE}.}
+
+\item{plain_text}{Whether to print only the text content.
+When \code{TRUE}, level, symbol, timestamp, and message type formatting are suppressed,
+but color and multiline settings still apply.}
 
 \item{.envir}{The environment to evaluate calls in.
 Default is \link{parent.frame}.}
