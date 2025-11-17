@@ -119,7 +119,7 @@ add_pkg_file <- function(
   }
 
   has_src_dir <- dir.exists("src")
-  
+
   file_content <- .generate_content(
     pkg_name = pkg_name,
     title = title,
@@ -172,7 +172,7 @@ add_pkg_file <- function(
   } else {
     NULL
   }
-  
+
   content <- c(
     "# -*- coding: utf-8 -*-",
     "",
@@ -566,8 +566,7 @@ add_pkg_file <- function(
 
   if (!has_cli) {
     log_message(
-      "Adding cli dependency to DESCRIPTION file",
-      message_type = "info",
+      "Adding cli dependency to {.file {desc_file}}",
       verbose = verbose
     )
 
@@ -611,7 +610,7 @@ add_pkg_file <- function(
   if (length(reference_start) == 0) {
     log_message(
       "No {.cls reference} section found in {.file {pkgdown_file}}",
-      message_type = "info",
+      message_type = "warning",
       verbose = verbose
     )
     return()
@@ -630,7 +629,7 @@ add_pkg_file <- function(
   if (!has_subtitle || !has_package_entry || !has_logo_entry) {
     log_message(
       "Updating {.file {pkgdown_file}} with package overview section",
-      message_type = "info",
+      message_type = "running",
       verbose = verbose
     )
 
@@ -643,10 +642,14 @@ add_pkg_file <- function(
     if (!has_package_entry || !has_logo_entry) {
       new_content <- c(new_content, "- contents:")
       if (!has_package_entry) {
-        new_content <- c(new_content, paste0("  - ", pkg_name, "-package"))
+        new_content <- c(
+          new_content, paste0("  - ", pkg_name, "-package")
+        )
       }
       if (!has_logo_entry) {
-        new_content <- c(new_content, paste0("  - ", tolower(pkg_name), "_logo"))
+        new_content <- c(
+          new_content, paste0("  - ", tolower(pkg_name), "_logo")
+        )
       }
     }
 
@@ -667,7 +670,6 @@ add_pkg_file <- function(
   } else {
     log_message(
       "Package overview section already present in {.file {pkgdown_file}}",
-      message_type = "info",
       verbose = verbose
     )
   }
