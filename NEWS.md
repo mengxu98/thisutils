@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.3.1
+
+* **docs**:
+  * Update `figlet()` references to use HTTPS, addressing CRAN incoming NOTE.
+
 # thisutils 0.3.0
 
 * **func**:
