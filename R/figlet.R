@@ -17,7 +17,7 @@
 #' @references
 #' \url{https://github.com/richfitz/rfiglet},
 #' \url{https://github.com/jbkunst/figletr},
-#' \url{http://www.figlet.org/}
+#' \url{https://www.figlet.org/}
 #'
 #' @export
 #'
