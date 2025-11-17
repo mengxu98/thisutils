@@ -1,0 +1,127 @@
+# ***thisutils***
+
+## **Introduction**
+
+[thisutils](https://mengxu98.github.io/thisutils/) is an R package for
+collecting some useful functions.
+
+## **Installation**
+
+Install CRAN version:
+
+``` r
+install.packages("thisutils")
+# or
+if (!require("pak", quietly = TRUE)) {
+  install.packages("pak")
+}
+pak::pak("thisutils")
+```
+
+Install development version from
+[GitHub](https://github.com/mengxu98/thisutils) use
+[pak](https://github.com/r-lib/pak):
+
+``` r
+if (!require("pak", quietly = TRUE)) {
+  install.packages("pak")
+}
+pak::pak("mengxu98/thisutils")
+```
+
+## **Usage**
+
+Please reference
+[here](https://mengxu98.github.io/thisutils/reference/index.html).
+
+# Package index
+
+### Package overview
+
+- [`thisutils`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)
+  [`thisutils-package`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)
+  : Collection of Utility Functions for Data Analysis and Computing
+- [`thisutils_logo()`](https://mengxu98.github.io/thisutils/reference/thisutils_logo.md)
+  : The logo of thisutils
+
+### Parallel processing
+
+- [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+  : Parallelize a function
+
+### Logging messages
+
+- [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)
+  : Get the verbose option
+- [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+  : Print formatted message
+- [`parse_inline_expressions()`](https://mengxu98.github.io/thisutils/reference/parse_inline_expressions.md)
+  : Parse inline expressions
+
+### ASCII art
+
+- [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
+  : Add package file
+- [`figlet()`](https://mengxu98.github.io/thisutils/reference/figlet.md)
+  : The figlet function
+- [`figlet_font()`](https://mengxu98.github.io/thisutils/reference/figlet_font.md)
+  : Get a figlet font
+
+### Correlation functions
+
+- [`pearson_correlation()`](https://mengxu98.github.io/thisutils/reference/pearson_correlation.md)
+  : Correlation and covariance calculation for sparse matrix
+- [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
+  : Sparse correlation function
+
+### Utility functions
+
+- [`` `%ss%` ``](https://mengxu98.github.io/thisutils/reference/grapes-ss-grapes.md)
+  : Value selection operator
+- [`as_matrix()`](https://mengxu98.github.io/thisutils/reference/as_matrix.md)
+  : Convert matrix into dense/sparse matrix
+- [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
+  : Capitalize the first letter of each word
+- [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
+  : Check sparsity of matrix
+- [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
+  : Download file from the Internet
+- [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
+  : Invoke a function with a list of arguments
+- [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)
+  : Process matrix
+- [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
+  : Switch matrix to table
+- [`max_depth()`](https://mengxu98.github.io/thisutils/reference/max_depth.md)
+  : Maximum depth of a list
+- [`maximump()`](https://mengxu98.github.io/thisutils/reference/maximump.md)
+  : Maximum P-value
+- [`meanp()`](https://mengxu98.github.io/thisutils/reference/meanp.md) :
+  Mean P-value
+- [`minimump()`](https://mengxu98.github.io/thisutils/reference/minimump.md)
+  : Minimum P-value
+- [`normalization()`](https://mengxu98.github.io/thisutils/reference/normalization.md)
+  : Normalize numeric vector
+- [`print(`*`<thisutils_logo>`*`)`](https://mengxu98.github.io/thisutils/reference/print.thisutils_logo.md)
+  : Print logo
+- [`r_square()`](https://mengxu98.github.io/thisutils/reference/r_square.md)
+  : Coefficient of determination (\\R^2\\)
+- [`remove_space()`](https://mengxu98.github.io/thisutils/reference/remove_space.md)
+  : Remove and normalize spaces
+- [`split_indices()`](https://mengxu98.github.io/thisutils/reference/split_indices.md)
+  : Split indices.
+- [`simulate_sparse_matrix()`](https://mengxu98.github.io/thisutils/reference/simulate_sparse_matrix.md)
+  : Generate a simulated sparse matrix
+- [`sump()`](https://mengxu98.github.io/thisutils/reference/sump.md) :
+  Sum P-value
+- [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+  : Switch table to matrix
+- [`try_get()`](https://mengxu98.github.io/thisutils/reference/try_get.md)
+  : Try to evaluate an expression a set number of times before failing
+- [`unnest_fun()`](https://mengxu98.github.io/thisutils/reference/unnest_fun.md)
+  : Unnest a list-column
+- [`votep()`](https://mengxu98.github.io/thisutils/reference/votep.md) :
+  Vote P-value
+- [`wilkinsonp()`](https://mengxu98.github.io/thisutils/reference/wilkinsonp.md)
+  : Wilkinson's P-value
+
