@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.3.0
+
+* **func**:
+  * Enhance `log_message()` function: Added new `plain_text` parameter to suppress level, symbol, timestamp, and message type formatting while preserving color and multiline settings, allowing for cleaner text-only output.
+  * Improve `add_pkg_file()` function: Enhanced message types and formatting, using more appropriate message types (`warning`, `running`) and improved file references in log messages.
+
 # thisutils 0.2.5
 
 * **func**:
