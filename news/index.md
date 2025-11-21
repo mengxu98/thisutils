@@ -1,5 +1,21 @@
 # Changelog
 
+## thisutils 0.3.2
+
+- **func**:
+  - Change default value of `timestamp_style` parameter in
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    function from `TRUE` to `FALSE` for cleaner default output.
+
+## thisutils 0.3.1
+
+CRAN release: 2025-11-17
+
+- **docs**:
+  - Update
+    [`figlet()`](https://mengxu98.github.io/thisutils/reference/figlet.md)
+    references to use HTTPS, addressing CRAN incoming NOTE.
+
 ## thisutils 0.3.0
 
 - **func**:

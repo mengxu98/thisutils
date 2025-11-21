@@ -49,7 +49,7 @@ handy print method.
 ## References
 
 <https://github.com/richfitz/rfiglet>,
-<https://github.com/jbkunst/figletr>, <http://www.figlet.org/>
+<https://github.com/jbkunst/figletr>, <https://www.figlet.org/>
 
 ## Examples
 

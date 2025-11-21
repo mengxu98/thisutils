@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-11-17T12:07Z
+last_built: 2025-11-21T12:39Z
 urls:
   reference: https://mengxu98.github.io/thisutils/reference
   article: https://mengxu98.github.io/thisutils/articles
