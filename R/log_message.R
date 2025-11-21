@@ -46,7 +46,7 @@
 #' @param timestamp_style Whether to apply the same text styling to the timestamp as the message text.
 #' When `TRUE`, timestamp formatting matches the message;
 #' when `FALSE`, timestamp keeps its default appearance.
-#' Default is `TRUE`.
+#' Default is `FALSE`.
 #' @param plain_text Whether to print only the text content.
 #' When `TRUE`, level, symbol, timestamp, and message type formatting are suppressed,
 #' but color and multiline settings still apply.
@@ -286,8 +286,7 @@
 #' log_message(
 #'   "Multi-line message\nwithout timestamp styling",
 #'   text_color = "#669999",
-#'   text_style = c("bold", "italic"),
-#'   timestamp_style = FALSE
+#'   text_style = c("bold", "italic")
 #' )
 #'
 #'
@@ -337,7 +336,7 @@ log_message <- function(
     timestamp_format = paste0(
       "[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] "
     ),
-    timestamp_style = TRUE,
+    timestamp_style = FALSE,
     plain_text = FALSE,
     .envir = parent.frame(),
     .frame = .envir) {
