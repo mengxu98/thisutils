@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.3.2
+
+* **func**:
+  * Change default value of `timestamp_style` parameter in `log_message()` function from `TRUE` to `FALSE` for cleaner default output.
+
 # thisutils 0.3.1
 
 * **docs**:
