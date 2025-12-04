@@ -342,12 +342,12 @@ log_message <- function(
     .frame = .envir) {
   verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
-  msg <- .build_message(...)
+  msg <- build_message(...)
 
   if (is.null(.envir) || !is.environment(.envir)) {
     .envir <- parent.frame()
   }
-  caller_call <- .get_caller_call(.frame)
+  caller_call <- get_caller_call(.frame)
 
   if (message_type == "error") {
     cli::cli_abort(msg, call = caller_call, .envir = .envir)
@@ -357,7 +357,7 @@ log_message <- function(
     return(invisible(NULL))
   }
 
-  .validate_params(
+  validate_params(
     level = level,
     symbol = symbol,
     text_color = text_color,
@@ -367,7 +367,7 @@ log_message <- function(
     .frame = .frame
   )
 
-  .output_message(
+  output_message(
     msg = msg,
     message_type = message_type,
     cli_model = cli_model,
@@ -442,7 +442,7 @@ get_verbose <- function(verbose = NULL) {
   verbose
 }
 
-.build_message <- function(...) {
+build_message <- function(...) {
   args <- list(...)
 
   if (length(args) == 0) {
@@ -482,7 +482,7 @@ get_verbose <- function(verbose = NULL) {
   capitalize(msg)
 }
 
-.validate_params <- function(
+validate_params <- function(
     level,
     symbol,
     text_color,
@@ -490,7 +490,7 @@ get_verbose <- function(verbose = NULL) {
     text_style,
     timestamp_style,
     .frame) {
-  caller_call <- .get_caller_call(.frame)
+  caller_call <- get_caller_call(.frame)
 
   if (!is.numeric(level) || length(level) != 1 || level < 1 || level != round(level)) {
     cli::cli_abort(
@@ -508,10 +508,11 @@ get_verbose <- function(verbose = NULL) {
     )
   }
 
-  .validate_color_param <- function(color_value,
-                                    param_name,
-                                    caller_call) {
-    if (!is.null(color_value) && !.check_color(color_value)) {
+  validate_color_param <- function(
+      color_value,
+      param_name,
+      caller_call) {
+    if (!is.null(color_value) && !check_color(color_value)) {
       error_msg <- paste0(
         "{.arg {param_name}} must be a valid color name, ",
         "hexadecimal color code (e.g., '#000000'), or R color name"
@@ -524,8 +525,8 @@ get_verbose <- function(verbose = NULL) {
     }
   }
 
-  .validate_color_param(text_color, "text_color", caller_call)
-  .validate_color_param(back_color, "back_color", caller_call)
+  validate_color_param(text_color, "text_color", caller_call)
+  validate_color_param(back_color, "back_color", caller_call)
 
   if (!is.null(text_color) && !is.null(back_color) && text_color == back_color) {
     cli::cli_abort(
@@ -557,7 +558,7 @@ get_verbose <- function(verbose = NULL) {
   }
 }
 
-.get_indent_part <- function(symbol, level) {
+get_indent_part <- function(symbol, level) {
   if (symbol != "  ") {
     paste0(paste(rep(symbol, level), collapse = ""), " ")
   } else if (level > 1) {
@@ -567,7 +568,7 @@ get_verbose <- function(verbose = NULL) {
   }
 }
 
-.format_line_with_style <- function(
+format_line_with_style <- function(
     line,
     prefix,
     text_color,
@@ -581,7 +582,7 @@ get_verbose <- function(verbose = NULL) {
 
   if (timestamp_style) {
     full_line <- paste0(prefix, line)
-    .style_formatting(
+    style_formatting(
       msg = full_line,
       text_color = text_color,
       back_color = back_color,
@@ -590,7 +591,7 @@ get_verbose <- function(verbose = NULL) {
       .envir = .envir
     )
   } else {
-    styled_line <- .style_formatting(
+    styled_line <- style_formatting(
       msg = line,
       text_color = text_color,
       back_color = back_color,
@@ -602,7 +603,7 @@ get_verbose <- function(verbose = NULL) {
   }
 }
 
-.output_cli_message <- function(
+output_cli_message <- function(
     message,
     message_type,
     .envir = parent.frame()) {
@@ -620,7 +621,7 @@ get_verbose <- function(verbose = NULL) {
   )
 }
 
-.output_message <- function(
+output_message <- function(
     msg,
     message_type,
     cli_model,
@@ -645,7 +646,7 @@ get_verbose <- function(verbose = NULL) {
     if (length(plain_msg) == 1 && grepl("\n", plain_msg)) {
       lines <- strsplit(plain_msg, "\n", fixed = TRUE)[[1]]
       for (line in lines) {
-        .plain_text_output(
+        plain_text_output(
           text = line,
           cli_model = cli_model,
           text_color = text_color,
@@ -655,7 +656,7 @@ get_verbose <- function(verbose = NULL) {
         )
       }
     } else {
-      .plain_text_output(
+      plain_text_output(
         text = plain_msg,
         cli_model = cli_model,
         text_color = text_color,
@@ -680,10 +681,10 @@ get_verbose <- function(verbose = NULL) {
         } else {
           ""
         }
-        indent_part <- .get_indent_part(symbol, level)
+        indent_part <- get_indent_part(symbol, level)
         prefix <- paste0(timestamp_part, indent_part)
       } else {
-        indent_part <- .get_indent_part(symbol, level)
+        indent_part <- get_indent_part(symbol, level)
         alignment_spaces <- if (timestamp) {
           timestamp_width <- nchar(
             timestamp_format
@@ -695,7 +696,7 @@ get_verbose <- function(verbose = NULL) {
         prefix <- paste0(alignment_spaces, indent_part)
       }
 
-      formatted_line <- .format_line_with_style(
+      formatted_line <- format_line_with_style(
         line = line,
         prefix = prefix,
         text_color = text_color,
@@ -704,7 +705,7 @@ get_verbose <- function(verbose = NULL) {
         timestamp_style = timestamp_style,
         .envir = .envir
       )
-      .output_cli_message(
+      output_cli_message(
         message = formatted_line,
         message_type = message_type,
         .envir = .envir
@@ -719,7 +720,7 @@ get_verbose <- function(verbose = NULL) {
     } else {
       ""
     }
-    indent_part <- .get_indent_part(symbol, level)
+    indent_part <- get_indent_part(symbol, level)
 
     if (symbol != "  ") {
       final_msg <- paste0(
@@ -734,7 +735,7 @@ get_verbose <- function(verbose = NULL) {
 
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
       if (timestamp_style) {
-        final_msg <- .style_formatting(
+        final_msg <- style_formatting(
           msg = final_msg,
           text_color = text_color,
           back_color = back_color,
@@ -743,7 +744,7 @@ get_verbose <- function(verbose = NULL) {
           .envir = .envir
         )
       } else {
-        styled_msg <- .style_formatting(
+        styled_msg <- style_formatting(
           msg = msg,
           text_color = text_color,
           back_color = back_color,
@@ -768,7 +769,7 @@ get_verbose <- function(verbose = NULL) {
       }
     }
 
-    .output_cli_message(
+    output_cli_message(
       message = final_msg,
       message_type = message_type,
       .envir = .envir
@@ -782,7 +783,7 @@ get_verbose <- function(verbose = NULL) {
     )
 
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
-      formatted_msg <- .style_formatting(
+      formatted_msg <- style_formatting(
         msg = formatted_msg,
         text_color = text_color,
         back_color = back_color,
@@ -803,7 +804,7 @@ get_verbose <- function(verbose = NULL) {
   }
 }
 
-.style_formatting <- function(
+style_formatting <- function(
     msg,
     text_color,
     back_color,
@@ -815,12 +816,12 @@ get_verbose <- function(verbose = NULL) {
   }
 
   if (!is.null(text_color)) {
-    text_fun <- .make_color_style(text_color)
+    text_fun <- make_color_style(text_color)
     msg <- text_fun(msg)
   }
 
   if (!is.null(back_color)) {
-    back_fun <- .make_color_style(back_color, bg = TRUE)
+    back_fun <- make_color_style(back_color, bg = TRUE)
     msg <- back_fun(msg)
   }
 
@@ -844,7 +845,7 @@ get_verbose <- function(verbose = NULL) {
   msg
 }
 
-.plain_text_output <- function(
+plain_text_output <- function(
     text,
     cli_model,
     text_color,
@@ -853,7 +854,7 @@ get_verbose <- function(verbose = NULL) {
     .envir = parent.frame()) {
   if (cli_model) {
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
-      text <- .style_formatting(
+      text <- style_formatting(
         msg = text,
         text_color = text_color,
         back_color = back_color,
@@ -872,7 +873,7 @@ get_verbose <- function(verbose = NULL) {
     )
 
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
-      formatted_text <- .style_formatting(
+      formatted_text <- style_formatting(
         msg = formatted_text,
         text_color = text_color,
         back_color = back_color,
@@ -886,7 +887,7 @@ get_verbose <- function(verbose = NULL) {
   }
 }
 
-.get_caller_call <- function(
+get_caller_call <- function(
     frame = parent.frame(),
     max_depth = 10) {
   if (is.null(frame)) {
@@ -897,12 +898,12 @@ get_verbose <- function(verbose = NULL) {
     {
       internal_functions <- c(
         "log_message",
-        ".validate_params",
-        ".output_message",
-        ".style_formatting",
-        ".check_color",
-        ".make_color_style",
-        ".extract_function_name"
+        "validate_params",
+        "output_message",
+        "style_formatting",
+        "check_color",
+        "make_color_style",
+        "extract_function_name"
       )
 
       calls <- sys.calls()
@@ -926,10 +927,10 @@ get_verbose <- function(verbose = NULL) {
           next
         }
 
-        fun_name <- .extract_function_name(call)
+        fun_name <- extract_function_name(call)
 
         if (!is.null(fun_name) && !fun_name %in% internal_functions) {
-          if (!identical(call[[1]], quote(.get_caller_call))) {
+          if (!identical(call[[1]], quote(get_caller_call))) {
             return(call)
           }
         }
@@ -943,7 +944,7 @@ get_verbose <- function(verbose = NULL) {
   )
 }
 
-.extract_function_name <- function(call) {
+extract_function_name <- function(call) {
   tryCatch(
     {
       fun_part <- call[[1]]
@@ -966,7 +967,7 @@ get_verbose <- function(verbose = NULL) {
   )
 }
 
-.make_color_style <- function(color, bg = FALSE) {
+make_color_style <- function(color, bg = FALSE) {
   if (!bg) {
     text_color_map <- list(
       "black" = cli::col_black,
@@ -1022,7 +1023,7 @@ get_verbose <- function(verbose = NULL) {
   return(cli::make_ansi_style(color, bg = bg))
 }
 
-.check_color <- function(color) {
+check_color <- function(color) {
   if (!is.character(color) || length(color) != 1) {
     return(FALSE)
   }

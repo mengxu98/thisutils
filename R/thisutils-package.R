@@ -26,6 +26,9 @@
 #' @param unicode Unicode symbols on UTF-8 platforms.
 #' Default is [cli::is_utf8_output].
 #'
+#' @return
+#' A character vector with class `thisutils_logo`.
+#'
 #' @references
 #' \url{https://github.com/tidyverse/tidyverse/blob/main/R/logo.R}
 #'
