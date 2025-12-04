@@ -120,7 +120,7 @@ add_pkg_file <- function(
 
   has_src_dir <- dir.exists("src")
 
-  file_content <- .generate_content(
+  file_content <- generate_content(
     pkg_name = pkg_name,
     title = title,
     pkg_description = pkg_description,
@@ -148,7 +148,7 @@ add_pkg_file <- function(
   invisible(file_content)
 }
 
-.generate_content <- function(
+generate_content <- function(
     pkg_name,
     title,
     pkg_description,
@@ -204,6 +204,11 @@ add_pkg_file <- function(
     "#' @md",
     "#' @param unicode Unicode symbols on UTF-8 platforms.",
     "#' Default is [cli::is_utf8_output].",
+    "#'",
+    "#' @return",
+    paste0(
+      "#' A character vector with class `", tolower(pkg_name), "_logo`."
+    ),
     "#'",
     "#' @references",
     "#' \\url{https://github.com/tidyverse/tidyverse/blob/main/R/logo.R}",
