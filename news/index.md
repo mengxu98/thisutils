@@ -1,5 +1,22 @@
 # Changelog
 
+## thisutils 0.3.4
+
+- **func**:
+  - Enhance
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    function: Added new `"ask"` message type for interactive user
+    prompts. When `message_type = "ask"`, the function uses
+    [`utils::askYesNo()`](https://rdrr.io/r/utils/askYesNo.html) to
+    prompt the user and returns `TRUE` for Yes, `FALSE` for No, and `NA`
+    for Cancel.
+  - Optimize
+    [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+    function: Improved progress bar status display in parallel
+    processing mode. Now shows only the first item name/value with
+    ellipsis (“…”) instead of concatenating all chunk items, resulting
+    in cleaner and more concise progress display.
+
 ## thisutils 0.3.3
 
 - **func**:

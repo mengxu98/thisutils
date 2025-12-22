@@ -12,7 +12,7 @@ message could be suppressed by
 log_message(
   ...,
   verbose = TRUE,
-  message_type = c("info", "success", "warning", "error", "running"),
+  message_type = c("info", "success", "warning", "error", "running", "ask"),
   cli_model = TRUE,
   level = 1,
   symbol = "  ",
@@ -42,7 +42,11 @@ log_message(
 - message_type:
 
   Type of message. Could be choose one of `"info"`, `"success"`,
-  `"warning"`, `"error"`, and `"running"`. Default is `"info"`.
+  `"warning"`, `"error"`, `"running"`, and `"ask"`. When `"ask"` is
+  used, the function will prompt the user for a Yes/No/Cancel response
+  using [utils::askYesNo](https://rdrr.io/r/utils/askYesNo.html), and
+  returns `TRUE` for Yes, `FALSE` for No, and `NA` for Cancel. Default
+  is `"info"`.
 
 - cli_model:
 
@@ -118,7 +122,8 @@ log_message(
 
 ## Value
 
-Formated message.
+Formated message, or a logical value (`TRUE`/`FALSE`/`NA`) if
+`message_type = "ask"`.
 
 ## References
 
@@ -129,10 +134,10 @@ Formated message.
 ``` r
 # basic usage
 log_message("Hello, ", "world!")
-#> ℹ [2025-12-04 02:53:42] Hello, world!
+#> ℹ [2025-12-22 08:07:07] Hello, world!
 
 log_message("hello, world!")
-#> ℹ [2025-12-04 02:53:42] Hello, world!
+#> ℹ [2025-12-22 08:07:07] Hello, world!
 
 log_message("Hello, world!", timestamp = FALSE)
 #> ℹ Hello, world!
@@ -141,19 +146,19 @@ log_message(
   "Hello, ", "world!",
   message_type = "success"
 )
-#> ✔ [2025-12-04 02:53:42] Hello, world!
+#> ✔ [2025-12-22 08:07:07] Hello, world!
 
 log_message(
   "Hello, world!",
   message_type = "warning"
 )
-#> ! [2025-12-04 02:53:42] Hello, world!
+#> ! [2025-12-22 08:07:07] Hello, world!
 
 log_message(
   "Processing data...",
   message_type = "running"
 )
-#> ◌ [2025-12-04 02:53:42] Processing data...
+#> ◌ [2025-12-22 08:07:07] Processing data...
 
 log_message(
   "Hello, ", "world!",
@@ -171,126 +176,126 @@ log_message("Hello, world!")
 # for global verbose option
 options(log_message.verbose = TRUE)
 log_message("Hello, world!", verbose = FALSE)
-#> ℹ [2025-12-04 02:53:42] Hello, world!
+#> ℹ [2025-12-22 08:07:07] Hello, world!
 options(log_message.verbose = NULL)
 
 
 # cli inline markup
 log_message("{.arg abc} is a argument")
-#> ℹ [2025-12-04 02:53:42] `abc` is a argument
+#> ℹ [2025-12-22 08:07:07] `abc` is a argument
 
 ## 'message' can not deal with cli inline markup
 message("hello, {.code world}!")
 #> hello, {.code world}!
 
 log_message("{.val list('abc')} is a {.cls {class(list('abc'))}}")
-#> ℹ [2025-12-04 02:53:42] "list('abc')" is a <list>
+#> ℹ [2025-12-22 08:07:07] "list('abc')" is a <list>
 
 log_message("{.code lm(y ~ x)} is a code example")
-#> ℹ [2025-12-04 02:53:42] `lm(y ~ x)` is a code example
+#> ℹ [2025-12-22 08:07:07] `lm(y ~ x)` is a code example
 
 log_message("{.dt List}list('abc')")
-#> ℹ [2025-12-04 02:53:42] List: list('abc')
+#> ℹ [2025-12-22 08:07:07] List: list('abc')
 
 log_message("address: {.email example@example.com}")
-#> ℹ [2025-12-04 02:53:42] Address: example@example.com
+#> ℹ [2025-12-22 08:07:07] Address: example@example.com
 
 log_message("{.emph R} is a programming language")
-#> ℹ [2025-12-04 02:53:42] R is a programming language
+#> ℹ [2025-12-22 08:07:07] R is a programming language
 
 log_message("{.envvar R_HOME}")
-#> ℹ [2025-12-04 02:53:42] `R_HOME`
+#> ℹ [2025-12-22 08:07:07] `R_HOME`
 
 log_message("{.file log_message.R} is a file")
-#> ℹ [2025-12-04 02:53:42] log_message.R is a file
+#> ℹ [2025-12-22 08:07:07] log_message.R is a file
 
 log_message("{.fn lm} is a function")
-#> ℹ [2025-12-04 02:53:42] `lm()` is a function
+#> ℹ [2025-12-22 08:07:07] `lm()` is a function
 
 log_message("{.fun lm} is a function")
-#> ℹ [2025-12-04 02:53:42] `lm()` is a function
+#> ℹ [2025-12-22 08:07:07] `lm()` is a function
 
 log_message("{.help lm} to get help")
-#> ℹ [2025-12-04 02:53:42] `?lm()` to get help
+#> ℹ [2025-12-22 08:07:07] `?lm()` to get help
 
 log_message("... see {.help [{.fun lm}](stats::lm)} to learn more")
-#> ℹ [2025-12-04 02:53:42] ... see `lm()` (`?stats::lm()`) to learn more
+#> ℹ [2025-12-22 08:07:07] ... see `lm()` (`?stats::lm()`) to learn more
 
 log_message(
   "See the {.href [cli homepage](https://cli.r-lib.org)} for details"
 )
-#> ℹ [2025-12-04 02:53:42] See the cli homepage (<https://cli.r-lib.org>) for details
+#> ℹ [2025-12-22 08:07:07] See the cli homepage (<https://cli.r-lib.org>) for details
 
 log_message("press {.kbd ENTER}")
-#> ℹ [2025-12-04 02:53:42] Press [ENTER]
+#> ℹ [2025-12-22 08:07:07] Press [ENTER]
 
 log_message("press {.key ENTER}")
-#> ℹ [2025-12-04 02:53:42] Press [ENTER]
+#> ℹ [2025-12-22 08:07:07] Press [ENTER]
 
 log_message("URL: {.url https://cli.r-lib.org}")
-#> ℹ [2025-12-04 02:53:42] URL: <https://cli.r-lib.org>
+#> ℹ [2025-12-22 08:07:07] URL: <https://cli.r-lib.org>
 
 log_message("Some {.field field}")
-#> ℹ [2025-12-04 02:53:42] Some field
+#> ℹ [2025-12-22 08:07:07] Some field
 
 log_message("{.path /usr/bin/R} is a path")
-#> ℹ [2025-12-04 02:53:42] /usr/bin/R is a path
+#> ℹ [2025-12-22 08:07:07] /usr/bin/R is a path
 
 log_message("{.pkg cli} is a package")
-#> ℹ [2025-12-04 02:53:42] cli is a package
+#> ℹ [2025-12-22 08:07:07] cli is a package
 
 log_message("{.val object} is a variable")
-#> ℹ [2025-12-04 02:53:42] "object" is a variable
+#> ℹ [2025-12-22 08:07:07] "object" is a variable
 
 log_message("{.run Rscript log_message.R} is a runnable file")
-#> ℹ [2025-12-04 02:53:42] `Rscript log_message.R` is a runnable file
+#> ℹ [2025-12-22 08:07:07] `Rscript log_message.R` is a runnable file
 
 log_message("{.str object} is a string")
-#> ℹ [2025-12-04 02:53:42] "object" is a string
+#> ℹ [2025-12-22 08:07:07] "object" is a string
 
 log_message("{.strong abc} is a strong string")
-#> ℹ [2025-12-04 02:53:42] abc is a strong string
+#> ℹ [2025-12-22 08:07:07] abc is a strong string
 
 log_message("{.topic stats::lm} is a topic")
-#> ℹ [2025-12-04 02:53:42] `?stats::lm` is a topic
+#> ℹ [2025-12-22 08:07:07] `?stats::lm` is a topic
 
 log_message("{.vignette cli} is a vignette")
-#> ℹ [2025-12-04 02:53:42] `vignette(cli)` is a vignette
+#> ℹ [2025-12-22 08:07:07] `vignette(cli)` is a vignette
 
 
 # set indentation
 log_message("Hello, world!", level = 2)
-#> ℹ [2025-12-04 02:53:42]   Hello, world!
+#> ℹ [2025-12-22 08:07:07]   Hello, world!
 
 log_message("Hello, world!", symbol = "->")
-#> ℹ [2025-12-04 02:53:42] -> Hello, world!
+#> ℹ [2025-12-22 08:07:07] -> Hello, world!
 
 log_message(
   "Hello, world!",
   symbol = "#####",
   level = 3
 )
-#> ℹ [2025-12-04 02:53:42] ############### Hello, world!
+#> ℹ [2025-12-22 08:07:07] ############### Hello, world!
 
 # color formatting
 log_message(
   "This is a red message",
   text_color = "#ff9900"
 )
-#> ℹ [2025-12-04 02:53:42] This is a red message
+#> ℹ [2025-12-22 08:07:07] This is a red message
 
 log_message(
   "This is a message with background",
   back_color = "#EE4000"
 )
-#> ℹ [2025-12-04 02:53:42] This is a message with background
+#> ℹ [2025-12-22 08:07:07] This is a message with background
 
 log_message(
   "This is a message with both text and background",
   text_color = "white",
   back_color = "cyan"
 )
-#> ℹ [2025-12-04 02:53:42] This is a message with both text and background
+#> ℹ [2025-12-22 08:07:07] This is a message with both text and background
 
 log_message(
   "This is a message with background",
@@ -318,59 +323,59 @@ log_message(
   "Bright red text",
   text_color = "br_red"
 )
-#> ℹ [2025-12-04 02:53:42] Bright red text
+#> ℹ [2025-12-22 08:07:07] Bright red text
 
 log_message(
   "Bright background",
   back_color = "br_yellow"
 )
-#> ℹ [2025-12-04 02:53:42] Bright background
+#> ℹ [2025-12-22 08:07:07] Bright background
 
 log_message(
   "Combined grey and style",
   text_color = "grey",
   text_style = "bold"
 )
-#> ℹ [2025-12-04 02:53:42] Combined grey and style
+#> ℹ [2025-12-22 08:07:07] Combined grey and style
 
 # text style formatting
 log_message(
   "Bold message",
   text_style = "bold"
 )
-#> ℹ [2025-12-04 02:53:42] Bold message
+#> ℹ [2025-12-22 08:07:07] Bold message
 
 log_message(
   "Italic message",
   text_style = "italic"
 )
-#> ℹ [2025-12-04 02:53:42] Italic message
+#> ℹ [2025-12-22 08:07:07] Italic message
 
 log_message(
   "Underlined message",
   text_style = "underline"
 )
-#> ℹ [2025-12-04 02:53:42] Underlined message
+#> ℹ [2025-12-22 08:07:07] Underlined message
 
 log_message(
   "Combined styles",
   text_style = c("bold", "underline")
 )
-#> ℹ [2025-12-04 02:53:42] Combined styles
+#> ℹ [2025-12-22 08:07:07] Combined styles
 
 log_message(
   "Color and style",
   text_color = "blue",
   text_style = c("bold", "italic")
 )
-#> ℹ [2025-12-04 02:53:42] Color and style
+#> ℹ [2025-12-22 08:07:07] Color and style
 
 log_message(
   "Hex color and style",
   text_color = "#FF5733",
   text_style = c("bold", "underline")
 )
-#> ℹ [2025-12-04 02:53:42] Hex color and style
+#> ℹ [2025-12-22 08:07:07] Hex color and style
 
 
 # multiline message
@@ -379,16 +384,16 @@ log_message(
   multiline_indent = TRUE,
   text_style = "italic"
 )
-#> ℹ [2025-12-04 02:53:42] Line 1
-#> ℹ [2025-12-04 02:53:42] Line 2
-#> ℹ [2025-12-04 02:53:42] Line 3
+#> ℹ [2025-12-22 08:07:07] Line 1
+#> ℹ [2025-12-22 08:07:07] Line 2
+#> ℹ [2025-12-22 08:07:07] Line 3
 
 log_message(
   "Multi-line\ncolored\nmessage",
   text_color = "blue",
   text_style = "italic"
 )
-#> ℹ [2025-12-04 02:53:42] Multi-line
+#> ℹ [2025-12-22 08:07:07] Multi-line
 #> ℹ                       colored
 #> ℹ                       message
 
@@ -408,7 +413,7 @@ log_message(
   text_style = "bold",
   timestamp_style = TRUE
 )
-#> ℹ [2025-12-04 02:53:42] Multi-line message
+#> ℹ [2025-12-22 08:07:07] Multi-line message
 #> ℹ                       with timestamp styling
 
 log_message(
@@ -416,7 +421,7 @@ log_message(
   text_color = "#669999",
   text_style = c("bold", "italic")
 )
-#> ℹ [2025-12-04 02:53:42] Multi-line message
+#> ℹ [2025-12-22 08:07:07] Multi-line message
 #> ℹ                       without timestamp styling
 
 
@@ -432,7 +437,7 @@ log_message(
     " that becomes green again!"
   )
 )
-#> ℹ [2025-12-04 02:53:42] I am a green line with a blue substring that becomes green again!
+#> ℹ [2025-12-22 08:07:07] I am a green line with a blue substring that becomes green again!
 
 # cli variables
 fun <- function(x = 1) {
@@ -441,9 +446,9 @@ fun <- function(x = 1) {
   log_message("{.val {x + 1}}")
 }
 fun()
-#> ℹ [2025-12-04 02:53:42] "x"
-#> ℹ [2025-12-04 02:53:42] 1
-#> ℹ [2025-12-04 02:53:42] 2
+#> ℹ [2025-12-22 08:07:07] "x"
+#> ℹ [2025-12-22 08:07:07] 1
+#> ℹ [2025-12-22 08:07:07] 2
 
 
 # print objects directly
@@ -453,9 +458,17 @@ df <- data.frame(
   z = c(" a", "b  ", "c")
 )
 log_message("Content:\n", df)
-#> ℹ [2025-12-04 02:53:42] Content:
+#> ℹ [2025-12-22 08:07:07] Content:
 #> ℹ                         x y   z
 #> ℹ                       1 1 a   a
 #> ℹ                       2 2 b b  
 #> ℹ                       3 3 c   c
+
+# interactive prompt
+if (interactive()) {
+  log_message(
+    "Do you want to continue?",
+    message_type = "ask"
+  )
+}
 ```

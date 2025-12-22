@@ -68,11 +68,12 @@ parallelize_fun(1:3, function(x) {
   Sys.sleep(0.2)
   x^2
 })
-#> ℹ [2025-12-04 02:53:44] Using 1 core
-#> ⠙ [2025-12-04 02:53:44] Running [1/3] Processing: 1  ETA:  0s
-#> ✔ [2025-12-04 02:53:44] Completed 3 tasks in 623ms
+#> ℹ [2025-12-22 08:07:09] Using 1 core
+#> ⠙ [2025-12-22 08:07:09] Running [1/3] Processing: 1  ETA:  0s
+#> ⠹ [2025-12-22 08:07:09] Running [2/3] Processing: 2  ETA:  0s
+#> ✔ [2025-12-22 08:07:09] Completed 3 tasks in 640ms
 #> 
-#> ℹ [2025-12-04 02:53:44] Building results
+#> ℹ [2025-12-22 08:07:09] Building results
 #> $`1`
 #> [1] 1
 #> 
@@ -87,8 +88,8 @@ parallelize_fun(list(1, 2, 3), function(x) {
   Sys.sleep(0.2)
   x^2
 }, cores = 2)
-#> ℹ [2025-12-04 02:53:45] Using 2 cores
-#> ℹ [2025-12-04 02:53:45] Building results
+#> ℹ [2025-12-22 08:07:09] Using 2 cores
+#> ℹ [2025-12-22 08:07:09] Building results
 #> $`1`
 #> [1] 1
 #> 
@@ -104,10 +105,10 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = FALSE)
-#> ℹ [2025-12-04 02:53:45] Using 1 core
-#> ℹ [2025-12-04 02:53:45] Building results
-#> ! [2025-12-04 02:53:45] Found 1 failed result
-#> ℹ [2025-12-04 02:53:45] ✖ Error details:
+#> ℹ [2025-12-22 08:07:10] Using 1 core
+#> ℹ [2025-12-22 08:07:10] Building results
+#> ! [2025-12-22 08:07:10] Found 1 failed result
+#> ℹ [2025-12-22 08:07:10] ✖ Error details:
 #> ℹ                       ✖ "3": Error on element 3
 #> $`1`
 #> [1] 1
@@ -139,12 +140,12 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = TRUE)
-#> ℹ [2025-12-04 02:53:45] Using 1 core
-#> ℹ [2025-12-04 02:53:45] Building results
-#> ! [2025-12-04 02:53:45] Found 1 failed result
-#> ℹ [2025-12-04 02:53:45] ✖ Error details:
+#> ℹ [2025-12-22 08:07:10] Using 1 core
+#> ℹ [2025-12-22 08:07:10] Building results
+#> ! [2025-12-22 08:07:10] Found 1 failed result
+#> ℹ [2025-12-22 08:07:10] ✖ Error details:
 #> ℹ                       ✖ "3": Error on element 3
-#> ℹ [2025-12-04 02:53:45] Removed 1 failed result
+#> ℹ [2025-12-22 08:07:10] Removed 1 failed result
 #> $`1`
 #> [1] 1
 #> 
@@ -164,10 +165,10 @@ parallelize_fun(1:5, function(x) {
   if (x == 4) stop("Error on element 4")
   x^2
 })
-#> ℹ [2025-12-04 02:53:45] Using 1 core
-#> ℹ [2025-12-04 02:53:45] Building results
-#> ! [2025-12-04 02:53:45] Found 2 failed results
-#> ℹ [2025-12-04 02:53:45] ✖ Error details:
+#> ℹ [2025-12-22 08:07:10] Using 1 core
+#> ℹ [2025-12-22 08:07:10] Building results
+#> ! [2025-12-22 08:07:10] Found 2 failed results
+#> ℹ [2025-12-22 08:07:10] ✖ Error details:
 #> ℹ                       ✖ "2": Error on element 3
 #> ℹ                       ✖ "4": Error on element 4
 #> $`1`
@@ -210,9 +211,9 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, throw_error = FALSE)
-#> ℹ [2025-12-04 02:53:45] Using 1 core
-#> ℹ [2025-12-04 02:53:45] Building results
-#> ! [2025-12-04 02:53:45] Found 1 failed result
+#> ℹ [2025-12-22 08:07:10] Using 1 core
+#> ℹ [2025-12-22 08:07:10] Building results
+#> ! [2025-12-22 08:07:10] Found 1 failed result
 #> $`1`
 #> [1] 1
 #> 

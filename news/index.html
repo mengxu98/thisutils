@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,14 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.4" id="thisutils-034">thisutils 0.3.4<a class="anchor" aria-label="anchor" href="#thisutils-034"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code> function: Added new <code>"ask"</code> message type for interactive user prompts. When <code>message_type = "ask"</code>, the function uses <code><a href="https://rdrr.io/r/utils/askYesNo.html" class="external-link">utils::askYesNo()</a></code> to prompt the user and returns <code>TRUE</code> for Yes, <code>FALSE</code> for No, and <code>NA</code> for Cancel.</li>
+<li>Optimize <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function: Improved progress bar status display in parallel processing mode. Now shows only the first item name/value with ellipsis (“…”) instead of concatenating all chunk items, resulting in cleaner and more concise progress display.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.3" id="thisutils-033">thisutils 0.3.3<a class="anchor" aria-label="anchor" href="#thisutils-033"></a></h2>
 <ul><li>

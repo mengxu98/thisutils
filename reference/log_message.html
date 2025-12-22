@@ -11,7 +11,7 @@ The message could be suppressed by base::suppressMessages."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@ The message could be suppressed by <a href="https://rdrr.io/r/base/message.html"
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">log_message</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  message_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"info"</span>, <span class="st">"success"</span>, <span class="st">"warning"</span>, <span class="st">"error"</span>, <span class="st">"running"</span><span class="op">)</span>,</span>
+<span>  message_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"info"</span>, <span class="st">"success"</span>, <span class="st">"warning"</span>, <span class="st">"error"</span>, <span class="st">"running"</span>, <span class="st">"ask"</span><span class="op">)</span>,</span>
 <span>  cli_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  symbol <span class="op">=</span> <span class="st">"  "</span>,</span>
@@ -84,7 +84,9 @@ Default is <code>TRUE</code>.</p></dd>
 
 <dt id="arg-message-type">message_type<a class="anchor" aria-label="anchor" href="#arg-message-type"></a></dt>
 <dd><p>Type of message.
-Could be choose one of <code>"info"</code>, <code>"success"</code>, <code>"warning"</code>, <code>"error"</code>, and <code>"running"</code>.
+Could be choose one of <code>"info"</code>, <code>"success"</code>, <code>"warning"</code>, <code>"error"</code>, <code>"running"</code>, and <code>"ask"</code>.
+When <code>"ask"</code> is used, the function will prompt the user for a Yes/No/Cancel response using <a href="https://rdrr.io/r/utils/askYesNo.html" class="external-link">utils::askYesNo</a>,
+and returns <code>TRUE</code> for Yes, <code>FALSE</code> for No, and <code>NA</code> for Cancel.
 Default is <code>"info"</code>.</p></dd>
 
 
@@ -171,7 +173,7 @@ Default is <code>.envir</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Formated message.</p>
+    <p>Formated message, or a logical value (<code>TRUE</code>/<code>FALSE</code>/<code>NA</code>) if <code>message_type = "ask"</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -182,10 +184,10 @@ Default is <code>.envir</code>.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># basic usage</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Hello, "</span>, <span class="st">"world!"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"hello, world!"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Hello, world!"</span>, timestamp <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Hello, world!</span>
@@ -194,19 +196,19 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  <span class="st">"Hello, "</span>, <span class="st">"world!"</span>,</span></span>
 <span class="r-in"><span>  message_type <span class="op">=</span> <span class="st">"success"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> [2025-12-04 02:53:42] Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> [2025-12-22 08:07:07] Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Hello, world!"</span>,</span></span>
 <span class="r-in"><span>  message_type <span class="op">=</span> <span class="st">"warning"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> [2025-12-04 02:53:42] Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> [2025-12-22 08:07:07] Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Processing data..."</span>,</span></span>
 <span class="r-in"><span>  message_type <span class="op">=</span> <span class="st">"running"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #FFAF00;">◌</span> [2025-12-04 02:53:42] Processing data...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #FFAF00;">◌</span> [2025-12-22 08:07:07] Processing data...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Hello, "</span>, <span class="st">"world!"</span>,</span></span>
@@ -224,126 +226,126 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span><span class="co"># for global verbose option</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>log_message.verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Hello, world!"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Hello, world!</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>log_message.verbose <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># cli inline markup</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.arg abc} is a argument"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `abc` is a argument</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `abc` is a argument</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## 'message' can not deal with cli inline markup</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"hello, {.code world}!"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> hello, {.code world}!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.val list('abc')} is a {.cls {class(list('abc'))}}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">"list('abc')"</span> is a <span style="color: #0000BB;">&lt;list&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">"list('abc')"</span> is a <span style="color: #0000BB;">&lt;list&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.code lm(y ~ x)} is a code example"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `lm(y ~ x)` is a code example</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `lm(y ~ x)` is a code example</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.dt List}list('abc')"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] List: list('abc')</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] List: list('abc')</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"address: {.email example@example.com}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Address: <span style="color: #0000BB;">example@example.com</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Address: <span style="color: #0000BB;">example@example.com</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.emph R} is a programming language"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-style: italic;">R</span> is a programming language</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-style: italic;">R</span> is a programming language</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.envvar R_HOME}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `R_HOME`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `R_HOME`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.file log_message.R} is a file"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">log_message.R</span> is a file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">log_message.R</span> is a file</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.fn lm} is a function"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `lm()` is a function</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `lm()` is a function</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.fun lm} is a function"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `lm()` is a function</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `lm()` is a function</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.help lm} to get help"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `?lm()` to get help</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `?lm()` to get help</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"... see {.help [{.fun lm}](stats::lm)} to learn more"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] ... see `lm()` (`?stats::lm()`) to learn more</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] ... see `lm()` (`?stats::lm()`) to learn more</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"See the {.href [cli homepage](https://cli.r-lib.org)} for details"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] See the cli homepage (<span style="color: #0000BB; font-style: italic;">&lt;https://cli.r-lib.org&gt;</span>) for details</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] See the cli homepage (<span style="color: #0000BB; font-style: italic;">&lt;https://cli.r-lib.org&gt;</span>) for details</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"press {.kbd ENTER}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Press <span style="color: #0000BB;">[ENTER]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Press <span style="color: #0000BB;">[ENTER]</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"press {.key ENTER}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Press <span style="color: #0000BB;">[ENTER]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Press <span style="color: #0000BB;">[ENTER]</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"URL: {.url https://cli.r-lib.org}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] URL: <span style="color: #0000BB; font-style: italic;">&lt;https://cli.r-lib.org&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] URL: <span style="color: #0000BB; font-style: italic;">&lt;https://cli.r-lib.org&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Some {.field field}"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Some <span style="color: #00BB00;">field</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Some <span style="color: #00BB00;">field</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.path /usr/bin/R} is a path"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">/usr/bin/R</span> is a path</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">/usr/bin/R</span> is a path</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.pkg cli} is a package"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">cli</span> is a package</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">cli</span> is a package</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.val object} is a variable"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">"object"</span> is a variable</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">"object"</span> is a variable</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.run Rscript log_message.R} is a runnable file"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `Rscript log_message.R` is a runnable file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `Rscript log_message.R` is a runnable file</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.str object} is a string"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] "object" is a string</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] "object" is a string</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.strong abc} is a strong string"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-weight: bold;">abc</span> is a strong string</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-weight: bold;">abc</span> is a strong string</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.topic stats::lm} is a topic"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `?stats::lm` is a topic</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `?stats::lm` is a topic</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"{.vignette cli} is a vignette"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] `vignette(cli)` is a vignette</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] `vignette(cli)` is a vignette</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># set indentation</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Hello, world!"</span>, level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42]   Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07]   Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Hello, world!"</span>, symbol <span class="op">=</span> <span class="st">"-&gt;"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] -&gt; Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] -&gt; Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Hello, world!"</span>,</span></span>
 <span class="r-in"><span>  symbol <span class="op">=</span> <span class="st">"#####"</span>,</span></span>
 <span class="r-in"><span>  level <span class="op">=</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] ############### Hello, world!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] ############### Hello, world!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># color formatting</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"This is a red message"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"#ff9900"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #FFAF00;">This is a red message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #FFAF00;">This is a red message</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"This is a message with background"</span>,</span></span>
 <span class="r-in"><span>  back_color <span class="op">=</span> <span class="st">"#EE4000"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="background-color: #FF5F00;">This is a message with background</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="background-color: #FF5F00;">This is a message with background</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"This is a message with both text and background"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"white"</span>,</span></span>
 <span class="r-in"><span>  back_color <span class="op">=</span> <span class="st">"cyan"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #BBBBBB; background-color: #00BBBB;">This is a message with both text and background</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #BBBBBB; background-color: #00BBBB;">This is a message with both text and background</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"This is a message with background"</span>,</span></span>
@@ -371,59 +373,59 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  <span class="st">"Bright red text"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"br_red"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #FF5555;">Bright red text</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #FF5555;">Bright red text</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Bright background"</span>,</span></span>
 <span class="r-in"><span>  back_color <span class="op">=</span> <span class="st">"br_yellow"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="background-color: #FFFF55;">Bright background</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="background-color: #FFFF55;">Bright background</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Combined grey and style"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"grey"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"bold"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #555555; font-weight: bold;">Combined grey and style</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #555555; font-weight: bold;">Combined grey and style</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># text style formatting</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Bold message"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"bold"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-weight: bold;">Bold message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-weight: bold;">Bold message</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Italic message"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"italic"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-style: italic;">Italic message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-style: italic;">Italic message</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Underlined message"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"underline"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="text-decoration: underline;">Underlined message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="text-decoration: underline;">Underlined message</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Combined styles"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bold"</span>, <span class="st">"underline"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-weight: bold; text-decoration: underline;">Combined styles</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-weight: bold; text-decoration: underline;">Combined styles</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Color and style"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"blue"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bold"</span>, <span class="st">"italic"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB; font-weight: bold; font-style: italic;">Color and style</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB; font-weight: bold; font-style: italic;">Color and style</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Hex color and style"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"#FF5733"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bold"</span>, <span class="st">"underline"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #FF875F; font-weight: bold; text-decoration: underline;">Hex color and style</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #FF875F; font-weight: bold; text-decoration: underline;">Hex color and style</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># multiline message</span></span></span>
@@ -432,16 +434,16 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  multiline_indent <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"italic"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-style: italic;">Line 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-style: italic;">Line 2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="font-style: italic;">Line 3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-style: italic;">Line 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-style: italic;">Line 2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="font-style: italic;">Line 3</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Multi-line\ncolored\nmessage"</span>,</span></span>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"blue"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"italic"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB; font-style: italic;">Multi-line</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB; font-style: italic;">Multi-line</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       <span style="color: #0000BB; font-style: italic;">colored</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       <span style="color: #0000BB; font-style: italic;">message</span></span>
 <span class="r-in"><span></span></span>
@@ -461,7 +463,7 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="st">"bold"</span>,</span></span>
 <span class="r-in"><span>  timestamp_style <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> <span style="color: #BB0000; font-weight: bold;">[2025-12-04 02:53:42] Multi-line message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> <span style="color: #BB0000; font-weight: bold;">[2025-12-22 08:07:07] Multi-line message</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> <span style="color: #BB0000; font-weight: bold;">                      with timestamp styling</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span></span></span>
@@ -469,7 +471,7 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  text_color <span class="op">=</span> <span class="st">"#669999"</span>,</span></span>
 <span class="r-in"><span>  text_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bold"</span>, <span class="st">"italic"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #87AFAF; font-weight: bold; font-style: italic;">Multi-line message</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #87AFAF; font-weight: bold; font-style: italic;">Multi-line message</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       <span style="color: #87AFAF; font-weight: bold; font-style: italic;">without timestamp styling</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -485,7 +487,7 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>    <span class="st">" that becomes green again!"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #00BB00;">I am a green line </span><span style="color: #0000BB; font-weight: bold; text-decoration: underline;">with a blue substring</span><span style="color: #00BB00;"> that becomes green again!</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #00BB00;">I am a green line </span><span style="color: #0000BB; font-weight: bold; text-decoration: underline;">with a blue substring</span><span style="color: #00BB00;"> that becomes green again!</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># cli variables</span></span></span>
 <span class="r-in"><span><span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -494,9 +496,9 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  <span class="fu">log_message</span><span class="op">(</span><span class="st">"{.val {x + 1}}"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="fu">fun</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">"x"</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] <span style="color: #0000BB;">2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">"x"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] <span style="color: #0000BB;">2</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># print objects directly</span></span></span>
@@ -506,11 +508,19 @@ Default is <code>.envir</code>.</p></dd>
 <span class="r-in"><span>  z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">" a"</span>, <span class="st">"b  "</span>, <span class="st">"c"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">log_message</span><span class="op">(</span><span class="st">"Content:\n"</span>, <span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-04 02:53:42] Content:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> [2025-12-22 08:07:07] Content:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                         x y   z</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       1 1 a   a</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       2 2 b b  </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span>                       3 3 c   c</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># interactive prompt</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">log_message</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"Do you want to continue?"</span>,</span></span>
+<span class="r-in"><span>    message_type <span class="op">=</span> <span class="st">"ask"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
