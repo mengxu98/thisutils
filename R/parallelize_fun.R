@@ -210,17 +210,27 @@ parallelize_fun <- function(
 
         if (has_names) {
           chunk_names <- names(x)[chunk]
+          status_text <- if (length(chunk_names) > 0) {
+            paste0(chunk_names[1], "…")
+          } else {
+            ""
+          }
           cli::cli_progress_update(
             id = pb,
             inc = length(chunk),
-            status = paste(chunk_names, collapse = ", ")
+            status = status_text
           )
         } else if (show_values) {
           chunk_values <- as.character(x[chunk])
+          status_text <- if (length(chunk_values) > 0) {
+            paste0(chunk_values[1], "…")
+          } else {
+            ""
+          }
           cli::cli_progress_update(
             id = pb,
             inc = length(chunk),
-            status = paste(chunk_values, collapse = ", ")
+            status = status_text
           )
         } else {
           cli::cli_progress_update(id = pb, inc = length(chunk))
