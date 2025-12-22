@@ -10,7 +10,9 @@
 #' @param verbose Whether to print the message.
 #' Default is `TRUE`.
 #' @param message_type Type of message.
-#' Could be choose one of `"info"`, `"success"`, `"warning"`, `"error"`, and `"running"`.
+#' Could be choose one of `"info"`, `"success"`, `"warning"`, `"error"`, `"running"`, and `"ask"`.
+#' When `"ask"` is used, the function will prompt the user for a Yes/No/Cancel response using [utils::askYesNo],
+#' and returns `TRUE` for Yes, `FALSE` for No, and `NA` for Cancel.
 #' Default is `"info"`.
 #' @param cli_model Whether to use the `cli` package to print the message.
 #' Default is `TRUE`.
@@ -55,7 +57,8 @@
 #' @param .frame The frame to use for error reporting.
 #' Default is `.envir`.
 #'
-#' @return Formated message.
+#' @return
+#' Formated message, or a logical value (`TRUE`/`FALSE`/`NA`) if `message_type = "ask"`.
 #'
 #' @references
 #' \url{https://cli.r-lib.org/articles/index.html}
@@ -319,11 +322,19 @@
 #'   z = c(" a", "b  ", "c")
 #' )
 #' log_message("Content:\n", df)
+#'
+#' # interactive prompt
+#' if (interactive()) {
+#'   log_message(
+#'     "Do you want to continue?",
+#'     message_type = "ask"
+#'   )
+#' }
 log_message <- function(
     ...,
     verbose = TRUE,
     message_type = c(
-      "info", "success", "warning", "error", "running"
+      "info", "success", "warning", "error", "running", "ask"
     ),
     cli_model = TRUE,
     level = 1,
@@ -366,6 +377,26 @@ log_message <- function(
     timestamp_style = timestamp_style,
     .frame = .frame
   )
+
+  if (message_type == "ask") {
+    output_message(
+      msg = msg,
+      message_type = message_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      text_style = text_style,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent,
+      timestamp_style = timestamp_style,
+      plain_text = plain_text,
+      .envir = .envir
+    )
+    return(utils::askYesNo(msg = ""))
+  }
 
   output_message(
     msg = msg,
@@ -508,10 +539,9 @@ validate_params <- function(
     )
   }
 
-  validate_color_param <- function(
-      color_value,
-      param_name,
-      caller_call) {
+  validate_color_param <- function(color_value,
+                                   param_name,
+                                   caller_call) {
     if (!is.null(color_value) && !check_color(color_value)) {
       error_msg <- paste0(
         "{.arg {param_name}} must be a valid color name, ",
@@ -617,7 +647,14 @@ output_cli_message <- function(
         cli::make_ansi_style("orange")(cli::symbol$circle_dotted), " ", message
       ),
       .envir = .envir
-    )
+    ),
+    "ask" = {
+      magenta_style <- cli::make_ansi_style("magenta")
+      cli::cli_text(
+        paste0(magenta_style("?"), " ", message),
+        .envir = .envir
+      )
+    }
   )
 }
 
@@ -798,7 +835,8 @@ output_message <- function(
       "info" = "",
       "success" = "SUCCESS: ",
       "warning" = "WARNING: ",
-      "running" = "RUNNING: "
+      "running" = "RUNNING: ",
+      "ask" = "? "
     )
     message(paste0(prefix, formatted_msg))
   }
