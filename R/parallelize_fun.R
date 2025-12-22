@@ -73,38 +73,20 @@ parallelize_fun <- function(
     options(cli.progress_show_after = 0)
     options(cli.progress_clear = FALSE)
 
-    if (has_names || show_values) {
-      pb <- cli::cli_progress_bar(
-        format = paste0(
-          "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
-          "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
-          "Processing: {.pkg {cli::pb_status}} ",
-          "ETA: {cli::pb_eta}"
-        ),
-        format_done = paste0(
-          "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
-          "Completed {.pkg {cli::pb_total}} tasks ",
-          "in {cli::pb_elapsed}"
-        ),
-        total = total,
-        clear = FALSE
-      )
-    } else {
-      pb <- cli::cli_progress_bar(
-        format = paste0(
-          "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
-          "Running [{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
-          "ETA: {cli::pb_eta}"
-        ),
-        format_done = paste0(
-          "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
-          "Completed {.pkg {cli::pb_total}} tasks ",
-          "in {cli::pb_elapsed}"
-        ),
-        total = total,
-        clear = FALSE
-      )
-    }
+    pb <- cli::cli_progress_bar(
+      format = paste0(
+        "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
+        "Running for {.pkg {cli::pb_status}}[{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
+        "ETA:{.pkg {cli::pb_eta}}"
+      ),
+      format_done = paste0(
+        "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
+        "Completed {.pkg {cli::pb_total}} tasks ",
+        "in {.pkg {cli::pb_elapsed}}"
+      ),
+      total = total,
+      clear = FALSE
+    )
   }
 
   if (cores == 1) {
@@ -211,7 +193,7 @@ parallelize_fun <- function(
         if (has_names) {
           chunk_names <- names(x)[chunk]
           status_text <- if (length(chunk_names) > 0) {
-            paste0(chunk_names[1], "…")
+            paste0(chunk_names[1], "...")
           } else {
             ""
           }
@@ -223,7 +205,7 @@ parallelize_fun <- function(
         } else if (show_values) {
           chunk_values <- as.character(x[chunk])
           status_text <- if (length(chunk_values) > 0) {
-            paste0(chunk_values[1], "…")
+            paste0(chunk_values[1], "...")
           } else {
             ""
           }
