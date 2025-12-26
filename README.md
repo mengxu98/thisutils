@@ -1,4 +1,4 @@
-# ***thisutils*** <img src="man/figures/logo.svg" align="right" width="120"/>
+# **thisutils** <img src="man/figures/logo.svg" align="right" width="120"/>
 
 <!-- badges: start -->
 
@@ -8,7 +8,7 @@
 
 ## **Introduction**
 
-[thisutils](https://mengxu98.github.io/thisutils/) is an R package for collecting some useful functions.
+[thisutils](https://mengxu98.github.io/thisutils/) is an R package for providing utility functions for data analysis and scientific computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
 
 ## **Installation**
 
