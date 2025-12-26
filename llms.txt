@@ -86,6 +86,8 @@ Please reference
   : Check sparsity of matrix
 - [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
   : Download file from the Internet
+- [`get_namespace_fun()`](https://mengxu98.github.io/thisutils/reference/get_namespace_fun.md)
+  : Get a function from a namespace
 - [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
   : Invoke a function with a list of arguments
 - [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)

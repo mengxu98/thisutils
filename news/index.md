@@ -1,5 +1,17 @@
 # Changelog
 
+## thisutils 0.3.5
+
+- **func**:
+  - Simplify
+    [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+    function: Unified progress bar creation logic by removing
+    conditional branches and using a single consistent format. Updated
+    progress bar format string for better readability and consistency.
+  - Add
+    [`get_namespace_fun()`](https://mengxu98.github.io/thisutils/reference/get_namespace_fun.md)
+    function.
+
 ## thisutils 0.3.4
 
 - **func**:
