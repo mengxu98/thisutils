@@ -23,6 +23,28 @@
   }
 }
 
+#' @title Get a function from a namespace
+#'
+#' @md
+#' @param pkg The name of the package.
+#' @param fun The name of the function.
+#'
+#' @return Function.
+#'
+#' @export
+get_namespace_fun <- function(pkg, fun) {
+  ns <- getNamespace(pkg)
+  if (exists(fun, envir = ns, inherits = FALSE)) {
+    get(fun, envir = ns, inherits = FALSE)
+  } else {
+    log_message(
+      "Function {.val {fun}} not found in {.pkg {pkg}} namespace",
+      message_type = "warning"
+    )
+    return(NULL)
+  }
+}
+
 #' @title Invoke a function with a list of arguments
 #'
 #' @md
