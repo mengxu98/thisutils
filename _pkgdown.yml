@@ -67,6 +67,7 @@ reference:
   - capitalize
   - check_sparsity
   - download
+  - get_namespace_fun
   - invoke_fun
   - matrix_process
   - matrix_to_table
