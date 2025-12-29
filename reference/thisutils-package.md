@@ -1,8 +1,8 @@
 # Collection of Utility Functions for Data Analysis and Computing
 
 Provides utility functions for data analysis and scientific computing.
-Includes functions for parallel processing, and other computational
-tasks to streamline workflows.
+Includes functions for logging, parallel processing, and other
+computational tasks to streamline workflows.
 
 ## Source
 

@@ -1,9 +1,11 @@
-# ***thisutils***
+# **thisutils**
 
 ## **Introduction**
 
 [thisutils](https://mengxu98.github.io/thisutils/) is an R package for
-collecting some useful functions.
+providing utility functions for data analysis and scientific computing.
+Includes functions for logging, parallel processing, and other
+computational tasks to streamline workflows.
 
 ## **Installation**
 
