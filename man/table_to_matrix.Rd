@@ -50,12 +50,14 @@ table_to_matrix(
 
 sparse_matrix <- simulate_sparse_matrix(10, 10)
 table_sparse <- matrix_to_table(
-  sparse_matrix,
-  keep_zero = TRUE
+  sparse_matrix
 )
 sparse_matrix_new <- table_to_matrix(
   table_sparse,
   return_sparse = TRUE
 )
 identical(sparse_matrix, sparse_matrix_new)
+}
+\seealso{
+\link{matrix_to_table}
 }

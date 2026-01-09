@@ -9,7 +9,7 @@ matrix_to_table(
   row_names = NULL,
   col_names = NULL,
   threshold = 0,
-  keep_zero = FALSE
+  keep_zero = TRUE
 )
 }
 \arguments{
@@ -50,4 +50,7 @@ matrix_to_table(
   row_names = c("r1", "r2"),
   col_names = c("c1", "c2")
 )
+}
+\seealso{
+\link{table_to_matrix}
 }

@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <algorithm>
 #include <unordered_set>
+#include <unordered_map>
 
 using namespace Rcpp;
 
@@ -16,6 +17,7 @@ using namespace Rcpp;
 //'
 //' @return A table with three columns: `row`, `col`, and `value`.
 //' @export
+//' @seealso [table_to_matrix]
 //'
 //' @examples
 //' test_matrix <- simulate_sparse_matrix(10, 10)
@@ -42,13 +44,11 @@ DataFrame matrix_to_table(SEXP matrix,
                           Nullable<CharacterVector> row_names = R_NilValue,
                           Nullable<CharacterVector> col_names = R_NilValue,
                           double threshold = 0.0,
-                          bool keep_zero = false)
+                          bool keep_zero = true)
 {
-  // Handle different matrix types
   int nrow = 0, ncol = 0;
   CharacterVector matrix_row_names, matrix_col_names;
 
-  // Filters as unordered_set for O(1) lookup
   std::unordered_set<std::string> row_filter_set;
   std::unordered_set<std::string> col_filter_set;
   bool use_row_filter = false;
@@ -78,12 +78,36 @@ DataFrame matrix_to_table(SEXP matrix,
 
   if (Rf_isMatrix(matrix))
   {
-    // Dense matrix path
     NumericMatrix dense_matrix = as<NumericMatrix>(matrix);
     nrow = dense_matrix.nrow();
     ncol = dense_matrix.ncol();
-    matrix_row_names = rownames(dense_matrix);
-    matrix_col_names = colnames(dense_matrix);
+    SEXP dimnames = Rf_getAttrib(matrix, R_DimNamesSymbol);
+    if (dimnames != R_NilValue && TYPEOF(dimnames) == VECSXP && Rf_length(dimnames) == 2)
+    {
+      SEXP rnames_sexp = VECTOR_ELT(dimnames, 0);
+      SEXP cnames_sexp = VECTOR_ELT(dimnames, 1);
+      if (rnames_sexp != R_NilValue && TYPEOF(rnames_sexp) == STRSXP)
+      {
+        matrix_row_names = CharacterVector(rnames_sexp);
+      }
+      else
+      {
+        matrix_row_names = CharacterVector(0);
+      }
+      if (cnames_sexp != R_NilValue && TYPEOF(cnames_sexp) == STRSXP)
+      {
+        matrix_col_names = CharacterVector(cnames_sexp);
+      }
+      else
+      {
+        matrix_col_names = CharacterVector(0);
+      }
+    }
+    else
+    {
+      matrix_row_names = CharacterVector(0);
+      matrix_col_names = CharacterVector(0);
+    }
 
     if (matrix_row_names.length() == 0 || matrix_col_names.length() == 0)
     {
@@ -120,7 +144,6 @@ DataFrame matrix_to_table(SEXP matrix,
   }
   else if (Rf_inherits(matrix, "dgCMatrix"))
   {
-    // Sparse dgCMatrix path without densifying
     S4 spmat(matrix);
     IntegerVector Dim = spmat.slot("Dim");
     nrow = Dim[0];
@@ -140,34 +163,148 @@ DataFrame matrix_to_table(SEXP matrix,
     IntegerVector i = spmat.slot("i"); // row indices (0-based)
     NumericVector x = spmat.slot("x"); // non-zero values
 
-    // Reserve approximate capacity
-    out_rows.reserve(x.size());
-    out_cols.reserve(x.size());
-    out_vals.reserve(x.size());
-
-    for (int col = 0; col < ncol; ++col)
+    if (keep_zero)
     {
-      std::string cname = as<std::string>(matrix_col_names[col]);
-      if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
+      // When keep_zero is TRUE, include all row/col combinations (including zeros)
+      // Create a set of non-zero positions for quick lookup
+      std::unordered_set<std::string> nonzero_positions;
+      for (int col = 0; col < ncol; ++col)
       {
-        continue;
-      }
-      int start = p[col];
-      int end = p[col + 1];
-      for (int idx = start; idx < end; ++idx)
-      {
-        int row = i[idx]; // 0-based
-        std::string rname = as<std::string>(matrix_row_names[row]);
-        if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
+        std::string cname = as<std::string>(matrix_col_names[col]);
+        if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
         {
           continue;
         }
-        double v = x[idx];
-        if (std::abs(v) >= threshold && (keep_zero || v != 0.0))
+        int start = p[col];
+        int end = p[col + 1];
+        for (int idx = start; idx < end; ++idx)
         {
-          out_rows.push_back(rname);
-          out_cols.push_back(cname);
-          out_vals.push_back(v);
+          int row = i[idx];
+          std::string rname = as<std::string>(matrix_row_names[row]);
+          if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
+          {
+            continue;
+          }
+          std::string pos_key = rname + "|" + cname;
+          nonzero_positions.insert(pos_key);
+        }
+      }
+
+      CharacterVector rows_to_iterate, cols_to_iterate;
+      if (use_row_filter)
+      {
+        for (int row = 0; row < nrow; ++row)
+        {
+          std::string rname = as<std::string>(matrix_row_names[row]);
+          if (row_filter_set.find(rname) != row_filter_set.end())
+          {
+            rows_to_iterate.push_back(rname);
+          }
+        }
+      }
+      else
+      {
+        rows_to_iterate = matrix_row_names;
+      }
+
+      if (use_col_filter)
+      {
+        for (int col = 0; col < ncol; ++col)
+        {
+          std::string cname = as<std::string>(matrix_col_names[col]);
+          if (col_filter_set.find(cname) != col_filter_set.end())
+          {
+            cols_to_iterate.push_back(cname);
+          }
+        }
+      }
+      else
+      {
+        cols_to_iterate = matrix_col_names;
+      }
+
+      size_t total_combinations = static_cast<size_t>(rows_to_iterate.size()) * static_cast<size_t>(cols_to_iterate.size());
+      out_rows.reserve(total_combinations);
+      out_cols.reserve(total_combinations);
+      out_vals.reserve(total_combinations);
+
+      std::unordered_map<std::string, int> row_idx_map, col_idx_map;
+      for (int row = 0; row < nrow; ++row)
+      {
+        row_idx_map[as<std::string>(matrix_row_names[row])] = row;
+      }
+      for (int col = 0; col < ncol; ++col)
+      {
+        col_idx_map[as<std::string>(matrix_col_names[col])] = col;
+      }
+
+      // Iterate through all row/col combinations
+      for (R_xlen_t r = 0; r < rows_to_iterate.size(); ++r)
+      {
+        std::string rname = as<std::string>(rows_to_iterate[r]);
+        int row_idx = row_idx_map[rname];
+        for (R_xlen_t c = 0; c < cols_to_iterate.size(); ++c)
+        {
+          std::string cname = as<std::string>(cols_to_iterate[c]);
+          int col_idx = col_idx_map[cname];
+          std::string pos_key = rname + "|" + cname;
+
+          double v = 0.0;
+          if (nonzero_positions.find(pos_key) != nonzero_positions.end())
+          {
+            // Find the actual value
+            int start = p[col_idx];
+            int end = p[col_idx + 1];
+            for (int idx = start; idx < end; ++idx)
+            {
+              if (i[idx] == row_idx)
+              {
+                v = x[idx];
+                break;
+              }
+            }
+          }
+
+          if (std::abs(v) >= threshold)
+          {
+            out_rows.push_back(rname);
+            out_cols.push_back(cname);
+            out_vals.push_back(v);
+          }
+        }
+      }
+    }
+    else
+    {
+      // Original logic for keep_zero = FALSE or with filtering
+      out_rows.reserve(x.size());
+      out_cols.reserve(x.size());
+      out_vals.reserve(x.size());
+
+      for (int col = 0; col < ncol; ++col)
+      {
+        std::string cname = as<std::string>(matrix_col_names[col]);
+        if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
+        {
+          continue;
+        }
+        int start = p[col];
+        int end = p[col + 1];
+        for (int idx = start; idx < end; ++idx)
+        {
+          int row = i[idx]; // 0-based
+          std::string rname = as<std::string>(matrix_row_names[row]);
+          if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
+          {
+            continue;
+          }
+          double v = x[idx];
+          if (std::abs(v) >= threshold && (keep_zero || v != 0.0))
+          {
+            out_rows.push_back(rname);
+            out_cols.push_back(cname);
+            out_vals.push_back(v);
+          }
         }
       }
     }
