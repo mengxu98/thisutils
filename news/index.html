@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,21 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.7" id="thisutils-037">thisutils 0.3.7<a class="anchor" aria-label="anchor" href="#thisutils-037"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Optimize <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> C++ implementation: Improved dimnames handling using <code>Rf_getAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility. Enhanced <code>keep_zero = TRUE</code> logic to efficiently include all row/column combinations (including zeros) using <code>unordered_set</code> and <code>unordered_map</code> for optimized lookups.</li>
+<li>Improve <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> C++ implementation: Enhanced sparse matrix construction by ensuring zero values are not added to sparse matrices. Improved dimnames setting using <code>Rf_setAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility.</li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.6" id="thisutils-036">thisutils 0.3.6<a class="anchor" aria-label="anchor" href="#thisutils-036"></a></h2><p class="text-muted">CRAN release: 2026-01-08</p>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Fix warning about ‘ATTRIB’ from check results of <em>CRAN</em>.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.5" id="thisutils-035">thisutils 0.3.5<a class="anchor" aria-label="anchor" href="#thisutils-035"></a></h2>
 <ul><li>

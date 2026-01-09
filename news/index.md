@@ -1,5 +1,29 @@
 # Changelog
 
+## thisutils 0.3.7
+
+- **func**:
+  - Optimize
+    [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
+    C++ implementation: Improved dimnames handling using `Rf_getAttrib`
+    and `R_DimNamesSymbol` for better compatibility. Enhanced
+    `keep_zero = TRUE` logic to efficiently include all row/column
+    combinations (including zeros) using `unordered_set` and
+    `unordered_map` for optimized lookups.
+  - Improve
+    [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+    C++ implementation: Enhanced sparse matrix construction by ensuring
+    zero values are not added to sparse matrices. Improved dimnames
+    setting using `Rf_setAttrib` and `R_DimNamesSymbol` for better
+    compatibility.
+
+## thisutils 0.3.6
+
+CRAN release: 2026-01-08
+
+- **func**:
+  - Fix warning about ‘ATTRIB’ from check results of *CRAN*.
+
 ## thisutils 0.3.5
 
 - **func**:

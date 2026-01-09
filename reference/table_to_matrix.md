@@ -41,6 +41,10 @@ table_to_matrix(
 
 A matrix.
 
+## See also
+
+[matrix_to_table](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
+
 ## Examples
 
 ``` r
@@ -52,7 +56,7 @@ table <- data.frame(
 matrix <- table_to_matrix(table)
 table_new <- matrix_to_table(matrix)
 identical(table, table_new)
-#> [1] TRUE
+#> [1] FALSE
 
 table_to_matrix(table, threshold = 0.3)
 #>     c1 c2 c3  c4   c5   c6
@@ -74,13 +78,12 @@ table_to_matrix(
 
 sparse_matrix <- simulate_sparse_matrix(10, 10)
 table_sparse <- matrix_to_table(
-  sparse_matrix,
-  keep_zero = TRUE
+  sparse_matrix
 )
 sparse_matrix_new <- table_to_matrix(
   table_sparse,
   return_sparse = TRUE
 )
 identical(sparse_matrix, sparse_matrix_new)
-#> [1] FALSE
+#> [1] TRUE
 ```

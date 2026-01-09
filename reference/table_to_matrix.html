@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,10 @@ Defaults to <code>0</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A matrix.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="matrix_to_table.html">matrix_to_table</a></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -92,7 +96,7 @@ Defaults to <code>0</code>.</p></dd>
 <span class="r-in"><span><span class="va">matrix</span> <span class="op">&lt;-</span> <span class="fu">table_to_matrix</span><span class="op">(</span><span class="va">table</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">table_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="matrix_to_table.html">matrix_to_table</a></span><span class="op">(</span><span class="va">matrix</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">table</span>, <span class="va">table_new</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">table_to_matrix</span><span class="op">(</span><span class="va">table</span>, threshold <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     c1 c2 c3  c4   c5   c6</span>
@@ -114,15 +118,14 @@ Defaults to <code>0</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sparse_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="simulate_sparse_matrix.html">simulate_sparse_matrix</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">table_sparse</span> <span class="op">&lt;-</span> <span class="fu"><a href="matrix_to_table.html">matrix_to_table</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">sparse_matrix</span>,</span></span>
-<span class="r-in"><span>  keep_zero <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="va">sparse_matrix</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sparse_matrix_new</span> <span class="op">&lt;-</span> <span class="fu">table_to_matrix</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">table_sparse</span>,</span></span>
 <span class="r-in"><span>  return_sparse <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">sparse_matrix</span>, <span class="va">sparse_matrix_new</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

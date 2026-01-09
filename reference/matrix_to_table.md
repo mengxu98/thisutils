@@ -10,7 +10,7 @@ matrix_to_table(
   row_names = NULL,
   col_names = NULL,
   threshold = 0,
-  keep_zero = FALSE
+  keep_zero = TRUE
 )
 ```
 
@@ -41,6 +41,10 @@ matrix_to_table(
 
 A table with three columns: `row`, `col`, and `value`.
 
+## See also
+
+[table_to_matrix](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+
 ## Examples
 
 ``` r
@@ -69,4 +73,7 @@ matrix_to_table(
 )
 #>   row col value
 #> 1  r1  c1     1
+#> 2  r1  c2     0
+#> 3  r2  c1     0
+#> 4  r2  c2     0
 ```
