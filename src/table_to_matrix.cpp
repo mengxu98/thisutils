@@ -16,6 +16,7 @@ using namespace Rcpp;
 //'
 //' @return A matrix.
 //' @export
+//' @seealso [matrix_to_table]
 //'
 //' @examples
 //' table <- data.frame(
@@ -37,8 +38,7 @@ using namespace Rcpp;
 //'
 //' sparse_matrix <- simulate_sparse_matrix(10, 10)
 //' table_sparse <- matrix_to_table(
-//'   sparse_matrix,
-//'   keep_zero = TRUE
+//'   sparse_matrix
 //' )
 //' sparse_matrix_new <- table_to_matrix(
 //'   table_sparse,
@@ -52,24 +52,20 @@ SEXP table_to_matrix(DataFrame table,
                      double threshold = 0.0,
                      bool return_sparse = false)
 {
-  // Validate input: table must have exactly 3 columns
   if (table.size() != 3)
   {
     stop("Input table must have exactly 3 columns");
   }
 
-  // Assign columns: first=row, second=col, third=value
   CharacterVector table_rows = table[0]; // First column as row names
   CharacterVector table_cols = table[1]; // Second column as column names
   NumericVector values = table[2];       // Third column as values
 
-  // Validate that the third column is numeric
   if (!Rf_isNumeric(table[2]))
   {
     stop("The third column must be numeric (values)");
   }
 
-  // Handle optional row and column parameters
   CharacterVector filter_rows;
   CharacterVector filter_cols;
 
@@ -93,7 +89,6 @@ SEXP table_to_matrix(DataFrame table,
     filter_cols = unique(table_cols);
   }
 
-  // Convert to standard strings for sorting
   std::vector<std::string> row_strings;
   std::vector<std::string> col_strings;
 
@@ -106,7 +101,6 @@ SEXP table_to_matrix(DataFrame table,
     col_strings.push_back(Rcpp::as<std::string>(filter_cols[i]));
   }
 
-  // Custom comparison function for gene names (e.g., g1, g2, g10)
   auto nameCompare = [](const std::string &a, const std::string &b)
   {
     size_t na = a.find_first_of("0123456789");
@@ -124,11 +118,9 @@ SEXP table_to_matrix(DataFrame table,
     return a < b;
   };
 
-  // Sort strings
   std::sort(row_strings.begin(), row_strings.end(), nameCompare);
   std::sort(col_strings.begin(), col_strings.end(), nameCompare);
 
-  // Create maps for lookups
   std::unordered_map<std::string, int> row_indices;
   std::unordered_map<std::string, int> col_indices;
 
@@ -141,7 +133,6 @@ SEXP table_to_matrix(DataFrame table,
     col_indices[col_strings[i]] = i;
   }
 
-  // Convert back to CharacterVector for rownames/colnames
   CharacterVector sorted_rows(row_strings.size());
   CharacterVector sorted_cols(col_strings.size());
   for (size_t i = 0; i < row_strings.size(); i++)
@@ -155,11 +146,9 @@ SEXP table_to_matrix(DataFrame table,
 
   if (return_sparse)
   {
-    // Return sparse matrix using Matrix package
     Environment Matrix_env = Environment::namespace_env("Matrix");
     Function sparseMatrix = Matrix_env["sparseMatrix"];
 
-    // Collect non-zero elements for sparse matrix
     std::vector<int> sparse_i, sparse_j;
     std::vector<double> sparse_x;
 
@@ -174,7 +163,7 @@ SEXP table_to_matrix(DataFrame table,
       if (row_it != row_indices.end() && col_it != col_indices.end())
       {
         double value = values[i];
-        if (std::abs(value) >= threshold)
+        if (std::abs(value) >= threshold && value != 0.0)
         {
           sparse_i.push_back(row_it->second + 1); // R uses 1-based indexing
           sparse_j.push_back(col_it->second + 1);
@@ -187,25 +176,37 @@ SEXP table_to_matrix(DataFrame table,
     IntegerVector sparse_j_vec(sparse_j.begin(), sparse_j.end());
     NumericVector sparse_x_vec(sparse_x.begin(), sparse_x.end());
 
+    SEXP dims = PROTECT(Rf_allocVector(INTSXP, 2));
+    INTEGER(dims)
+    [0] = row_strings.size();
+    INTEGER(dims)
+    [1] = col_strings.size();
+
+    SEXP dimnames = PROTECT(Rf_allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(dimnames, 0, static_cast<SEXP>(sorted_rows));
+    SET_VECTOR_ELT(dimnames, 1, static_cast<SEXP>(sorted_cols));
+
     SEXP result = sparseMatrix(
         Named("i") = sparse_i_vec,
         Named("j") = sparse_j_vec,
         Named("x") = sparse_x_vec,
-        Named("dims") = IntegerVector::create(row_strings.size(), col_strings.size()),
-        Named("dimnames") = List::create(sorted_rows, sorted_cols));
+        Named("dims") = dims,
+        Named("dimnames") = dimnames);
 
+    UNPROTECT(2);
     return result;
   }
   else
   {
-    // Create and initialize dense matrix with zeros
     NumericMatrix matrix(row_strings.size(), col_strings.size());
     std::fill(matrix.begin(), matrix.end(), 0.0);
 
-    rownames(matrix) = sorted_rows;
-    colnames(matrix) = sorted_cols;
+    SEXP dimnames = PROTECT(Rf_allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(dimnames, 0, sorted_rows);
+    SET_VECTOR_ELT(dimnames, 1, sorted_cols);
+    Rf_setAttrib(matrix, R_DimNamesSymbol, dimnames);
+    UNPROTECT(1);
 
-    // Fill matrix only with filtered and valid entries
     for (R_xlen_t i = 0; i < table.nrows(); ++i)
     {
       std::string row_name = Rcpp::as<std::string>(table_rows[i]);
@@ -214,11 +215,9 @@ SEXP table_to_matrix(DataFrame table,
       auto row_it = row_indices.find(row_name);
       auto col_it = col_indices.find(col_name);
 
-      // Skip if row or col is not in filtered set
       if (row_it != row_indices.end() && col_it != col_indices.end())
       {
         double value = values[i];
-        // Apply threshold filtering based on absolute values
         if (std::abs(value) >= threshold)
         {
           matrix(row_it->second, col_it->second) = value;

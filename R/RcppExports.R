@@ -13,6 +13,7 @@
 #'
 #' @return A table with three columns: `row`, `col`, and `value`.
 #' @export
+#' @seealso [table_to_matrix]
 #'
 #' @examples
 #' test_matrix <- simulate_sparse_matrix(10, 10)
@@ -34,7 +35,7 @@
 #'   row_names = c("r1", "r2"),
 #'   col_names = c("c1", "c2")
 #' )
-matrix_to_table <- function(matrix, row_names = NULL, col_names = NULL, threshold = 0.0, keep_zero = FALSE) {
+matrix_to_table <- function(matrix, row_names = NULL, col_names = NULL, threshold = 0.0, keep_zero = TRUE) {
     .Call('_thisutils_matrix_to_table', PACKAGE = 'thisutils', matrix, row_names, col_names, threshold, keep_zero)
 }
 
@@ -72,6 +73,7 @@ split_indices <- function(group, n = 0L) {
 #'
 #' @return A matrix.
 #' @export
+#' @seealso [matrix_to_table]
 #'
 #' @examples
 #' table <- data.frame(
@@ -93,8 +95,7 @@ split_indices <- function(group, n = 0L) {
 #'
 #' sparse_matrix <- simulate_sparse_matrix(10, 10)
 #' table_sparse <- matrix_to_table(
-#'   sparse_matrix,
-#'   keep_zero = TRUE
+#'   sparse_matrix
 #' )
 #' sparse_matrix_new <- table_to_matrix(
 #'   table_sparse,
