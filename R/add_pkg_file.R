@@ -1,9 +1,7 @@
-#' @title Add package file
-#'
-#' @description
-#' Automatically generate a file containing functions and related code for R package development.
+#' @title Add a package file and print package information
 #'
 #' @md
+#' @inheritParams log_message
 #' @param use_figlet Whether to use figlet for ASCII art generation.
 #' Default is `TRUE`. Details see [figlet].
 #' @param figlet_font Character string, figlet font to use.
@@ -11,11 +9,9 @@
 #' @param colors Character vector, colors to use for the logo elements.
 #' @param unicode Whether to use Unicode symbols.
 #' Default is `TRUE`.
-#' @param verbose Whether to print progress messages.
-#' Default is `TRUE`.
 #'
 #' @return
-#' Creates a file in specified output directory.
+#' Creates a file named `R/<pkg_name>-package.R`.
 #'
 #' @export
 add_pkg_file <- function(
@@ -30,7 +26,7 @@ add_pkg_file <- function(
   desc_file <- "DESCRIPTION"
   pkgdown_file <- "_pkgdown.yml"
 
-  desc_info <- .read_description(desc_file, verbose)
+  desc_info <- read_description(desc_file, verbose)
 
   pkg_name <- desc_info$Package
   title <- desc_info$Title
@@ -118,8 +114,6 @@ add_pkg_file <- function(
     )
   }
 
-  has_src_dir <- dir.exists("src")
-
   file_content <- generate_content(
     pkg_name = pkg_name,
     title = title,
@@ -130,7 +124,7 @@ add_pkg_file <- function(
     ascii_lines = ascii_lines,
     colors = colors,
     unicode = unicode,
-    has_src_dir = has_src_dir
+    src_exist = dir.exists("src")
   )
 
   output_file <- file.path(
@@ -142,8 +136,8 @@ add_pkg_file <- function(
     message_type = "success",
     verbose = verbose
   )
-  .check_dependency(desc_file, verbose)
-  .check_pkgdown(pkgdown_file, pkg_name, verbose)
+  check_dependencies(desc_file, verbose)
+  check_pkgdown(pkgdown_file, pkg_name, verbose)
 
   invisible(file_content)
 }
@@ -158,13 +152,13 @@ generate_content <- function(
     ascii_lines,
     colors,
     unicode,
-    has_src_dir = FALSE) {
-  ascii_with_numbers <- .add_color_numbers(
+    src_exist = FALSE) {
+  ascii_with_numbers <- add_ascii_numbers(
     ascii_lines,
     length(colors)
   )
 
-  use_dynlib_line <- if (has_src_dir) {
+  use_dynlib_line <- if (src_exist) {
     c(
       paste0("#' @useDynLib ", pkg_name),
       "#'"
@@ -226,7 +220,7 @@ generate_content <- function(
     ),
     "  )",
     "",
-    .generate_hexa(length(colors), colors, unicode),
+    generate_hexa(length(colors), colors, unicode),
     "",
     "  col_hexa <- mapply(",
     "    function(x, y) cli::make_ansi_style(y)(x),",
@@ -272,16 +266,19 @@ generate_content <- function(
     ".onAttach <- function(libname, pkgname) {",
     "  verbose <- thisutils::get_verbose()",
     "  if (isTRUE(verbose)) {",
-    "    version <- utils::packageDescription(",
-    "      pkgname,",
-    "      fields = \"Version\"",
+    "    version <- utils::packageVersion(pkgname)",
+    "    date <- utils::packageDate(pkgname)",
+    "    url <- utils::packageDescription(",
+    "      pkgname, fields = \"URL\"",
     "    )",
     "",
     "    msg <- paste0(",
     "      cli::col_grey(strrep(\"-\", 60)),",
     "      \"\\n\",",
-    "      cli::col_blue(pkgname, \" version \", version),",
+    "      cli::col_blue(\"Version: \", version, \" (\", date, \" update)\"),",
     "      \"\\n\",",
+    "      cli::col_blue(\"Website: \", cli::style_italic(url)),",
+    "      \"\\n\\n\",",
     "      cli::col_grey(\"This message can be suppressed by:\"),",
     "      \"\\n\",",
     paste0(
@@ -308,7 +305,7 @@ generate_content <- function(
   content
 }
 
-.add_color_numbers <- function(
+add_ascii_numbers <- function(
     ascii_lines,
     num_colors) {
   if (length(ascii_lines) == 0) {
@@ -324,7 +321,7 @@ generate_content <- function(
   result
 }
 
-.generate_hexa <- function(
+generate_hexa <- function(
     num_colors,
     colors,
     unicode) {
@@ -359,7 +356,7 @@ generate_content <- function(
   code
 }
 
-.read_description <- function(
+read_description <- function(
     desc_file,
     verbose = TRUE) {
   if (!file.exists(desc_file)) {
@@ -534,7 +531,7 @@ generate_content <- function(
   )
 }
 
-.check_dependency <- function(desc_file, verbose = TRUE) {
+check_dependencies <- function(desc_file, verbose = TRUE) {
   if (!file.exists(desc_file)) {
     log_message(
       "{.file {desc_file}} not found",
@@ -599,7 +596,7 @@ generate_content <- function(
   }
 }
 
-.check_pkgdown <- function(pkgdown_file, pkg_name, verbose = TRUE) {
+check_pkgdown <- function(pkgdown_file, pkg_name, verbose = TRUE) {
   if (!file.exists(pkgdown_file)) {
     log_message(
       "{.file {pkgdown_file}} not found",
