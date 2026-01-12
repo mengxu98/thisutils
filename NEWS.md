@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.3.8
+
+* **func**:
+  * Improve `add_pkg_file()` flow: better metadata extraction/logging from DESCRIPTION, and smarter logo generation fallback when figlet fails. Generated package files now include `@useDynLib` only when `src/` exists.
+  * Refresh startup messages: `.onAttach()` now shows package version, release date, and website link in both generated package files.
+
 # thisutils 0.3.7
 
 * **func**:
