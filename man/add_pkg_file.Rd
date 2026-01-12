@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_pkg_file.R
 \name{add_pkg_file}
 \alias{add_pkg_file}
-\title{Add package file}
+\title{Add a package file and print package information}
 \usage{
 add_pkg_file(
   use_figlet = TRUE,
@@ -25,12 +25,12 @@ Default is \code{"Slant"}.}
 \item{unicode}{Whether to use Unicode symbols.
 Default is \code{TRUE}.}
 
-\item{verbose}{Whether to print progress messages.
+\item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
 }
 \value{
-Creates a file in specified output directory.
+Creates a file named \verb{R/<pkg_name>-package.R}.
 }
 \description{
-Automatically generate a file containing functions and related code for R package development.
+Add a package file and print package information
 }
