@@ -1,7 +1,6 @@
-# Add package file
+# Add a package file and print package information
 
-Automatically generate a file containing functions and related code for
-R package development.
+Add a package file and print package information
 
 ## Usage
 
@@ -38,8 +37,8 @@ add_pkg_file(
 
 - verbose:
 
-  Whether to print progress messages. Default is `TRUE`.
+  Whether to print the message. Default is `TRUE`.
 
 ## Value
 
-Creates a file in specified output directory.
+Creates a file named `R/<pkg_name>-package.R`.

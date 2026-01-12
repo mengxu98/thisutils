@@ -63,7 +63,7 @@ Please reference
 ### ASCII art
 
 - [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
-  : Add package file
+  : Add a package file and print package information
 - [`figlet()`](https://mengxu98.github.io/thisutils/reference/figlet.md)
   : The figlet function
 - [`figlet_font()`](https://mengxu98.github.io/thisutils/reference/figlet_font.md)

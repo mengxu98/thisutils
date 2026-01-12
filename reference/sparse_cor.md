@@ -130,7 +130,7 @@ system.time(
   sparse_cor(m1)
 )
 #>    user  system elapsed 
-#>   0.003   0.000   0.004 
+#>   0.003   0.000   0.003 
 system.time(
   cor(as_matrix(m1))
 )
@@ -141,7 +141,7 @@ system.time(
   sparse_cor(m1, m2)
 )
 #>    user  system elapsed 
-#>   0.001   0.000   0.002 
+#>   0.002   0.000   0.002 
 system.time(
   cor(as_matrix(m1), as_matrix(m2))
 )
