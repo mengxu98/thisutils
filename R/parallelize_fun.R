@@ -77,7 +77,7 @@ parallelize_fun <- function(
       format = paste0(
         "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
         "Running for {.pkg {cli::pb_status}}[{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
-        "{cli::pb_bar} {cli::pb_percent}% | ETA: {.pkg {cli::pb_eta}}"
+        "{cli::pb_bar} {cli::pb_percent} | ETA: {.pkg {cli::pb_eta}}"
       ),
       format_done = paste0(
         "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
