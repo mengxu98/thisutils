@@ -1,5 +1,15 @@
 # Changelog
 
+## thisutils 0.3.9
+
+- **func**:
+  - Fix
+    [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
+    dependency management: `cli` dependency is now added with correct
+    comma separation, and both Imports and Suggests sections are
+    automatically sorted alphabetically. The Suggests section is now
+    enforced to follow Imports.
+
 ## thisutils 0.3.8
 
 - **func**:
