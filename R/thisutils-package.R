@@ -83,7 +83,6 @@ thisutils_logo <- function(unicode = cli::is_utf8_output()) {
 #' @method print thisutils_logo
 #'
 #' @export
-#'
 print.thisutils_logo <- function(x, ...) {
   cat(x, ..., sep = "\n")
   invisible(x)

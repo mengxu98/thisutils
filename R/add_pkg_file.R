@@ -255,7 +255,6 @@ generate_content <- function(
     ),
     "#'",
     "#' @export",
-    "#'",
     paste0(
       "print.", tolower(pkg_name), "_logo <- function(x, ...) {"
     ),
