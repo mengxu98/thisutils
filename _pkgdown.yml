@@ -65,6 +65,7 @@ reference:
   - '%ss%'
   - as_matrix
   - capitalize
+  - check_r
   - check_sparsity
   - download
   - get_namespace_fun
@@ -78,6 +79,7 @@ reference:
   - normalization
   - print.thisutils_logo
   - r_square
+  - remove_r
   - remove_space
   - split_indices
   - simulate_sparse_matrix
