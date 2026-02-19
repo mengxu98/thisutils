@@ -1,5 +1,11 @@
 # thisutils
 
+# thisutils 0.4.0
+
+* **func**:
+  * Add `check_r()`: check and install R packages from CRAN, Bioconductor, or GitHub; supports version pinning (`pkg@version` or `pkg==version`) and optional `force` reinstall; uses `pak::pak()` for installation with configurable `lib` and `dependencies`.
+  * Add `remove_r()`: check and remove installed R packages from the given library; uses `pak::pkg_remove()`; skips packages that are not installed and reports success or failure per package.
+
 # thisutils 0.3.9
 
 * **func**:
