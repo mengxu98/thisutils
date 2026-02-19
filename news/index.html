@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,14 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="thisutils-040">thisutils 0.4.0<a class="anchor" aria-label="anchor" href="#thisutils-040"></a></h2>
+<ul><li>
+<strong>func</strong>:
+<ul><li>Add <code><a href="../reference/check_r.html">check_r()</a></code>: check and install R packages from CRAN, Bioconductor, or GitHub; supports version pinning (<code>pkg@version</code> or <code>pkg==version</code>) and optional <code>force</code> reinstall; uses <code><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak::pak()</a></code> for installation with configurable <code>lib</code> and <code>dependencies</code>.</li>
+<li>Add <code><a href="../reference/remove_r.html">remove_r()</a></code>: check and remove installed R packages from the given library; uses <code><a href="https://pak.r-lib.org/reference/pkg_remove.html" class="external-link">pak::pkg_remove()</a></code>; skips packages that are not installed and reports success or failure per package.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.9" id="thisutils-039">thisutils 0.3.9<a class="anchor" aria-label="anchor" href="#thisutils-039"></a></h2>
 <ul><li>

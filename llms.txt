@@ -84,6 +84,8 @@ Please reference
   : Convert matrix into dense/sparse matrix
 - [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
   : Capitalize the first letter of each word
+- [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+  : Check and install R packages
 - [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
   : Check sparsity of matrix
 - [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
@@ -110,6 +112,8 @@ Please reference
   : Print logo
 - [`r_square()`](https://mengxu98.github.io/thisutils/reference/r_square.md)
   : Coefficient of determination (\\R^2\\)
+- [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md)
+  : Check and remove R packages
 - [`remove_space()`](https://mengxu98.github.io/thisutils/reference/remove_space.md)
   : Remove and normalize spaces
 - [`split_indices()`](https://mengxu98.github.io/thisutils/reference/split_indices.md)

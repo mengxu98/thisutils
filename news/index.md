@@ -1,5 +1,22 @@
 # Changelog
 
+## thisutils 0.4.0
+
+- **func**:
+  - Add
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md):
+    check and install R packages from CRAN, Bioconductor, or GitHub;
+    supports version pinning (`pkg@version` or `pkg==version`) and
+    optional `force` reinstall; uses
+    [`pak::pak()`](https://pak.r-lib.org/reference/pak.html) for
+    installation with configurable `lib` and `dependencies`.
+  - Add
+    [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md):
+    check and remove installed R packages from the given library; uses
+    [`pak::pkg_remove()`](https://pak.r-lib.org/reference/pkg_remove.html);
+    skips packages that are not installed and reports success or failure
+    per package.
+
 ## thisutils 0.3.9
 
 - **func**:
