@@ -46,7 +46,7 @@ Package installation status.
 
 ``` r
 check_r(c("ggplot2", "dplyr"))
-#> ◌ [2026-02-19 06:12:47] Installing: ggplot2...
+#> ◌ [2026-02-20 02:15:22] Installing: ggplot2...
 #> ℹ Loading metadata database
 #> ✔ Loading metadata database ... done
 #> 
@@ -178,73 +178,130 @@ check_r(c("ggplot2", "dplyr"))
 #> + libproj-dev      - sf   
 #> + libudunits2-dev  - units
 #> ℹ No downloads are needed, 116 pkgs are cached
-#> ✔ Got backports 1.5.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (115.90 kB)
-#> ✔ Got proxy 0.4-29 (x86_64-pc-linux-gnu-ubuntu-24.04) (172.19 kB)
-#> ✔ Got profvis 0.4.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (348.59 kB)
-#> ✔ Got roxygen2 7.3.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (731.24 kB)
+#> ✔ Got askpass 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (21.89 kB)
+#> ✔ Got base64enc 0.1-6 (x86_64-pc-linux-gnu-ubuntu-24.04) (28.70 kB)
+#> ✔ Got brio 1.1.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (35.30 kB)
 #> ✔ Got brew 1.0-10 (x86_64-pc-linux-gnu-ubuntu-24.04) (76.35 kB)
-#> ✔ Got multcomp 1.4-29 (x86_64-pc-linux-gnu-ubuntu-24.04) (643.70 kB)
-#> ✔ Got generics 0.1.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (80.38 kB)
-#> ✔ Got tidyr 1.3.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.18 MB)
-#> ✔ Got scales 1.4.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (841.36 kB)
+#> ✔ Got backports 1.5.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (115.90 kB)
 #> ✔ Got Formula 1.2-5 (x86_64-pc-linux-gnu-ubuntu-24.04) (159.13 kB)
-#> ✔ Got broom 1.0.12 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.78 MB)
-#> ✔ Got e1071 1.7-17 (x86_64-pc-linux-gnu-ubuntu-24.04) (588.22 kB)
-#> ✔ Got colorspace 2.1-2 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.64 MB)
-#> ✔ Got gridExtra 2.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.11 MB)
-#> ✔ Got htmlwidgets 1.6.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (815.05 kB)
-#> ✔ Got labeling 0.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (60.95 kB)
+#> ✔ Got digest 0.6.39 (x86_64-pc-linux-gnu-ubuntu-24.04) (230.38 kB)
+#> ✔ Got pkgconfig 2.0.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (18.08 kB)
 #> ✔ Got RColorBrewer 1.1-3 (x86_64-pc-linux-gnu-ubuntu-24.04) (51.81 kB)
-#> ✔ Got lazyeval 0.2.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (157.44 kB)
-#> ✔ Got isoband 0.3.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.68 MB)
-#> ✔ Got quarto 1.5.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (544.37 kB)
-#> ✔ Got hexbin 1.28.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.60 MB)
-#> ✔ Got classInt 0.4-11 (x86_64-pc-linux-gnu-ubuntu-24.04) (496.56 kB)
-#> ✔ Got sandwich 3.1-1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.51 MB)
-#> ✔ Got vdiffr 1.0.9 (x86_64-pc-linux-gnu-ubuntu-24.04) (213.10 kB)
-#> ✔ Got commonmark 2.0.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (148.07 kB)
-#> ✔ Got covr 3.6.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (344.29 kB)
-#> ✔ Got checkmate 2.3.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (767.77 kB)
+#> ✔ Got pkgload 1.5.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (222.83 kB)
+#> ✔ Got sys 3.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (40.73 kB)
+#> ✔ Got e1071 1.7-17 (x86_64-pc-linux-gnu-ubuntu-24.04) (588.22 kB)
+#> ✔ Got stringr 1.6.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (333.76 kB)
+#> ✔ Got diffobj 0.3.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.00 MB)
 #> ✔ Got gtable 0.3.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (222.55 kB)
-#> ✔ Got s2 1.1.9 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.21 MB)
+#> ✔ Got lifecycle 1.0.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (131.69 kB)
+#> ✔ Got systemfonts 1.3.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (817.04 kB)
+#> ✔ Got curl 7.0.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (788.30 kB)
+#> ✔ Got dplyr 1.2.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.52 MB)
+#> ✔ Got broom 1.0.12 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.78 MB)
+#> ✔ Got ps 1.9.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (499.64 kB)
+#> ✔ Got tidyselect 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (225.28 kB)
+#> ✔ Got generics 0.1.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (80.38 kB)
+#> ✔ Got tibble 3.3.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (647.68 kB)
+#> ✔ Got mapproj 1.2.12 (x86_64-pc-linux-gnu-ubuntu-24.04) (51.48 kB)
 #> ✔ Got httr 1.4.8 (x86_64-pc-linux-gnu-ubuntu-24.04) (480.15 kB)
 #> ✔ Got munsell 0.5.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (243.50 kB)
-#> ✔ Got mapproj 1.2.12 (x86_64-pc-linux-gnu-ubuntu-24.04) (51.48 kB)
-#> ✔ Got farver 2.1.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.47 MB)
-#> ✔ Got MatrixModels 0.5-4 (x86_64-pc-linux-gnu-ubuntu-24.04) (408.50 kB)
-#> ✔ Got svglite 2.2.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (239.36 kB)
-#> ✔ Got tidyselect 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (225.28 kB)
-#> ✔ Got units 1.0-0 (x86_64-pc-linux-gnu-ubuntu-24.04) (478.58 kB)
-#> ✔ Got SparseM 1.84-2 (x86_64-pc-linux-gnu-ubuntu-24.04) (887.98 kB)
-#> ✔ Got viridisLite 0.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.30 MB)
-#> ✔ Got Hmisc 5.2-5 (x86_64-pc-linux-gnu-ubuntu-24.04) (3.64 MB)
-#> ✔ Got wk 0.9.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.73 MB)
-#> ✔ Got ggplot2 4.0.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (8.48 MB)
-#> ✔ Got htmlTable 2.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (417.61 kB)
-#> ✔ Got later 1.4.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (154.56 kB)
-#> ✔ Got rex 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (126.59 kB)
-#> ✔ Got dplyr 1.2.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.52 MB)
-#> ✔ Got stringr 1.6.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (333.76 kB)
+#> ✔ Got pkgbuild 1.4.8 (x86_64-pc-linux-gnu-ubuntu-24.04) (208.62 kB)
 #> ✔ Got DBI 1.2.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (916.93 kB)
-#> ✔ Got hms 1.1.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (103.38 kB)
-#> ✔ Got zoo 1.8-15 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.06 MB)
-#> ✔ Got quantreg 6.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.46 MB)
-#> ✔ Got rstudioapi 0.18.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (346.01 kB)
-#> ✔ Got TH.data 1.1-5 (x86_64-pc-linux-gnu-ubuntu-24.04) (8.76 MB)
-#> ✔ Got S7 0.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (325.15 kB)
+#> ✔ Got praise 1.0.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (16.39 kB)
+#> ✔ Got rprojroot 2.1.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (113.23 kB)
+#> ✔ Got rex 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (126.59 kB)
 #> ✔ Got mvtnorm 1.3-3 (x86_64-pc-linux-gnu-ubuntu-24.04) (952.05 kB)
-#> ✔ Got data.table 1.18.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.97 MB)
+#> ✔ Got testthat 3.3.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.14 MB)
+#> ✔ Got openssl 2.3.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.31 MB)
+#> ✔ Got withr 3.0.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (223.90 kB)
+#> ✔ Got xfun 0.56 (x86_64-pc-linux-gnu-ubuntu-24.04) (596.48 kB)
+#> ✔ Got rlang 1.1.7 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.60 MB)
+#> ✔ Got crayon 1.5.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (163.30 kB)
+#> ✔ Got commonmark 2.0.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (148.07 kB)
+#> ✔ Got evaluate 1.0.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (102.86 kB)
+#> ✔ Got desc 1.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (334.52 kB)
+#> ✔ Got s2 1.1.9 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.21 MB)
+#> ✔ Got wk 0.9.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.73 MB)
+#> ✔ Got fs 1.6.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (310.07 kB)
+#> ✔ Got classInt 0.4-11 (x86_64-pc-linux-gnu-ubuntu-24.04) (496.56 kB)
+#> ✔ Got htmlTable 2.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (417.61 kB)
+#> ✔ Got viridisLite 0.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.30 MB)
+#> ✔ Got jquerylib 0.1.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (526.85 kB)
+#> ✔ Got gridExtra 2.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.11 MB)
+#> ✔ Got later 1.4.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (154.56 kB)
+#> ✔ Got lazyeval 0.2.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (157.44 kB)
+#> ✔ Got hexbin 1.28.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.60 MB)
 #> ✔ Got ggplot2movies 0.0.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.26 MB)
+#> ✔ Got magrittr 2.0.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (221.44 kB)
+#> ✔ Got bslib 0.10.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (6.06 MB)
+#> ✔ Got R6 2.6.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (86.81 kB)
+#> ✔ Got jsonlite 2.0.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.09 MB)
+#> ✔ Got pillar 1.11.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (660.46 kB)
+#> ✔ Got profvis 0.4.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (348.59 kB)
+#> ✔ Got purrr 1.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (554.22 kB)
+#> ✔ Got S7 0.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (325.15 kB)
+#> ✔ Got quarto 1.5.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (544.37 kB)
+#> ✔ Got roxygen2 7.3.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (731.24 kB)
+#> ✔ Got SparseM 1.84-2 (x86_64-pc-linux-gnu-ubuntu-24.04) (887.98 kB)
+#> ✔ Got scales 1.4.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (841.36 kB)
+#> ✔ Got xml2 1.5.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (281.53 kB)
 #> ✔ Got maps 3.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (3.09 MB)
+#> ✔ Got tinytex 0.58 (x86_64-pc-linux-gnu-ubuntu-24.04) (143.77 kB)
+#> ✔ Got waldo 0.6.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (135.16 kB)
+#> ✔ Got sandwich 3.1-1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.51 MB)
+#> ✔ Got Rcpp 1.1.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.22 MB)
+#> ✔ Got vctrs 0.7.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.45 MB)
+#> ✔ Got covr 3.6.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (344.29 kB)
+#> ✔ Got fastmap 1.2.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (66.05 kB)
+#> ✔ Got zoo 1.8-15 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.06 MB)
+#> ✔ Got hms 1.1.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (103.38 kB)
+#> ✔ Got multcomp 1.4-29 (x86_64-pc-linux-gnu-ubuntu-24.04) (643.70 kB)
+#> ✔ Got cli 3.6.5 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.34 MB)
+#> ✔ Got labeling 0.4.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (60.95 kB)
+#> ✔ Got fontawesome 0.5.3 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.40 MB)
+#> ✔ Got MatrixModels 0.5-4 (x86_64-pc-linux-gnu-ubuntu-24.04) (408.50 kB)
+#> ✔ Got rappdirs 0.3.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (45.71 kB)
+#> ✔ Got processx 3.8.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (337.39 kB)
+#> ✔ Got proxy 0.4-29 (x86_64-pc-linux-gnu-ubuntu-24.04) (172.19 kB)
+#> ✔ Got knitr 1.51 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.05 MB)
+#> ✔ Got rstudioapi 0.18.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (346.01 kB)
+#> ✔ Got utf8 1.2.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (151.81 kB)
+#> ✔ Got svglite 2.2.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (239.36 kB)
+#> ✔ Got vdiffr 1.0.9 (x86_64-pc-linux-gnu-ubuntu-24.04) (213.10 kB)
+#> ✔ Got data.table 1.18.2.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.97 MB)
+#> ✔ Got tidyr 1.3.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.18 MB)
+#> ✔ Got htmltools 0.5.9 (x86_64-pc-linux-gnu-ubuntu-24.04) (354.78 kB)
+#> ✔ Got highr 0.11 (x86_64-pc-linux-gnu-ubuntu-24.04) (37.50 kB)
+#> ✔ Got checkmate 2.3.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (767.77 kB)
+#> ✔ Got htmlwidgets 1.6.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (815.05 kB)
+#> ✔ Got colorspace 2.1-2 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.64 MB)
+#> ✔ Got stringi 1.8.7 (x86_64-pc-linux-gnu-ubuntu-24.04) (3.29 MB)
+#> ✔ Got ragg 1.5.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (743.40 kB)
+#> ✔ Got yaml 2.3.12 (x86_64-pc-linux-gnu-ubuntu-24.04) (121.13 kB)
+#> ✔ Got isoband 0.3.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.68 MB)
+#> ✔ Got units 1.0-0 (x86_64-pc-linux-gnu-ubuntu-24.04) (478.58 kB)
+#> ✔ Got farver 2.1.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.47 MB)
+#> ✔ Got mime 0.13 (x86_64-pc-linux-gnu-ubuntu-24.04) (44.52 kB)
+#> ✔ Got sass 0.4.10 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.46 MB)
+#> ✔ Got rmarkdown 2.30 (x86_64-pc-linux-gnu-ubuntu-24.04) (2.64 MB)
+#> ✔ Got textshaping 1.0.4 (x86_64-pc-linux-gnu-ubuntu-24.04) (190.05 kB)
+#> ✔ Got TH.data 1.1-5 (x86_64-pc-linux-gnu-ubuntu-24.04) (8.76 MB)
+#> ✔ Got glue 1.8.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (168.12 kB)
+#> ✔ Got cachem 1.1.0 (x86_64-pc-linux-gnu-ubuntu-24.04) (67.49 kB)
+#> ✔ Got memoise 2.0.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (48.86 kB)
+#> ✔ Got callr 3.7.6 (x86_64-pc-linux-gnu-ubuntu-24.04) (449.24 kB)
+#> ✔ Got ggplot2 4.0.2 (x86_64-pc-linux-gnu-ubuntu-24.04) (8.48 MB)
+#> ✔ Got quantreg 6.1 (x86_64-pc-linux-gnu-ubuntu-24.04) (1.46 MB)
+#> ✔ Got Hmisc 5.2-5 (x86_64-pc-linux-gnu-ubuntu-24.04) (3.64 MB)
 #> ✔ Got sf 1.0-24 (x86_64-pc-linux-gnu-ubuntu-24.04) (9.47 MB)
 #> ℹ Installing system requirements
 #> ℹ Executing `sudo sh -c apt-get -y update`
 #> Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
 #> Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
-#> Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
 #> Hit:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease
 #> Hit:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease
 #> Hit:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease
+#> Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
 #> Hit:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease
 #> Reading package lists...
 #> ℹ Executing `sudo sh -c apt-get -y install libcurl4-openssl-dev libssl-dev make pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libabsl-dev cmake libgdal-dev gdal-bin libgeos-dev libproj-dev libsqlite3-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libudunits2-dev libxml2-dev`
@@ -267,7 +324,7 @@ check_r(c("ggplot2", "dplyr"))
 #> libharfbuzz-dev is already the newest version (8.3.0-2build2).
 #> libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.7).
 #> The following additional packages will be installed:
-#>   cmake-data default-libmysqlclient-dev gdal-data gdal-plugins hdf5-helpers
+#> cmake-data default-libmysqlclient-dev gdal-data gdal-plugins hdf5-helpers
 #>   libabsl20220623t64 libaec-dev libaec0 libaom-dev libarmadillo-dev
 #>   libarmadillo12 libarpack2-dev libarpack2t64 libblosc-dev libblosc1
 #>   libboost-dev libboost1.83-dev libcfitsio-dev libcfitsio-doc libcfitsio10t64
@@ -281,7 +338,7 @@ check_r(c("ggplot2", "dplyr"))
 #>   libkmlxsd1t64 libltdl-dev libminizip-dev libminizip1t64 libnetcdf-dev
 #>   libnetcdf19t64 libodbccr2 libodbcinst2 libogdi-dev libogdi4.1
 #>   libopenjp2-7-dev libpoppler-dev libpoppler-private-dev libpoppler134
-#> libproj25 libqhull-dev libqhull-r8.0 libqhull8.0 libqhullcpp8.0 librhash0
+#>   libproj25 libqhull-dev libqhull-r8.0 libqhull8.0 libqhullcpp8.0 librhash0
 #>   librttopo-dev librttopo1 libspatialite-dev libspatialite8t64 libsuperlu-dev
 #>   libsuperlu6 libsz2 libudunits2-0 libudunits2-data liburiparser-dev
 #>   liburiparser1 libx265-199 libx265-dev libxerces-c-dev libxerces-c3.2t64
@@ -312,10 +369,10 @@ check_r(c("ggplot2", "dplyr"))
 #>   libblosc1 libboost-dev libboost1.83-dev libcfitsio-dev libcfitsio-doc
 #>   libcfitsio10t64 libdav1d-dev libdav1d7 libde265-dev libfreexl-dev libfreexl1
 #>   libfyba-dev libfyba0t64 libgdal-dev libgdal34t64 libgeos-c1t64 libgeos-dev
-#>   libgeos3.12.1t64 libgeotiff-dev libgeotiff5 libgif-dev libgif7 libhdf4-0-alt
+#> libgeos3.12.1t64 libgeotiff-dev libgeotiff5 libgif-dev libgif7 libhdf4-0-alt
 #>   libhdf4-alt-dev libhdf5-103-1t64 libhdf5-cpp-103-1t64 libhdf5-dev
 #>   libhdf5-fortran-102t64 libhdf5-hl-100t64 libhdf5-hl-cpp-100t64
-#> libhdf5-hl-fortran-100t64 libheif-dev libjson-c-dev libjsoncpp25 libkml-dev
+#>   libhdf5-hl-fortran-100t64 libheif-dev libjson-c-dev libjsoncpp25 libkml-dev
 #>   libkmlbase1t64 libkmlconvenience1t64 libkmldom1t64 libkmlengine1t64
 #>   libkmlregionator1t64 libkmlxsd1t64 libltdl-dev libminizip-dev libminizip1t64
 #>   libnetcdf-dev libnetcdf19t64 libodbccr2 libodbcinst2 libogdi-dev libogdi4.1
@@ -326,7 +383,7 @@ check_r(c("ggplot2", "dplyr"))
 #>   libudunits2-dev liburiparser-dev liburiparser1 libx265-199 libx265-dev
 #>   libxerces-c-dev libxerces-c3.2t64 proj-bin proj-data python3-gdal
 #>   python3-numpy unixodbc-common unixodbc-dev
-#> 0 upgraded, 100 newly installed, 0 to remove and 76 not upgraded.
+#> 0 upgraded, 100 newly installed, 0 to remove and 147 not upgraded.
 #> Need to get 78.8 MB of archives.
 #> After this operation, 475 MB of additional disk space will be used.
 #> Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
@@ -430,7 +487,7 @@ check_r(c("ggplot2", "dplyr"))
 #> Get:99 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 unixodbc-dev amd64 2.3.12-1ubuntu0.24.04.1 [250 kB]
 #> Get:100 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libgdal-dev amd64 3.8.4+dfsg-3ubuntu3 [211 kB]
 #> Get:101 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 proj-bin amd64 9.4.0-1build2 [164 kB]
-#> Fetched 78.8 MB in 4s (18.1 MB/s)
+#> Fetched 78.8 MB in 9s (8548 kB/s)
 #> Selecting previously unselected package libjsoncpp25:amd64.
 #> (Reading database ...
 #> (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%
@@ -442,7 +499,7 @@ check_r(c("ggplot2", "dplyr"))
 #> (Reading database ... 85%
 #> (Reading database ... 90%
 #> (Reading database ... 95%
-#> (Reading database ... 100%(Reading database ... 230127 files and directories currently installed.)
+#> (Reading database ... 100%(Reading database ... 229541 files and directories currently installed.)
 #> Preparing to unpack .../00-libjsoncpp25_1.9.5-6build1_amd64.deb ...
 #> Unpacking libjsoncpp25:amd64 (1.9.5-6build1) ...
 #> Selecting previously unselected package librhash0:amd64.
@@ -841,140 +898,143 @@ check_r(c("ggplot2", "dplyr"))
 #> Setting up libarmadillo-dev (1:12.6.7+dfsg-1build2) ...
 #> Setting up libhdf4-alt-dev (4.2.16-4build1) ...
 #> Setting up libgdal-dev (3.8.4+dfsg-3ubuntu3) ...
-#> Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+#> Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
 #> Processing triggers for man-db (2.12.0-4build2) ...
 #> Not building database; man-db/auto-update is not 'true'.
 #> Processing triggers for sgml-base (1.31) ...
 #> Processing triggers for install-info (7.1-3build2) ...
 #> Setting up libudunits2-0 (2.2.28-7build1) ...
 #> Setting up libudunits2-dev (2.2.28-7build1) ...
-#> Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+#> Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
 #> Running kernel seems to be up-to-date.
 #> 
 #> Restarting services...
 #> Service restarts being deferred:
+#>  systemctl restart getty@tty1.service
 #>  systemctl restart networkd-dispatcher.service
+#>  systemctl restart serial-getty@ttyS0.service
+#>  systemctl restart systemd-logind.service
 #> No containers need to be restarted.
 #> 
-#> No user sessions are running outdated binaries.
-#> 
+#> User sessions running outdated binaries:
+#>  runner @ user manager service: systemd[1144]
 #> No VM guests are running outdated hypervisor (qemu) binaries on this host.
-#> ✔ Installed askpass 1.2.1  (67ms)
-#> ✔ Installed backports 1.5.0  (86ms)
-#> ✔ Installed base64enc 0.1-6  (109ms)
-#> ✔ Installed brew 1.0-10  (139ms)
-#> ✔ Installed brio 1.1.5  (60ms)
-#> ✔ Installed broom 1.0.12  (92ms)
-#> ✔ Installed bslib 0.10.0  (114ms)
-#> ✔ Installed cachem 1.1.0  (98ms)
-#> ✔ Installed callr 3.7.6  (64ms)
-#> ✔ Installed checkmate 2.3.4  (66ms)
-#> ✔ Installed classInt 0.4-11  (65ms)
-#> ✔ Installed cli 3.6.5  (62ms)
-#> ✔ Installed colorspace 2.1-2  (69ms)
-#> ✔ Installed commonmark 2.0.0  (64ms)
-#> ✔ Installed covr 3.6.5  (94ms)
-#> ✔ Installed crayon 1.5.3  (66ms)
-#> ✔ Installed curl 7.0.0  (64ms)
-#> ✔ Installed data.table 1.18.2.1  (76ms)
-#> ✔ Installed DBI 1.2.3  (75ms)
-#> ✔ Installed desc 1.4.3  (65ms)
-#> ✔ Installed diffobj 0.3.6  (64ms)
-#> ✔ Installed digest 0.6.39  (98ms)
-#> ✔ Installed dplyr 1.2.0  (101ms)
-#> ✔ Installed e1071 1.7-17  (66ms)
-#> ✔ Installed evaluate 1.0.5  (67ms)
-#> ✔ Installed farver 2.1.2  (67ms)
-#> ✔ Installed fastmap 1.2.0  (61ms)
-#> ✔ Installed fontawesome 0.5.3  (62ms)
-#> ✔ Installed Formula 1.2-5  (61ms)
-#> ✔ Installed fs 1.6.6  (94ms)
-#> ✔ Installed generics 0.1.4  (66ms)
+#> ✔ Installed askpass 1.2.1  (63ms)
+#> ✔ Installed backports 1.5.0  (81ms)
+#> ✔ Installed base64enc 0.1-6  (104ms)
+#> ✔ Installed brew 1.0-10  (134ms)
+#> ✔ Installed brio 1.1.5  (59ms)
+#> ✔ Installed broom 1.0.12  (78ms)
+#> ✔ Installed cachem 1.1.0  (1s)
+#> ✔ Installed bslib 0.10.0  (1.1s)
+#> ✔ Installed callr 3.7.6  (65ms)
+#> ✔ Installed checkmate 2.3.4  (64ms)
+#> ✔ Installed classInt 0.4-11  (63ms)
+#> ✔ Installed cli 3.6.5  (90ms)
+#> ✔ Installed colorspace 2.1-2  (92ms)
+#> ✔ Installed commonmark 2.0.0  (63ms)
+#> ✔ Installed covr 3.6.5  (62ms)
+#> ✔ Installed crayon 1.5.3  (63ms)
+#> ✔ Installed curl 7.0.0  (62ms)
+#> ✔ Installed data.table 1.18.2.1  (72ms)
+#> ✔ Installed DBI 1.2.3  (73ms)
+#> ✔ Installed desc 1.4.3  (104ms)
+#> ✔ Installed diffobj 0.3.6  (62ms)
+#> ✔ Installed digest 0.6.39  (64ms)
+#> ✔ Installed dplyr 1.2.0  (67ms)
+#> ✔ Installed e1071 1.7-17  (63ms)
+#> ✔ Installed evaluate 1.0.5  (58ms)
+#> ✔ Installed farver 2.1.2  (59ms)
+#> ✔ Installed fastmap 1.2.0  (93ms)
+#> ✔ Installed fontawesome 0.5.3  (61ms)
+#> ✔ Installed Formula 1.2-5  (59ms)
+#> ✔ Installed fs 1.6.6  (60ms)
+#> ✔ Installed generics 0.1.4  (62ms)
 #> ✔ Installed ggplot2movies 0.0.1  (1s)
 #> ✔ Installed ggplot2 4.0.2  (1.1s)
-#> ✔ Installed glue 1.8.0  (70ms)
-#> ✔ Installed gridExtra 2.3  (92ms)
-#> ✔ Installed gtable 0.3.6  (94ms)
+#> ✔ Installed glue 1.8.0  (68ms)
+#> ✔ Installed gridExtra 2.3  (60ms)
+#> ✔ Installed gtable 0.3.6  (60ms)
 #> ✔ Installed hexbin 1.28.5  (66ms)
 #> ✔ Installed highr 0.11  (63ms)
-#> ✔ Installed Hmisc 5.2-5  (64ms)
-#> ✔ Installed hms 1.1.4  (63ms)
+#> ✔ Installed Hmisc 5.2-5  (96ms)
+#> ✔ Installed hms 1.1.4  (96ms)
 #> ✔ Installed htmlTable 2.4.3  (62ms)
-#> ✔ Installed htmltools 0.5.9  (63ms)
-#> ✔ Installed htmlwidgets 1.6.4  (96ms)
-#> ✔ Installed httr 1.4.8  (69ms)
-#> ✔ Installed isoband 0.3.0  (69ms)
-#> ✔ Installed jquerylib 0.1.4  (64ms)
-#> ✔ Installed jsonlite 2.0.0  (67ms)
-#> ✔ Installed knitr 1.51  (76ms)
-#> ✔ Installed labeling 0.4.3  (70ms)
-#> ✔ Installed later 1.4.6  (93ms)
-#> ✔ Installed lazyeval 0.2.2  (65ms)
-#> ✔ Installed lifecycle 1.0.5  (63ms)
-#> ✔ Installed magrittr 2.0.4  (64ms)
-#> ✔ Installed mapproj 1.2.12  (62ms)
-#> ✔ Installed maps 3.4.3  (63ms)
-#> ✔ Installed MatrixModels 0.5-4  (65ms)
-#> ✔ Installed memoise 2.0.1  (94ms)
-#> ✔ Installed mime 0.13  (99ms)
-#> ✔ Installed multcomp 1.4-29  (70ms)
-#> ✔ Installed munsell 0.5.1  (64ms)
-#> ✔ Installed mvtnorm 1.3-3  (63ms)
-#> ✔ Installed openssl 2.3.4  (63ms)
-#> ✔ Installed pillar 1.11.1  (64ms)
-#> ✔ Installed pkgbuild 1.4.8  (64ms)
-#> ✔ Installed pkgconfig 2.0.3  (93ms)
-#> ✔ Installed pkgload 1.5.0  (64ms)
-#> ✔ Installed praise 1.0.0  (64ms)
-#> ✔ Installed processx 3.8.6  (63ms)
+#> ✔ Installed htmltools 0.5.9  (62ms)
+#> ✔ Installed htmlwidgets 1.6.4  (63ms)
+#> ✔ Installed httr 1.4.8  (63ms)
+#> ✔ Installed isoband 0.3.0  (62ms)
+#> ✔ Installed jquerylib 0.1.4  (60ms)
+#> ✔ Installed jsonlite 2.0.0  (95ms)
+#> ✔ Installed knitr 1.51  (72ms)
+#> ✔ Installed labeling 0.4.3  (71ms)
+#> ✔ Installed later 1.4.6  (61ms)
+#> ✔ Installed lazyeval 0.2.2  (62ms)
+#> ✔ Installed lifecycle 1.0.5  (59ms)
+#> ✔ Installed magrittr 2.0.4  (62ms)
+#> ✔ Installed mapproj 1.2.12  (97ms)
+#> ✔ Installed maps 3.4.3  (62ms)
+#> ✔ Installed MatrixModels 0.5-4  (63ms)
+#> ✔ Installed memoise 2.0.1  (61ms)
+#> ✔ Installed mime 0.13  (59ms)
+#> ✔ Installed multcomp 1.4-29  (59ms)
+#> ✔ Installed munsell 0.5.1  (59ms)
+#> ✔ Installed mvtnorm 1.3-3  (94ms)
+#> ✔ Installed openssl 2.3.4  (62ms)
+#> ✔ Installed pillar 1.11.1  (63ms)
+#> ✔ Installed pkgbuild 1.4.8  (63ms)
+#> ✔ Installed pkgconfig 2.0.3  (60ms)
+#> ✔ Installed pkgload 1.5.0  (61ms)
+#> ✔ Installed praise 1.0.0  (62ms)
+#> ✔ Installed processx 3.8.6  (96ms)
 #> ✔ Installed profvis 0.4.0  (64ms)
-#> ✔ Installed proxy 0.4-29  (63ms)
-#> ✔ Installed ps 1.9.1  (63ms)
-#> ✔ Installed purrr 1.2.1  (97ms)
-#> ✔ Installed quantreg 6.1  (68ms)
-#> ✔ Installed quarto 1.5.1  (66ms)
-#> ✔ Installed R6 2.6.1  (65ms)
-#> ✔ Installed ragg 1.5.0  (66ms)
-#> ✔ Installed rappdirs 0.3.4  (68ms)
-#> ✔ Installed RColorBrewer 1.1-3  (63ms)
-#> ✔ Installed Rcpp 1.1.1  (109ms)
-#> ✔ Installed rex 1.2.1  (97ms)
+#> ✔ Installed proxy 0.4-29  (62ms)
+#> ✔ Installed ps 1.9.1  (61ms)
+#> ✔ Installed purrr 1.2.1  (63ms)
+#> ✔ Installed quantreg 6.1  (63ms)
+#> ✔ Installed quarto 1.5.1  (62ms)
+#> ✔ Installed R6 2.6.1  (96ms)
+#> ✔ Installed ragg 1.5.0  (97ms)
+#> ✔ Installed rappdirs 0.3.4  (65ms)
+#> ✔ Installed RColorBrewer 1.1-3  (61ms)
+#> ✔ Installed Rcpp 1.1.1  (63ms)
+#> ✔ Installed rex 1.2.1  (64ms)
 #> ✔ Installed rlang 1.1.7  (67ms)
-#> ✔ Installed rmarkdown 2.30  (75ms)
-#> ✔ Installed roxygen2 7.3.3  (74ms)
-#> ✔ Installed rprojroot 2.1.1  (65ms)
-#> ✔ Installed rstudioapi 0.18.0  (62ms)
-#> ✔ Installed s2 1.1.9  (95ms)
-#> ✔ Installed S7 0.2.1  (99ms)
-#> ✔ Installed sandwich 3.1-1  (67ms)
-#> ✔ Installed sass 0.4.10  (67ms)
-#> ✔ Installed scales 1.4.0  (66ms)
+#> ✔ Installed rmarkdown 2.30  (110ms)
+#> ✔ Installed roxygen2 7.3.3  (104ms)
+#> ✔ Installed rprojroot 2.1.1  (64ms)
+#> ✔ Installed rstudioapi 0.18.0  (61ms)
+#> ✔ Installed s2 1.1.9  (65ms)
+#> ✔ Installed S7 0.2.1  (64ms)
+#> ✔ Installed sandwich 3.1-1  (61ms)
+#> ✔ Installed sass 0.4.10  (99ms)
+#> ✔ Installed scales 1.4.0  (100ms)
 #> ✔ Installed SparseM 1.84-2  (1s)
 #> ✔ Installed sf 1.0-24  (1.1s)
-#> ✔ Installed stringi 1.8.7  (112ms)
-#> ✔ Installed stringr 1.6.0  (68ms)
-#> ✔ Installed svglite 2.2.2  (68ms)
-#> ✔ Installed sys 3.4.3  (66ms)
-#> ✔ Installed systemfonts 1.3.1  (64ms)
-#> ✔ Installed testthat 3.3.2  (66ms)
-#> ✔ Installed textshaping 1.0.4  (65ms)
-#> ✔ Installed TH.data 1.1-5  (107ms)
-#> ✔ Installed tibble 3.3.1  (67ms)
-#> ✔ Installed tidyr 1.3.2  (69ms)
-#> ✔ Installed tidyselect 1.2.1  (66ms)
-#> ✔ Installed tinytex 0.58  (63ms)
-#> ✔ Installed units 1.0-0  (63ms)
-#> ✔ Installed utf8 1.2.6  (68ms)
-#> ✔ Installed vctrs 0.7.1  (110ms)
-#> ✔ Installed vdiffr 1.0.9  (68ms)
-#> ✔ Installed viridisLite 0.4.3  (67ms)
-#> ✔ Installed waldo 0.6.2  (65ms)
-#> ✔ Installed withr 3.0.2  (64ms)
-#> ✔ Installed wk 0.9.5  (63ms)
-#> ✔ Installed xfun 0.56  (63ms)
-#> ✔ Installed xml2 1.5.2  (105ms)
-#> ✔ Installed yaml 2.3.12  (104ms)
-#> ✔ Installed zoo 1.8-15  (49ms)
-#> ✔ 1 pkg + 128 deps: kept 8, added 116, dld 59 (74.17 MB) [43.5s]
-#> ✔ [2026-02-19 06:13:31] ggplot2 and dplyr installed successfully
+#> ✔ Installed stringi 1.8.7  (119ms)
+#> ✔ Installed stringr 1.6.0  (65ms)
+#> ✔ Installed svglite 2.2.2  (64ms)
+#> ✔ Installed sys 3.4.3  (63ms)
+#> ✔ Installed systemfonts 1.3.1  (69ms)
+#> ✔ Installed testthat 3.3.2  (71ms)
+#> ✔ Installed textshaping 1.0.4  (62ms)
+#> ✔ Installed TH.data 1.1-5  (101ms)
+#> ✔ Installed tibble 3.3.1  (63ms)
+#> ✔ Installed tidyr 1.3.2  (65ms)
+#> ✔ Installed tidyselect 1.2.1  (63ms)
+#> ✔ Installed tinytex 0.58  (61ms)
+#> ✔ Installed units 1.0-0  (61ms)
+#> ✔ Installed utf8 1.2.6  (61ms)
+#> ✔ Installed vctrs 0.7.1  (101ms)
+#> ✔ Installed vdiffr 1.0.9  (66ms)
+#> ✔ Installed viridisLite 0.4.3  (62ms)
+#> ✔ Installed waldo 0.6.2  (60ms)
+#> ✔ Installed withr 3.0.2  (62ms)
+#> ✔ Installed wk 0.9.5  (64ms)
+#> ✔ Installed xfun 0.56  (62ms)
+#> ✔ Installed xml2 1.5.2  (111ms)
+#> ✔ Installed yaml 2.3.12  (75ms)
+#> ✔ Installed zoo 1.8-15  (46ms)
+#> ✔ 1 pkg + 128 deps: kept 8, added 116, dld 116 (114.21 MB) [52.5s]
+#> ✔ [2026-02-20 02:16:14] ggplot2 and dplyr installed successfully
 ```
