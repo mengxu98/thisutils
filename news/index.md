@@ -1,5 +1,12 @@
 # Changelog
 
+## thisutils 0.4.1
+
+- **func**:
+  - Remove `@examples` for
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+    function.
+
 ## thisutils 0.4.0
 
 - **func**:

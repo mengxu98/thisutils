@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/mengxu98/thisutils/blob/main/DESCRIPTION)
 
 Xu M (2026). *thisutils: Collection of Utility Functions for Data
-Analysis and Computing*. R package version 0.4.0,
+Analysis and Computing*. R package version 0.4.1,
 <https://mengxu98.github.io/thisutils/>.
 
     @Manual{,
       title = {thisutils: Collection of Utility Functions for Data Analysis and Computing},
       author = {Meng Xu},
       year = {2026},
-      note = {R package version 0.4.0},
+      note = {R package version 0.4.1},
       url = {https://mengxu98.github.io/thisutils/},
     }
