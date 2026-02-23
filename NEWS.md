@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.4.1
+
+* **func**:
+  * Remove `@examples` for `check_r()` function.
+
 # thisutils 0.4.0
 
 * **func**:
