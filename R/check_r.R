@@ -14,8 +14,6 @@
 #' @return Package installation status.
 #'
 #' @export
-#' @examples
-#' check_r(c("ggplot2", "dplyr"))
 check_r <- function(
     packages,
     lib = .libPaths()[1],

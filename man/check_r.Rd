@@ -34,6 +34,3 @@ Package installation status.
 \description{
 Check and install R packages
 }
-\examples{
-check_r(c("ggplot2", "dplyr"))
-}
