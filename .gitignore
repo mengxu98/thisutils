@@ -21,3 +21,7 @@ test/
 .RData
 .Rprofile
 revdep/
+
+# Python files
+__pycache__/
+*.pyc
