@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,16 +37,25 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.2" id="thisutils-042">thisutils 0.4.2<a class="anchor" aria-label="anchor" href="#thisutils-042"></a></h2><p class="text-muted">CRAN release: 2026-02-23</p>
+<ul><li>
+<strong>feat</strong>:
+<ul><li>Add <code><a href="../reference/check_ci_env.html">check_ci_env()</a></code>: detect whether the current session should be treated as CI/pkgdown context; returns <code>TRUE</code> for interactive sessions and for GitHub Actions when <code>GITHUB_ACTIONS=true</code> and <code>GITHUB_WORKFLOW=pkgdown</code> (case-insensitive), otherwise returns <code>FALSE</code>.</li>
+<li>Add <code><a href="../reference/is_outlier.html">is_outlier()</a></code>: detect outlier indices using median and MAD-based bounds (<code>nmads</code>, <code>constant</code>) with <code>type = "both"|"lower"|"higher</code>; <code>NA</code> values are also included in the returned index vector.</li>
+<li>Export <code><a href="../reference/check_pkg_status.html">check_pkg_status()</a></code>: make the package/version checker available as a public API; it checks installation status in a target library (<code>lib</code>) and optionally verifies exact version match when <code>version</code> is provided.</li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="thisutils-041">thisutils 0.4.1<a class="anchor" aria-label="anchor" href="#thisutils-041"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Remove <code>@examples</code> for <code><a href="../reference/check_r.html">check_r()</a></code> function.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="thisutils-040">thisutils 0.4.0<a class="anchor" aria-label="anchor" href="#thisutils-040"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Add <code><a href="../reference/check_r.html">check_r()</a></code>: check and install R packages from CRAN, Bioconductor, or GitHub; supports version pinning (<code>pkg@version</code> or <code>pkg==version</code>) and optional <code>force</code> reinstall; uses <code><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak::pak()</a></code> for installation with configurable <code>lib</code> and <code>dependencies</code>.</li>
 <li>Add <code><a href="../reference/remove_r.html">remove_r()</a></code>: check and remove installed R packages from the given library; uses <code><a href="https://pak.r-lib.org/reference/pkg_remove.html" class="external-link">pak::pkg_remove()</a></code>; skips packages that are not installed and reports success or failure per package.</li>
 </ul></li>
@@ -54,14 +63,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.9" id="thisutils-039">thisutils 0.3.9<a class="anchor" aria-label="anchor" href="#thisutils-039"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Fix <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> dependency management: <code>cli</code> dependency is now added with correct comma separation, and both Imports and Suggests sections are automatically sorted alphabetically. The Suggests section is now enforced to follow Imports.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.8" id="thisutils-038">thisutils 0.3.8<a class="anchor" aria-label="anchor" href="#thisutils-038"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Improve <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> flow: better metadata extraction/logging from DESCRIPTION, and smarter logo generation fallback when figlet fails. Generated package files now include <code>@useDynLib</code> only when <code>src/</code> exists.</li>
 <li>Refresh startup messages: <code>.onAttach()</code> now shows package version, release date, and website link in both generated package files.</li>
 </ul></li>
@@ -69,7 +78,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.7" id="thisutils-037">thisutils 0.3.7<a class="anchor" aria-label="anchor" href="#thisutils-037"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Optimize <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> C++ implementation: Improved dimnames handling using <code>Rf_getAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility. Enhanced <code>keep_zero = TRUE</code> logic to efficiently include all row/column combinations (including zeros) using <code>unordered_set</code> and <code>unordered_map</code> for optimized lookups.</li>
 <li>Improve <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> C++ implementation: Enhanced sparse matrix construction by ensuring zero values are not added to sparse matrices. Improved dimnames setting using <code>Rf_setAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility.</li>
 </ul></li>
@@ -77,14 +86,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.6" id="thisutils-036">thisutils 0.3.6<a class="anchor" aria-label="anchor" href="#thisutils-036"></a></h2><p class="text-muted">CRAN release: 2026-01-08</p>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Fix warning about ‘ATTRIB’ from check results of <em>CRAN</em>.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.5" id="thisutils-035">thisutils 0.3.5<a class="anchor" aria-label="anchor" href="#thisutils-035"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Simplify <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function: Unified progress bar creation logic by removing conditional branches and using a single consistent format. Updated progress bar format string for better readability and consistency.</li>
 <li>Add <code><a href="../reference/get_namespace_fun.html">get_namespace_fun()</a></code> function.</li>
 </ul></li>
@@ -92,7 +101,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.4" id="thisutils-034">thisutils 0.3.4<a class="anchor" aria-label="anchor" href="#thisutils-034"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code> function: Added new <code>"ask"</code> message type for interactive user prompts. When <code>message_type = "ask"</code>, the function uses <code><a href="https://rdrr.io/r/utils/askYesNo.html" class="external-link">utils::askYesNo()</a></code> to prompt the user and returns <code>TRUE</code> for Yes, <code>FALSE</code> for No, and <code>NA</code> for Cancel.</li>
 <li>Optimize <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function: Improved progress bar status display in parallel processing mode. Now shows only the first item name/value with ellipsis (“…”) instead of concatenating all chunk items, resulting in cleaner and more concise progress display.</li>
 </ul></li>
@@ -100,7 +109,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.3" id="thisutils-033">thisutils 0.3.3<a class="anchor" aria-label="anchor" href="#thisutils-033"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Refactor internal helper functions in <code><a href="../reference/log_message.html">log_message()</a></code> and <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code>: Converted private helper functions (prefixed with <code>.</code>) to public functions, improving code accessibility and maintainability. Functions affected include <code>build_message()</code>, <code>validate_params()</code>, <code>output_message()</code>, <code>style_formatting()</code>, <code>plain_text_output()</code>, <code>get_caller_call()</code>, <code>extract_function_name()</code>, <code>make_color_style()</code>, <code>check_color()</code>, and <code>generate_content()</code>.</li>
 </ul></li>
 <li>
@@ -111,7 +120,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.2" id="thisutils-032">thisutils 0.3.2<a class="anchor" aria-label="anchor" href="#thisutils-032"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Change default value of <code>timestamp_style</code> parameter in <code><a href="../reference/log_message.html">log_message()</a></code> function from <code>TRUE</code> to <code>FALSE</code> for cleaner default output.</li>
 </ul></li>
 </ul></div>
@@ -125,7 +134,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="thisutils-030">thisutils 0.3.0<a class="anchor" aria-label="anchor" href="#thisutils-030"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code> function: Added new <code>plain_text</code> parameter to suppress level, symbol, timestamp, and message type formatting while preserving color and multiline settings, allowing for cleaner text-only output.</li>
 <li>Improve <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function: Enhanced message types and formatting, using more appropriate message types (<code>warning</code>, <code>running</code>) and improved file references in log messages.</li>
 </ul></li>
@@ -133,7 +142,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.5" id="thisutils-025">thisutils 0.2.5<a class="anchor" aria-label="anchor" href="#thisutils-025"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Optimize <code><a href="../reference/check_sparsity.html">check_sparsity()</a></code> function: Improved calculation logic by computing total counts upfront, avoiding redundant calculations for sparse and non-sparse matrices.</li>
 <li>Optimize <code><a href="../reference/normalization.html">normalization()</a></code> function: Enhanced <code>max_min</code> and <code>maximum</code> methods by caching min/max values to avoid repeated calculations.</li>
 <li>Improve code quality in <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code>: Replaced <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply()</a></code> with <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code> for type-safe return values and optimized error handling logic.</li>
@@ -146,14 +155,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.4" id="thisutils-024">thisutils 0.2.4<a class="anchor" aria-label="anchor" href="#thisutils-024"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code> function: Now automatically handles non-character objects (e.g., <code>data.table</code>, <code>data.frame</code>) by formatting them with <code>capture.output(print(...))</code>, allowing direct object input without manual string conversion.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="thisutils-023">thisutils 0.2.3<a class="anchor" aria-label="anchor" href="#thisutils-023"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Rewrite <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> C++ implementation to iterate <code>dgCMatrix</code> slots directly, avoiding dense conversion and reducing memory/time cost on large sparse matrices.</li>
 <li>Align <code>keep_zero</code>/<code>threshold</code> semantics across C++/R: retain entries if <code>abs(value) &gt;= threshold</code>; zeros are retained only when <code>keep_zero = TRUE</code> and <code>threshold == 0</code>.</li>
 </ul></li>
@@ -161,7 +170,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="thisutils-022">thisutils 0.2.2<a class="anchor" aria-label="anchor" href="#thisutils-022"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Enhance <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function: Added support for named vectors and vectors in progress display, showing current processing item names or values in the progress bar. Improved progress bar formatting with status information and enhanced parallel processing progress updates.</li>
 <li>Improve visual formatting in <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> and <code>thisutils-package.R</code>: Enhanced separator line display with grey color styling using <code><a href="https://cli.r-lib.org/reference/ansi-styles.html" class="external-link">cli::col_grey()</a></code> for better visual consistency.</li>
 </ul></li>
@@ -169,14 +178,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="thisutils-021">thisutils 0.2.1<a class="anchor" aria-label="anchor" href="#thisutils-021"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Enhance <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function: Added automatic dependency checking to ensure <code>cli</code> package is included in DESCRIPTION file, and automatic pkgdown configuration checking to ensure proper package overview section setup.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="thisutils-020">thisutils 0.2.0<a class="anchor" aria-label="anchor" href="#thisutils-020"></a></h2><p class="text-muted">CRAN release: 2025-10-06</p>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Add package logo.</li>
 <li>Add <code><a href="../reference/get_verbose.html">get_verbose()</a></code> function: New exported function to get verbose option from global options or local arguments, providing better control over message display.</li>
 <li>Enhance <code>.onAttach()</code> function: Now respects verbose settings and only displays startup messages when verbose mode is enabled, improving user experience.</li>
@@ -190,14 +199,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.9" id="thisutils-019">thisutils 0.1.9<a class="anchor" aria-label="anchor" href="#thisutils-019"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Remove <code>list_figlet_fonts()</code> and <code>rescale()</code> functions.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.7" id="thisutils-017">thisutils 0.1.7<a class="anchor" aria-label="anchor" href="#thisutils-017"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Refactor <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function: Simplified function parameters by removing manual parameter inputs and automatically extracting all package information from DESCRIPTION file. Enhanced error handling and improved logging messages.</li>
 <li>Enhance <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> function with robust error handling: Added <code>clean_result</code> parameter to control automatic removal of failed results, and <code>throw_error</code> parameter to control detailed error message display. Functions now gracefully handle partial failures without stopping execution.</li>
 <li>Add <code><a href="../reference/parse_inline_expressions.html">parse_inline_expressions()</a></code> function: High-performance inline expression parser that evaluates <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code> expressions while preserving CLI formatting markers like <code>{.val ...}</code>.</li>
@@ -207,7 +216,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.6" id="thisutils-016">thisutils 0.1.6<a class="anchor" aria-label="anchor" href="#thisutils-016"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Add statistical <em>P-value</em> combination functions: <code><a href="../reference/wilkinsonp.html">wilkinsonp()</a></code>, <code><a href="../reference/maximump.html">maximump()</a></code>, <code><a href="../reference/minimump.html">minimump()</a></code>, <code><a href="../reference/meanp.html">meanp()</a></code>, <code><a href="../reference/votep.html">votep()</a></code>, and <code><a href="../reference/sump.html">sump()</a></code> for meta-analysis and multiple study result integration.</li>
 <li>Add <code><a href="../reference/max_depth.html">max_depth()</a></code> function to calculate the maximum depth of nested lists.</li>
 </ul></li>
@@ -215,21 +224,21 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.5" id="thisutils-015">thisutils 0.1.5<a class="anchor" aria-label="anchor" href="#thisutils-015"></a></h2><p class="text-muted">CRAN release: 2025-09-11</p>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Update <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> function. Now, <code><a href="../reference/add_pkg_file.html">add_pkg_file()</a></code> can automatically extract information of <em>R</em> package from <code>DESCRIPTION</code> file and save it in the <code>./R/</code> folder.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.4" id="thisutils-014">thisutils 0.1.4<a class="anchor" aria-label="anchor" href="#thisutils-014"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Delete <code>str_wrap()</code> function.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.3" id="thisutils-013">thisutils 0.1.3<a class="anchor" aria-label="anchor" href="#thisutils-013"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Replace <code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">purrr::map2()</a></code> with <code><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply()</a></code>, and delete <code>purrr</code> package in <code>DESCRIPTION</code>.</li>
 <li>Replace <code><a href="https://rdrr.io/r/methods/is.html" class="external-link">methods::is()</a></code> with <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code>, and delete <code>methods</code> package in <code>DESCRIPTION</code>.</li>
 </ul></li>
@@ -241,14 +250,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="thisutils-011">thisutils 0.1.1<a class="anchor" aria-label="anchor" href="#thisutils-011"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Add <code><a href="../reference/matrix_process.html">matrix_process()</a></code> function.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.9" id="thisutils-009">thisutils 0.0.9<a class="anchor" aria-label="anchor" href="#thisutils-009"></a></h2>
 <ul><li>
-<strong>func</strong>:
+<strong>feat</strong>:
 <ul><li>Add <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> and <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> functions for data conversion between matrix and table formats.</li>
 <li>Modify parameter <code>sparse</code> to <code>return_sparse</code> for <code><a href="../reference/as_matrix.html">as_matrix()</a></code>
 </li>

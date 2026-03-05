@@ -38,6 +38,15 @@
 - [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
   : Sparse correlation function
 
+### Package management
+
+- [`check_pkg_status()`](https://mengxu98.github.io/thisutils/reference/check_pkg_status.md)
+  : Check if a package is installed with the specified version
+- [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+  : Check and install R packages
+- [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md)
+  : Check and remove R packages
+
 ### Utility functions
 
 - [`` `%ss%` ``](https://mengxu98.github.io/thisutils/reference/grapes-ss-grapes.md)
@@ -46,8 +55,8 @@
   : Convert matrix into dense/sparse matrix
 - [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
   : Capitalize the first letter of each word
-- [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
-  : Check and install R packages
+- [`check_ci_env()`](https://mengxu98.github.io/thisutils/reference/check_ci_env.md)
+  : Check CI environment
 - [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
   : Check sparsity of matrix
 - [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
@@ -56,6 +65,8 @@
   : Get a function from a namespace
 - [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
   : Invoke a function with a list of arguments
+- [`is_outlier()`](https://mengxu98.github.io/thisutils/reference/is_outlier.md)
+  : Detect outliers using MAD (Median Absolute Deviation)
 - [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)
   : Process matrix
 - [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
@@ -74,8 +85,6 @@
   : Print logo
 - [`r_square()`](https://mengxu98.github.io/thisutils/reference/r_square.md)
   : Coefficient of determination (\\R^2\\)
-- [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md)
-  : Check and remove R packages
 - [`remove_space()`](https://mengxu98.github.io/thisutils/reference/remove_space.md)
   : Remove and normalize spaces
 - [`split_indices()`](https://mengxu98.github.io/thisutils/reference/split_indices.md)

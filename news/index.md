@@ -1,15 +1,37 @@
 # Changelog
 
+## thisutils 0.4.2
+
+CRAN release: 2026-02-23
+
+- **feat**:
+  - Add
+    [`check_ci_env()`](https://mengxu98.github.io/thisutils/reference/check_ci_env.md):
+    detect whether the current session should be treated as CI/pkgdown
+    context; returns `TRUE` for interactive sessions and for GitHub
+    Actions when `GITHUB_ACTIONS=true` and `GITHUB_WORKFLOW=pkgdown`
+    (case-insensitive), otherwise returns `FALSE`.
+  - Add
+    [`is_outlier()`](https://mengxu98.github.io/thisutils/reference/is_outlier.md):
+    detect outlier indices using median and MAD-based bounds (`nmads`,
+    `constant`) with `type = "both"|"lower"|"higher`; `NA` values are
+    also included in the returned index vector.
+  - Export
+    [`check_pkg_status()`](https://mengxu98.github.io/thisutils/reference/check_pkg_status.md):
+    make the package/version checker available as a public API; it
+    checks installation status in a target library (`lib`) and
+    optionally verifies exact version match when `version` is provided.
+
 ## thisutils 0.4.1
 
-- **func**:
+- **feat**:
   - Remove `@examples` for
     [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
     function.
 
 ## thisutils 0.4.0
 
-- **func**:
+- **feat**:
   - Add
     [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md):
     check and install R packages from CRAN, Bioconductor, or GitHub;
@@ -26,7 +48,7 @@
 
 ## thisutils 0.3.9
 
-- **func**:
+- **feat**:
   - Fix
     [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
     dependency management: `cli` dependency is now added with correct
@@ -36,7 +58,7 @@
 
 ## thisutils 0.3.8
 
-- **func**:
+- **feat**:
   - Improve
     [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
     flow: better metadata extraction/logging from DESCRIPTION, and
@@ -47,7 +69,7 @@
 
 ## thisutils 0.3.7
 
-- **func**:
+- **feat**:
   - Optimize
     [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
     C++ implementation: Improved dimnames handling using `Rf_getAttrib`
@@ -66,12 +88,12 @@
 
 CRAN release: 2026-01-08
 
-- **func**:
+- **feat**:
   - Fix warning about ‘ATTRIB’ from check results of *CRAN*.
 
 ## thisutils 0.3.5
 
-- **func**:
+- **feat**:
   - Simplify
     [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
     function: Unified progress bar creation logic by removing
@@ -83,7 +105,7 @@ CRAN release: 2026-01-08
 
 ## thisutils 0.3.4
 
-- **func**:
+- **feat**:
   - Enhance
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     function: Added new `"ask"` message type for interactive user
@@ -100,7 +122,7 @@ CRAN release: 2026-01-08
 
 ## thisutils 0.3.3
 
-- **func**:
+- **feat**:
   - Refactor internal helper functions in
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     and
@@ -119,7 +141,7 @@ CRAN release: 2026-01-08
 
 ## thisutils 0.3.2
 
-- **func**:
+- **feat**:
   - Change default value of `timestamp_style` parameter in
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     function from `TRUE` to `FALSE` for cleaner default output.
@@ -135,7 +157,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.3.0
 
-- **func**:
+- **feat**:
   - Enhance
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     function: Added new `plain_text` parameter to suppress level,
@@ -149,7 +171,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.2.5
 
-- **func**:
+- **feat**:
   - Optimize
     [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
     function: Improved calculation logic by computing total counts
@@ -189,7 +211,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.2.4
 
-- **func**:
+- **feat**:
   - Enhance
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     function: Now automatically handles non-character objects (e.g.,
@@ -199,7 +221,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.2.3
 
-- **func**:
+- **feat**:
   - Rewrite
     [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
     C++ implementation to iterate `dgCMatrix` slots directly, avoiding
@@ -211,7 +233,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.2.2
 
-- **func**:
+- **feat**:
   - Enhance
     [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
     function: Added support for named vectors and vectors in progress
@@ -227,7 +249,7 @@ CRAN release: 2025-11-17
 
 ## thisutils 0.2.1
 
-- **func**:
+- **feat**:
   - Enhance
     [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
     function: Added automatic dependency checking to ensure `cli`
@@ -239,7 +261,7 @@ CRAN release: 2025-11-17
 
 CRAN release: 2025-10-06
 
-- **func**:
+- **feat**:
   - Add package logo.
   - Add
     [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)
@@ -261,12 +283,12 @@ CRAN release: 2025-10-06
 
 ## thisutils 0.1.9
 
-- **func**:
+- **feat**:
   - Remove `list_figlet_fonts()` and `rescale()` functions.
 
 ## thisutils 0.1.7
 
-- **func**:
+- **feat**:
   - Refactor
     [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
     function: Simplified function parameters by removing manual
@@ -291,7 +313,7 @@ CRAN release: 2025-10-06
 
 ## thisutils 0.1.6
 
-- **func**:
+- **feat**:
   - Add statistical *P-value* combination functions:
     [`wilkinsonp()`](https://mengxu98.github.io/thisutils/reference/wilkinsonp.md),
     [`maximump()`](https://mengxu98.github.io/thisutils/reference/maximump.md),
@@ -309,7 +331,7 @@ CRAN release: 2025-10-06
 
 CRAN release: 2025-09-11
 
-- **func**:
+- **feat**:
   - Update
     [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
     function. Now,
@@ -319,12 +341,12 @@ CRAN release: 2025-09-11
 
 ## thisutils 0.1.4
 
-- **func**:
+- **feat**:
   - Delete `str_wrap()` function.
 
 ## thisutils 0.1.3
 
-- **func**:
+- **feat**:
   - Replace
     [`purrr::map2()`](https://purrr.tidyverse.org/reference/map2.html)
     with [`mapply()`](https://rdrr.io/r/base/mapply.html), and delete
@@ -337,14 +359,14 @@ CRAN release: 2025-09-11
 
 ## thisutils 0.1.1
 
-- **func**:
+- **feat**:
   - Add
     [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)
     function.
 
 ## thisutils 0.0.9
 
-- **func**:
+- **feat**:
   - Add
     [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
     and
