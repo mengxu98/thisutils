@@ -774,3 +774,26 @@ is_outlier <- function(
   out <- c(which(is.na(x)), out)
   return(out)
 }
+
+#' @title Check CI environment
+#'
+#' @return
+#' A logical value.
+#'
+#' @export
+check_ci_env <- function() {
+  if (interactive()) {
+    return(TRUE)
+  }
+
+  github_actions <- Sys.getenv("GITHUB_ACTIONS", unset = "")
+  github_workflow <- Sys.getenv("GITHUB_WORKFLOW", unset = "")
+
+  if (nzchar(github_actions) && github_actions == "true") {
+    if (nzchar(github_workflow) && tolower(github_workflow) == "pkgdown") {
+      return(TRUE)
+    }
+  }
+
+  return(FALSE)
+}
