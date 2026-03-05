@@ -14,7 +14,7 @@ is_outlier(
 \arguments{
 \item{x}{Numeric vector.}
 
-\item{nmads}{Number of median absolute deviations (MADs) from the median to define the boundaries for outliers.
+\item{nmads}{Number of MADs from the median to define the boundaries for outliers.
 Default is \code{2.5}.}
 
 \item{constant}{Constant factor to convert the MAD to a standard deviation.
