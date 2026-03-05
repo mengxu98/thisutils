@@ -730,7 +730,7 @@ max_depth <- function(x, depth = 0) {
 #'
 #' @md
 #' @param x Numeric vector.
-#' @param nmads Number of median absolute deviations (MADs) from the median to define the boundaries for outliers.
+#' @param nmads Number of MADs from the median to define the boundaries for outliers.
 #' Default is `2.5`.
 #' @param constant Constant factor to convert the MAD to a standard deviation.
 #' Default is `1.4826`, which is consistent with the MAD of a normal distribution.

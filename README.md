@@ -8,7 +8,7 @@
 
 ## **Introduction**
 
-[thisutils](https://mengxu98.github.io/thisutils/) is an R package for providing utility functions for data analysis and scientific computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
+[thisutils](https://mengxu98.github.io/thisutils/) is an R package for providing utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
 
 ## **Installation**
 
