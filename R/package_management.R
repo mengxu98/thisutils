@@ -182,7 +182,20 @@ remove_r <- function(
   return(invisible(status_list))
 }
 
-check_pkg_status <- function(pkg, version = NULL, lib = .libPaths()[1]) {
+#' @title Check if a package is installed with the specified version
+#'
+#' @md
+#' @inheritParams check_r
+#' @param pkg Package name.
+#' @param version Package version to check. If `NULL`, only checks if the package is installed.
+#'
+#' @return `TRUE` if the package is installed with the specified version, `FALSE` otherwise.
+#'
+#' @export
+check_pkg_status <- function(
+    pkg,
+    version = NULL,
+    lib = .libPaths()[1]) {
   installed_pkgs_info <- utils::installed.packages(lib.loc = lib)
   installed_pkgs <- installed_pkgs_info[, "Package"]
   installed_pkgs_version <- installed_pkgs_info[, "Version"]
