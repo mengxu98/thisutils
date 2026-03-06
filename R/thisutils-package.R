@@ -2,7 +2,7 @@
 
 #' @title Collection of Utility Functions for Data Analysis and Computing
 #'
-#' @useDynLib thisutils
+#' @useDynLib thisutils, .registration = TRUE
 #'
 #' @description
 #' Provides utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
