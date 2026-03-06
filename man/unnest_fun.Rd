@@ -18,7 +18,7 @@ If you want to preserve all rows,
 use \code{keep_empty = TRUE} to replace size-0 elements with a single row of missing values.}
 }
 \description{
-Implement similar functions to the \link[tidyr:unnest]{tidyr::unnest} function.
+Implement similar functions to the \code{tidyr::unnest} function.
 }
 \examples{
 data <- data.frame(

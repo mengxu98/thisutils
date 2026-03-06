@@ -146,7 +146,7 @@ capitalize <- function(x, force_tolower = FALSE) {
 #' @title Unnest a list-column
 #'
 #' @description
-#' Implement similar functions to the [tidyr::unnest] function.
+#' Implement similar functions to the `tidyr::unnest` function.
 #'
 #' @md
 #' @param data A data frame.
