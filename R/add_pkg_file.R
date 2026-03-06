@@ -7,8 +7,6 @@
 #' @param figlet_font Character string, figlet font to use.
 #' Default is `"Slant"`.
 #' @param colors Character vector, colors to use for the logo elements.
-#' @param unicode Whether to use Unicode symbols.
-#' Default is `TRUE`.
 #'
 #' @return
 #' Creates a file named `R/<pkg_name>-package.R`.
@@ -21,7 +19,6 @@ add_pkg_file <- function(
       "red", "yellow", "green", "magenta", "cyan",
       "yellow", "green", "white", "magenta", "cyan"
     ),
-    unicode = TRUE,
     verbose = TRUE) {
   desc_file <- "DESCRIPTION"
   pkgdown_file <- "_pkgdown.yml"
@@ -123,7 +120,6 @@ add_pkg_file <- function(
     github_url = github_url,
     ascii_lines = ascii_lines,
     colors = colors,
-    unicode = unicode,
     src_exist = dir.exists("src")
   )
 
@@ -151,7 +147,6 @@ generate_content <- function(
     github_url,
     ascii_lines,
     colors,
-    unicode,
     src_exist = FALSE) {
   ascii_with_numbers <- add_ascii_numbers(
     ascii_lines,
@@ -220,7 +215,7 @@ generate_content <- function(
     ),
     "  )",
     "",
-    generate_hexa(length(colors), colors, unicode),
+    generate_hexa(length(colors), colors),
     "",
     "  col_hexa <- mapply(",
     "    function(x, y) cli::make_ansi_style(y)(x),",
@@ -322,8 +317,7 @@ add_ascii_numbers <- function(
 
 generate_hexa <- function(
     num_colors,
-    colors,
-    unicode) {
+    colors) {
   symbols <- rep(c("*", ".", "o"), length.out = num_colors)
 
   code <- c(
@@ -357,7 +351,7 @@ generate_hexa <- function(
 
 read_description <- function(
     desc_file,
-    verbose = TRUE) {
+    verbose) {
   if (!file.exists(desc_file)) {
     log_message(
       "DESCRIPTION file not found",
@@ -530,7 +524,7 @@ read_description <- function(
   )
 }
 
-check_dependencies <- function(desc_file, verbose = TRUE) {
+check_dependencies <- function(desc_file, verbose) {
   if (!file.exists(desc_file)) {
     log_message(
       "{.file {desc_file}} not found",
@@ -640,7 +634,7 @@ check_dependencies <- function(desc_file, verbose = TRUE) {
   }
 }
 
-check_pkgdown <- function(pkgdown_file, pkg_name, verbose = TRUE) {
+check_pkgdown <- function(pkgdown_file, pkg_name, verbose) {
   if (!file.exists(pkgdown_file)) {
     log_message(
       "{.file {pkgdown_file}} not found",
@@ -661,58 +655,123 @@ check_pkgdown <- function(pkgdown_file, pkg_name, verbose = TRUE) {
     )
     return()
   }
+  reference_start <- reference_start[1]
 
-  has_subtitle <- any(
-    grepl('subtitle: "Package overview"', pkgdown_content)
-  )
-  has_package_entry <- any(
-    grepl(paste0("- ", pkg_name, "-package"), pkgdown_content)
-  )
-  has_logo_entry <- any(
-    grepl(paste0("- ", tolower(pkg_name), "_logo"), pkgdown_content)
+  reference_end <- length(pkgdown_content)
+  if (reference_start < length(pkgdown_content)) {
+    for (i in (reference_start + 1):length(pkgdown_content)) {
+      if (grepl("^[A-Za-z]", pkgdown_content[i]) && !grepl("^\\s", pkgdown_content[i])) {
+        reference_end <- i - 1
+        break
+      }
+    }
+  }
+
+  target_entries <- c(
+    paste0("  - ", pkg_name, "-package"),
+    paste0("  - ", tolower(pkg_name), "_logo"),
+    paste0("  - print.", tolower(pkg_name), "_logo")
   )
 
-  if (!has_subtitle || !has_package_entry || !has_logo_entry) {
+  ref_lines <- if (reference_start + 1 <= reference_end) {
+    pkgdown_content[(reference_start + 1):reference_end]
+  } else {
+    character(0)
+  }
+  subtitle_in_ref <- which(grepl('^- subtitle: "Package overview"$', ref_lines))
+
+  modified <- FALSE
+
+  if (length(subtitle_in_ref) == 0) {
+    insert_block <- c(
+      "",
+      "- subtitle: \"Package overview\"",
+      "- contents:",
+      target_entries
+    )
+
+    pkgdown_content <- c(
+      pkgdown_content[1:reference_start],
+      insert_block,
+      pkgdown_content[(reference_start + 1):length(pkgdown_content)]
+    )
+    modified <- TRUE
+  } else {
+    subtitle_global <- reference_start + subtitle_in_ref[1]
+
+    next_subtitle_in_ref <- which(
+      grepl("^- subtitle:", ref_lines) & (seq_along(ref_lines) > subtitle_in_ref[1])
+    )
+    block_end <- if (length(next_subtitle_in_ref) > 0) {
+      reference_start + next_subtitle_in_ref[1] - 1
+    } else {
+      reference_end
+    }
+
+    if (subtitle_global + 1 <= block_end) {
+      block_lines <- pkgdown_content[(subtitle_global + 1):block_end]
+    } else {
+      block_lines <- character(0)
+    }
+
+    contents_rel <- which(grepl("^- contents:$", block_lines))
+
+    if (length(contents_rel) == 0) {
+      pkgdown_content <- append(
+        pkgdown_content,
+        values = c("- contents:", target_entries),
+        after = subtitle_global
+      )
+      modified <- TRUE
+    } else {
+      contents_global <- subtitle_global + contents_rel[1]
+
+      item_start <- contents_global + 1
+      item_end <- contents_global
+      while (item_end + 1 <= block_end && grepl("^  - ", pkgdown_content[item_end + 1])) {
+        item_end <- item_end + 1
+      }
+
+      existing_items <- if (item_end >= item_start) {
+        pkgdown_content[item_start:item_end]
+      } else {
+        character(0)
+      }
+
+      other_items <- existing_items[!(existing_items %in% target_entries)]
+      new_items <- c(target_entries, other_items)
+
+      if (!identical(existing_items, new_items)) {
+        if (item_end >= item_start) {
+          pkgdown_content <- c(
+            pkgdown_content[1:(item_start - 1)],
+            new_items,
+            pkgdown_content[(item_end + 1):length(pkgdown_content)]
+          )
+        } else {
+          pkgdown_content <- append(
+            pkgdown_content,
+            values = new_items,
+            after = contents_global
+          )
+        }
+        modified <- TRUE
+      }
+    }
+  }
+
+  if (modified) {
     log_message(
       "Updating {.file {pkgdown_file}} with package overview section",
       message_type = "running",
       verbose = verbose
     )
-
-    insert_pos <- reference_start + 1
-
-    new_content <- c()
-    if (!has_subtitle) {
-      new_content <- c(new_content, "", "- subtitle: \"Package overview\"")
-    }
-    if (!has_package_entry || !has_logo_entry) {
-      new_content <- c(new_content, "- contents:")
-      if (!has_package_entry) {
-        new_content <- c(
-          new_content, paste0("  - ", pkg_name, "-package")
-        )
-      }
-      if (!has_logo_entry) {
-        new_content <- c(
-          new_content, paste0("  - ", tolower(pkg_name), "_logo")
-        )
-      }
-    }
-
-    if (length(new_content) > 0) {
-      updated_content <- c(
-        pkgdown_content[1:insert_pos],
-        new_content,
-        pkgdown_content[(insert_pos + 1):length(pkgdown_content)]
-      )
-
-      writeLines(updated_content, pkgdown_file)
-      log_message(
-        "Successfully updated {.file {pkgdown_file}}",
-        message_type = "success",
-        verbose = verbose
-      )
-    }
+    writeLines(pkgdown_content, pkgdown_file)
+    log_message(
+      "Successfully updated {.file {pkgdown_file}}",
+      message_type = "success",
+      verbose = verbose
+    )
   } else {
     log_message(
       "Package overview section already present in {.file {pkgdown_file}}",

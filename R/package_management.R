@@ -184,6 +184,7 @@ remove_r <- function(
 
 #' @title Check if a package is installed with the specified version
 #'
+#' @md
 #' @inheritParams check_r
 #' @param pkg Package name.
 #' @param version Package version to check. If `NULL`, only checks if the package is installed.

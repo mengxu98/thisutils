@@ -9,7 +9,6 @@ add_pkg_file(
   figlet_font = "Slant",
   colors = c("red", "yellow", "green", "magenta", "cyan", "yellow", "green", "white",
     "magenta", "cyan"),
-  unicode = TRUE,
   verbose = TRUE
 )
 }
@@ -21,9 +20,6 @@ Default is \code{TRUE}. Details see \link{figlet}.}
 Default is \code{"Slant"}.}
 
 \item{colors}{Character vector, colors to use for the logo elements.}
-
-\item{unicode}{Whether to use Unicode symbols.
-Default is \code{TRUE}.}
 
 \item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
