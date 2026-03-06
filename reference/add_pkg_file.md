@@ -10,7 +10,6 @@ add_pkg_file(
   figlet_font = "Slant",
   colors = c("red", "yellow", "green", "magenta", "cyan", "yellow", "green", "white",
     "magenta", "cyan"),
-  unicode = TRUE,
   verbose = TRUE
 )
 ```
@@ -30,10 +29,6 @@ add_pkg_file(
 - colors:
 
   Character vector, colors to use for the logo elements.
-
-- unicode:
-
-  Whether to use Unicode symbols. Default is `TRUE`.
 
 - verbose:
 

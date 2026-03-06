@@ -16,7 +16,7 @@ check_pkg_status(pkg, version = NULL, lib = .libPaths()[1])
 
 - version:
 
-  Package version to check. If \`NULL\`, only checks if the package is
+  Package version to check. If `NULL`, only checks if the package is
   installed.
 
 - lib:
@@ -25,5 +25,5 @@ check_pkg_status(pkg, version = NULL, lib = .libPaths()[1])
 
 ## Value
 
-\`TRUE\` if the package is installed with the specified version,
-\`FALSE\` otherwise.
+`TRUE` if the package is installed with the specified version, `FALSE`
+otherwise.
