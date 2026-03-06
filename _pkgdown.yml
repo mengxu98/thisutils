@@ -38,6 +38,8 @@ reference:
 - contents:
   - thisutils-package
   - thisutils_logo
+  - print.thisutils_logo
+
 
 - subtitle: "Parallel processing"
 - contents:
@@ -84,7 +86,6 @@ reference:
   - meanp
   - minimump
   - normalization
-  - print.thisutils_logo
   - r_square
   - remove_space
   - split_indices
