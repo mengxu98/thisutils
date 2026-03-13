@@ -28,5 +28,5 @@ The \\R^2\\ value.
 y <- rnorm(100)
 y_pred <- y + rnorm(100, sd = 0.5)
 r_square(y, y_pred)
-#> [1] 0.7778111
+#> [1] 0.7681726
 ```
