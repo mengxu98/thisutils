@@ -166,38 +166,46 @@ normalization <- function(
     )
   )
   na_index <- which(is.na(x))
-  x[na_index] <- 0
+  x_calc <- x
+  x_calc[na_index] <- NA
   x <- switch(
     EXPR = method,
     "max_min" = {
-      min_x <- min(x)
-      max_x <- max(x)
-      (x - min_x) / (max_x - min_x)
+      min_x <- min(x_calc, na.rm = TRUE)
+      max_x <- max(x_calc, na.rm = TRUE)
+      (x_calc - min_x) / (max_x - min_x)
     },
     "maximum" = {
-      max_abs_x <- max(abs(x))
-      x / max_abs_x
+      max_abs_x <- max(abs(x_calc), na.rm = TRUE)
+      x_calc / max_abs_x
     },
     "sum" = {
-      x / sum(abs(x))
+      x_calc / sum(abs(x_calc), na.rm = TRUE)
     },
     "softmax" = {
-      temp <- (x - mean(x)) / stats::sd(x)
-      exp(temp) / sum(exp(temp))
+      temp <- (x_calc - mean(x_calc, na.rm = TRUE)) / stats::sd(x_calc, na.rm = TRUE)
+      exp(temp) / sum(exp(temp), na.rm = TRUE)
     },
     "z_score" = {
-      (x - mean(x)) / stats::sd(x)
+      (x_calc - mean(x_calc, na.rm = TRUE)) / stats::sd(x_calc, na.rm = TRUE)
     },
     "mad" = {
-      (x - stats::median(x)) / stats::mad(x)
+      (x_calc - stats::median(x_calc, na.rm = TRUE)) / stats::mad(x_calc, na.rm = TRUE)
     },
     "unit_vector" = {
-      x / sqrt(sum(x^2))
+      x_calc / sqrt(sum(x_calc^2, na.rm = TRUE))
+    },
+    "robust_scale" = {
+      q1 <- stats::quantile(x_calc, 0.25, na.rm = TRUE)
+      q3 <- stats::quantile(x_calc, 0.75, na.rm = TRUE)
+      iqr <- q3 - q1
+      med <- stats::median(x_calc, na.rm = TRUE)
+      (x_calc - med) / iqr
     }
   )
 
-  if (!na_rm) {
-    x[na_index] <- NA
+  if (na_rm) {
+    x[na_index] <- 0
   }
 
   x
@@ -251,6 +259,7 @@ matrix_process <- function(
   if (is.function(method)) {
     matrix_processed <- method(matrix, ...)
   } else {
+    method <- match.arg(method)
     matrix_processed <- switch(
       EXPR = method,
       "raw" = {
