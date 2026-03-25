@@ -11,6 +11,7 @@ parallelize_fun(
   export_fun = NULL,
   clean_result = FALSE,
   throw_error = TRUE,
+  progress_bar_width = 18L,
   timestamp_format = paste0("[", format(Sys.time(), "\%Y-\%m-\%d \%H:\%M:\%S"), "] "),
   verbose = TRUE
 )
@@ -31,6 +32,9 @@ Default is \code{FALSE}.}
 
 \item{throw_error}{Whether to print detailed error information for failed results.
 Default is \code{TRUE}.}
+
+\item{progress_bar_width}{Width of the verbose progress bar in characters.
+Default is \code{18L}.}
 
 \item{timestamp_format}{Format string for timestamp display.
 Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
