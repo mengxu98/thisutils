@@ -78,7 +78,10 @@ sparse_cor <- function(
       y <- as_matrix(y, return_sparse = TRUE)
     }
     if (nrow(x) != nrow(y)) {
-      stop("x and y must have the same number of rows.")
+      log_message(
+        "{.arg x} and {.arg y} must have the same number of rows",
+        message_type = "error"
+      )
     }
   }
 
