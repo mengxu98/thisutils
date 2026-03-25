@@ -12,6 +12,8 @@
 #' Default is `FALSE`.
 #' @param throw_error Whether to print detailed error information for failed results.
 #' Default is `TRUE`.
+#' @param progress_bar_width Width of the verbose progress bar in characters.
+#' Default is `10L`.
 #'
 #' @return
 #' A list of computed results.
@@ -54,16 +56,20 @@
 #'   x^2
 #' }, throw_error = FALSE)
 parallelize_fun <- function(
-    x,
-    fun,
-    cores = 1,
-    export_fun = NULL,
-    clean_result = FALSE,
-    throw_error = TRUE,
-    timestamp_format = paste0(
-      "[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] "
-    ),
-    verbose = TRUE) {
+  x,
+  fun,
+  cores = 1,
+  export_fun = NULL,
+  clean_result = FALSE,
+  throw_error = TRUE,
+  progress_bar_width = 10L,
+  timestamp_format = paste0(
+    "[",
+    format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+    "] "
+  ),
+  verbose = TRUE
+) {
   total <- length(x)
   has_names <- !is.null(names(x)) && any(names(x) != "")
   is_vector <- is.vector(x) && !is.list(x)
@@ -80,7 +86,8 @@ parallelize_fun <- function(
       format = paste0(
         "{cli::make_ansi_style('orange')(cli::pb_spin)} {timestamp_format}",
         "Running for {.pkg {cli::pb_status}}[{.pkg {cli::pb_current}}/{.pkg {cli::pb_total}}] ",
-        "{cli::pb_bar} {cli::pb_percent} | ETA: {.pkg {cli::pb_eta}}"
+        "{(parallel_progress_bar(cli::pb_current, cli::pb_total, progress_bar_width))} ",
+        "{cli::pb_percent} | ETA: {.pkg {cli::pb_eta}}"
       ),
       format_done = paste0(
         "{cli::col_green(cli::symbol$tick)} {timestamp_format}",
@@ -92,7 +99,7 @@ parallelize_fun <- function(
     )
   }
 
-  .safe_call <- function(fun, ...) {
+  safe_call <- function(fun, ...) {
     msg_con <- file(nullfile(), open = "w")
     sink(msg_con, type = "message")
     on.exit({
@@ -114,7 +121,7 @@ parallelize_fun <- function(
 
       for (i in seq_along(x)) {
         output_list[i] <- list(tryCatch(
-          .safe_call(fun, x[[i]]),
+          safe_call(fun, x[[i]]),
           error = function(e) {
             structure(
               list(
@@ -139,9 +146,10 @@ parallelize_fun <- function(
       cli::cli_progress_done(id = pb)
     } else {
       output_list <- base::lapply(
-        X = x, FUN = function(xi) {
+        X = x,
+        FUN = function(xi) {
           tryCatch(
-            .safe_call(fun, xi),
+            safe_call(fun, xi),
             error = function(e) {
               structure(
                 list(
@@ -158,7 +166,7 @@ parallelize_fun <- function(
   }
 
   if (cores > 1) {
-    cores <- .cores_detect(cores, total)
+    cores <- cores_detect(cores, total)
     doParallel::registerDoParallel(cores = cores)
 
     log_message(
@@ -183,23 +191,24 @@ parallelize_fun <- function(
           i = chunk,
           .combine = "c",
           .export = export_fun
-        ) %dopar% {
-          list(
-            tryCatch(
-              .safe_call(fun, x[[i]]),
-              error = function(e) {
-                structure(
-                  list(
-                    error = e$message,
-                    index = i,
-                    input = x[[i]]
-                  ),
-                  class = "parallelize_error"
-                )
-              }
+        ) %dopar%
+          {
+            list(
+              tryCatch(
+                safe_call(fun, x[[i]]),
+                error = function(e) {
+                  structure(
+                    list(
+                      error = e$message,
+                      index = i,
+                      input = x[[i]]
+                    ),
+                    class = "parallelize_error"
+                  )
+                }
+              )
             )
-          )
-        }
+          }
 
         output_chunks[[chunk_idx]] <- chunk_results
 
@@ -241,21 +250,22 @@ parallelize_fun <- function(
       output_list <- foreach::foreach(
         i = seq_along(x),
         .export = export_fun
-      ) %dopar% {
-        tryCatch(
-          .safe_call(fun, x[[i]]),
-          error = function(e) {
-            structure(
-              list(
-                error = e$message,
-                index = i,
-                input = x[[i]]
-              ),
-              class = "parallelize_error"
-            )
-          }
-        )
-      }
+      ) %dopar%
+        {
+          tryCatch(
+            safe_call(fun, x[[i]]),
+            error = function(e) {
+              structure(
+                list(
+                  error = e$message,
+                  index = i,
+                  input = x[[i]]
+                ),
+                class = "parallelize_error"
+              )
+            }
+          )
+        }
     }
 
     doParallel::stopImplicitCluster()
@@ -268,7 +278,9 @@ parallelize_fun <- function(
   )
 
   error_indices <- vapply(
-    output_list, function(x) inherits(x, "parallelize_error"), logical(1)
+    output_list,
+    function(x) inherits(x, "parallelize_error"),
+    logical(1)
   )
   if (any(error_indices)) {
     log_message(
@@ -282,9 +294,10 @@ parallelize_fun <- function(
       error_objects <- output_list[error_indices]
       error_inputs <- x[error_indices]
 
-      # Group errors by message
       error_msgs <- vapply(
-        error_objects, function(e) e$error, character(1)
+        error_objects,
+        function(e) e$error,
+        character(1)
       )
       error_groups <- split(
         seq_along(error_msgs),
@@ -292,7 +305,8 @@ parallelize_fun <- function(
       )
 
       group_lines <- vapply(
-        names(error_groups), function(msg) {
+        names(error_groups),
+        function(msg) {
           idx <- error_groups[[msg]]
           inputs <- error_inputs[idx]
           n <- length(idx)
@@ -350,9 +364,45 @@ parallelize_fun <- function(
   return(output_list)
 }
 
-.cores_detect <- function(
-    cores = 1,
-    num_session = NULL) {
+parallel_progress_bar <- function(
+  current,
+  total,
+  width = 10L
+) {
+  width <- suppressWarnings(as.integer(width[[1]]))
+  if (is.na(width) || width < 1L) {
+    width <- 10L
+  }
+
+  current <- suppressWarnings(as.numeric(current))
+  total <- suppressWarnings(as.numeric(total))
+
+  if (!is.finite(total) || total <= 0) {
+    return("")
+  }
+
+  if (!is.finite(current)) {
+    current <- 0
+  }
+
+  current <- max(0, min(current, total))
+  filled <- floor(width * current / total)
+  if (current >= total) {
+    filled <- width
+  }
+
+  empty <- max(width - filled, 0L)
+
+  paste0(
+    cli::col_green(strrep("\u25A0", filled)),
+    strrep(" ", empty)
+  )
+}
+
+cores_detect <- function(
+  cores = 1,
+  num_session = NULL
+) {
   if (is.null(num_session)) {
     return(1)
   }
