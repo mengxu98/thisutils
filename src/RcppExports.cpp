@@ -10,6 +10,46 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// compute_simpson_index_cpp
+NumericVector compute_simpson_index_cpp(const NumericMatrix& D, const IntegerMatrix& knn_idx, const IntegerVector& batch_labels, double perplexity, double tol, int max_iter);
+RcppExport SEXP _thisutils_compute_simpson_index_cpp(SEXP DSEXP, SEXP knn_idxSEXP, SEXP batch_labelsSEXP, SEXP perplexitySEXP, SEXP tolSEXP, SEXP max_iterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const IntegerMatrix& >::type knn_idx(knn_idxSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type batch_labels(batch_labelsSEXP);
+    Rcpp::traits::input_parameter< double >::type perplexity(perplexitySEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_simpson_index_cpp(D, knn_idx, batch_labels, perplexity, tol, max_iter));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lisi_exact_knn_cpp
+List lisi_exact_knn_cpp(const NumericMatrix& X, int k);
+RcppExport SEXP _thisutils_lisi_exact_knn_cpp(SEXP XSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(lisi_exact_knn_cpp(X, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// drop_self_from_knn_cpp
+List drop_self_from_knn_cpp(const IntegerMatrix& nn_idx, const NumericMatrix& nn_dists);
+RcppExport SEXP _thisutils_drop_self_from_knn_cpp(SEXP nn_idxSEXP, SEXP nn_distsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const IntegerMatrix& >::type nn_idx(nn_idxSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type nn_dists(nn_distsSEXP);
+    rcpp_result_gen = Rcpp::wrap(drop_self_from_knn_cpp(nn_idx, nn_dists));
+    return rcpp_result_gen;
+END_RCPP
+}
 // matrix_to_table
 DataFrame matrix_to_table(SEXP matrix, Nullable<CharacterVector> row_names, Nullable<CharacterVector> col_names, double threshold, bool keep_zero);
 RcppExport SEXP _thisutils_matrix_to_table(SEXP matrixSEXP, SEXP row_namesSEXP, SEXP col_namesSEXP, SEXP thresholdSEXP, SEXP keep_zeroSEXP) {
@@ -54,6 +94,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_thisutils_compute_simpson_index_cpp", (DL_FUNC) &_thisutils_compute_simpson_index_cpp, 6},
+    {"_thisutils_lisi_exact_knn_cpp", (DL_FUNC) &_thisutils_lisi_exact_knn_cpp, 2},
+    {"_thisutils_drop_self_from_knn_cpp", (DL_FUNC) &_thisutils_drop_self_from_knn_cpp, 2},
     {"_thisutils_matrix_to_table", (DL_FUNC) &_thisutils_matrix_to_table, 5},
     {"_thisutils_split_indices", (DL_FUNC) &_thisutils_split_indices, 2},
     {"_thisutils_table_to_matrix", (DL_FUNC) &_thisutils_table_to_matrix, 5},
