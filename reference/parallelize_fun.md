@@ -68,11 +68,11 @@ parallelize_fun(1:3, function(x) {
   Sys.sleep(0.2)
   x^2
 })
-#> ℹ [2026-03-13 13:22:35] Using 1 core
-#> ⠙ [2026-03-13 13:22:35] Running for 1 [1/3] ■■■■■■■■■■■                       3…
-#> ✔ [2026-03-13 13:22:35] Completed 3 tasks in 628ms
+#> ℹ [2026-03-25 03:37:42] Using 1 core
+#> ⠙ [2026-03-25 03:37:42] Running for 1 [1/3] ■■■■■■■■■■■                       3…
+#> ✔ [2026-03-25 03:37:42] Completed 3 tasks in 628ms
 #> 
-#> ℹ [2026-03-13 13:22:35] Building results
+#> ℹ [2026-03-25 03:37:42] Building results
 #> $`1`
 #> [1] 1
 #> 
@@ -87,15 +87,15 @@ parallelize_fun(list(1, 2, 3), function(x) {
   Sys.sleep(0.2)
   x^2
 }, cores = 2)
-#> ℹ [2026-03-13 13:22:35] Using 2 cores
-#> ℹ [2026-03-13 13:22:35] Building results
-#> $`1`
+#> ℹ [2026-03-25 03:37:42] Using 2 cores
+#> ℹ [2026-03-25 03:37:42] Building results
+#> [[1]]
 #> [1] 1
 #> 
-#> $`2`
+#> [[2]]
 #> [1] 9
 #> 
-#> $`3`
+#> [[3]]
 #> [1] 4
 #> 
 
@@ -104,11 +104,11 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = FALSE)
-#> ℹ [2026-03-13 13:22:36] Using 1 core
-#> ℹ [2026-03-13 13:22:36] Building results
-#> ! [2026-03-13 13:22:36] Found 1 failed result
-#> ℹ [2026-03-13 13:22:36] ✖ Error details:
-#> ℹ                       ✖ "3": Error on element 3
+#> ℹ [2026-03-25 03:37:43] Using 1 core
+#> ℹ [2026-03-25 03:37:43] Building results
+#> ! [2026-03-25 03:37:43] Found 1 failed result
+#> ℹ [2026-03-25 03:37:43] ✖ Error details:
+#> ℹ                       ✖ Error on element 3 (1): "3"
 #> $`1`
 #> [1] 1
 #> 
@@ -139,12 +139,12 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = TRUE)
-#> ℹ [2026-03-13 13:22:36] Using 1 core
-#> ℹ [2026-03-13 13:22:36] Building results
-#> ! [2026-03-13 13:22:36] Found 1 failed result
-#> ℹ [2026-03-13 13:22:36] ✖ Error details:
-#> ℹ                       ✖ "3": Error on element 3
-#> ℹ [2026-03-13 13:22:36] Removed 1 failed result
+#> ℹ [2026-03-25 03:37:43] Using 1 core
+#> ℹ [2026-03-25 03:37:43] Building results
+#> ! [2026-03-25 03:37:43] Found 1 failed result
+#> ℹ [2026-03-25 03:37:43] ✖ Error details:
+#> ℹ                       ✖ Error on element 3 (1): "3"
+#> ℹ [2026-03-25 03:37:43] Removed 1 failed result
 #> $`1`
 #> [1] 1
 #> 
@@ -164,12 +164,12 @@ parallelize_fun(1:5, function(x) {
   if (x == 4) stop("Error on element 4")
   x^2
 })
-#> ℹ [2026-03-13 13:22:36] Using 1 core
-#> ℹ [2026-03-13 13:22:36] Building results
-#> ! [2026-03-13 13:22:36] Found 2 failed results
-#> ℹ [2026-03-13 13:22:36] ✖ Error details:
-#> ℹ                       ✖ "2": Error on element 3
-#> ℹ                       ✖ "4": Error on element 4
+#> ℹ [2026-03-25 03:37:43] Using 1 core
+#> ℹ [2026-03-25 03:37:43] Building results
+#> ! [2026-03-25 03:37:43] Found 2 failed results
+#> ℹ [2026-03-25 03:37:43] ✖ Error details:
+#> ℹ                       ✖ Error on element 3 (1): "2"
+#> ℹ                       ✖ Error on element 4 (1): "4"
 #> $`1`
 #> [1] 1
 #> 
@@ -210,9 +210,9 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, throw_error = FALSE)
-#> ℹ [2026-03-13 13:22:36] Using 1 core
-#> ℹ [2026-03-13 13:22:36] Building results
-#> ! [2026-03-13 13:22:36] Found 1 failed result
+#> ℹ [2026-03-25 03:37:43] Using 1 core
+#> ℹ [2026-03-25 03:37:43] Building results
+#> ! [2026-03-25 03:37:43] Found 1 failed result
 #> $`1`
 #> [1] 1
 #> 

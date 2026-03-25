@@ -1,6 +1,6 @@
 # Unnest a list-column
 
-Implement similar functions to the tidyr::unnest function.
+Implement similar functions to the `tidyr::unnest` function.
 
 ## Usage
 
