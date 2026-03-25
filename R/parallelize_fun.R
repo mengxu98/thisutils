@@ -70,8 +70,11 @@ parallelize_fun <- function(
   show_values <- !has_names && is_vector
 
   if (verbose) {
-    options(cli.progress_show_after = 0)
-    options(cli.progress_clear = FALSE)
+    old_cli_opts <- options(
+      cli.progress_show_after = 0,
+      cli.progress_clear = FALSE
+    )
+    on.exit(options(old_cli_opts), add = TRUE)
 
     pb <- cli::cli_progress_bar(
       format = paste0(
@@ -89,6 +92,16 @@ parallelize_fun <- function(
     )
   }
 
+  .safe_call <- function(fun, ...) {
+    msg_con <- file(nullfile(), open = "w")
+    sink(msg_con, type = "message")
+    on.exit({
+      sink(type = "message")
+      close(msg_con)
+    })
+    suppressWarnings(fun(...))
+  }
+
   if (cores == 1) {
     log_message(
       "Using {.pkg 1} core",
@@ -100,8 +113,8 @@ parallelize_fun <- function(
       output_list <- vector("list", total)
 
       for (i in seq_along(x)) {
-        output_list[[i]] <- tryCatch(
-          fun(x[[i]]),
+        output_list[i] <- list(tryCatch(
+          .safe_call(fun, x[[i]]),
           error = function(e) {
             structure(
               list(
@@ -112,7 +125,7 @@ parallelize_fun <- function(
               class = "parallelize_error"
             )
           }
-        )
+        ))
 
         if (has_names) {
           cli::cli_progress_update(id = pb, status = names(x)[i])
@@ -128,7 +141,7 @@ parallelize_fun <- function(
       output_list <- base::lapply(
         X = x, FUN = function(xi) {
           tryCatch(
-            fun(xi),
+            .safe_call(fun, xi),
             error = function(e) {
               structure(
                 list(
@@ -173,7 +186,7 @@ parallelize_fun <- function(
         ) %dopar% {
           list(
             tryCatch(
-              fun(x[[i]]),
+              .safe_call(fun, x[[i]]),
               error = function(e) {
                 structure(
                   list(
@@ -230,7 +243,7 @@ parallelize_fun <- function(
         .export = export_fun
       ) %dopar% {
         tryCatch(
-          fun(x[[i]]),
+          .safe_call(fun, x[[i]]),
           error = function(e) {
             structure(
               list(
@@ -253,10 +266,6 @@ parallelize_fun <- function(
     timestamp_format = timestamp_format,
     verbose = verbose
   )
-  if (verbose) {
-    options(cli.progress_show_after = NULL)
-    options(cli.progress_clear = NULL)
-  }
 
   error_indices <- vapply(
     output_list, function(x) inherits(x, "parallelize_error"), logical(1)
@@ -273,20 +282,45 @@ parallelize_fun <- function(
       error_objects <- output_list[error_indices]
       error_inputs <- x[error_indices]
 
-      error_message <- mapply(
-        function(error_obj, input_val) {
-          parse_inline_expressions(
-            "{.val {input_val}}: {.emph {error_obj$error}}"
+      # Group errors by message
+      error_msgs <- vapply(
+        error_objects, function(e) e$error, character(1)
+      )
+      error_groups <- split(
+        seq_along(error_msgs),
+        error_msgs
+      )
+
+      group_lines <- vapply(
+        names(error_groups), function(msg) {
+          idx <- error_groups[[msg]]
+          inputs <- error_inputs[idx]
+          n <- length(idx)
+          max_show <- 3
+          shown <- vapply(
+            utils::head(inputs, max_show),
+            function(v) {
+              parse_inline_expressions("{.val {v}}")
+            },
+            character(1)
           )
-        }, error_objects, error_inputs
+          task_str <- paste(shown, collapse = ", ")
+          if (n > max_show) {
+            task_str <- paste0(
+              task_str,
+              sprintf(" and %d more", n - max_show)
+            )
+          }
+          parse_inline_expressions(
+            paste0("{.emph ", msg, "} (", n, "): ", task_str)
+          )
+        },
+        character(1)
       )
-      error_message <- paste0(
-        error_message,
-        collapse = "\n"
-      )
+
       error_message <- paste0(
         "Error details:\n",
-        error_message
+        paste(group_lines, collapse = "\n")
       )
       log_message(
         error_message,
@@ -307,7 +341,11 @@ parallelize_fun <- function(
     }
   }
 
-  names(output_list) <- x
+  if (has_names) {
+    names(output_list) <- names(x)
+  } else if (is_vector) {
+    names(output_list) <- as.character(x)
+  }
 
   return(output_list)
 }
