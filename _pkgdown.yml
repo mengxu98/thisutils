@@ -40,7 +40,6 @@ reference:
   - thisutils_logo
   - print.thisutils_logo
 
-
 - subtitle: "Parallel processing"
 - contents:
   - parallelize_fun
@@ -75,6 +74,8 @@ reference:
   - capitalize
   - check_ci_env
   - check_sparsity
+  - compute_lisi
+  - compute_simpson_index
   - download
   - get_namespace_fun
   - invoke_fun
