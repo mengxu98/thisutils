@@ -70,23 +70,15 @@ invoke_fun <- function(
     ...,
     .env = rlang::caller_env()) {
   args <- c(.args, list(...))
-  .bury <- c(".fn", "")
-  if (rlang::is_null(.bury) || !length(args)) {
+  if (!length(args)) {
     if (rlang::is_scalar_character(.fn)) {
       .fn <- rlang::env_get(.env, .fn, inherit = TRUE)
     }
     call <- rlang::call2(.fn, !!!args)
     return(rlang::eval_bare(call, .env))
   }
-  if (!rlang::is_character(.bury, 2L)) {
-    log_message(
-      "{.arg .bury} must be a {.field character vector} of length 2",
-      message_type = "error"
-    )
-  }
-  arg_prefix <- .bury[[2]]
-  fn_nm <- .bury[[1]]
-  buried_nms <- paste0(arg_prefix, seq_along(args))
+  fn_nm <- ".fn"
+  buried_nms <- paste0("", seq_along(args))
   buried_args <- rlang::set_names(args, buried_nms)
   .env <- rlang::env(.env, !!!buried_args)
   args <- rlang::set_names(buried_nms, names(args))
