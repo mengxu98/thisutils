@@ -181,7 +181,7 @@ parallelize_fun <- function(
         rep(1:cores, length.out = total)
       )
 
-      output_chunks <- vector("list", total)
+      output_list <- vector("list", total)
       for (chunk_idx in seq_along(chunks)) {
         chunk <- chunks[[chunk_idx]]
 
@@ -210,7 +210,7 @@ parallelize_fun <- function(
             )
           }
 
-        output_chunks[[chunk_idx]] <- chunk_results
+        output_list[chunk] <- chunk_results
 
         if (has_names) {
           chunk_names <- names(x)[chunk]
@@ -242,8 +242,6 @@ parallelize_fun <- function(
       }
 
       cli::cli_progress_done(id = pb)
-
-      output_list <- unlist(output_chunks, recursive = FALSE)
     } else {
       i <- NULL
       "%dopar%" <- foreach::"%dopar%"
@@ -406,10 +404,23 @@ cores_detect <- function(
   if (is.null(num_session)) {
     return(1)
   }
-  cores <- min(
-    (parallel::detectCores(logical = FALSE) - 1),
-    cores,
-    num_session
+  detected_cores <- suppressWarnings(
+    parallel::detectCores(logical = FALSE)
   )
-  return(cores)
+  if (!is.finite(detected_cores) || detected_cores < 2) {
+    detected_cores <- 2L
+  }
+
+  max_cores <- max(1L, as.integer(detected_cores) - 1L)
+  requested_cores <- suppressWarnings(as.integer(cores[[1]]))
+  if (is.na(requested_cores) || requested_cores < 1L) {
+    requested_cores <- 1L
+  }
+
+  num_session <- suppressWarnings(as.integer(num_session[[1]]))
+  if (is.na(num_session) || num_session < 1L) {
+    num_session <- 1L
+  }
+
+  min(max_cores, requested_cores, num_session)
 }
