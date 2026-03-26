@@ -70,3 +70,34 @@ test_that("parallelize_fun with verbose progress bar", {
     parallelize_fun(1:3, function(x) x^2, verbose = TRUE)
   )
 })
+
+test_that("parallel progress bar uses supplied width", {
+  bar <- parallel_progress_bar(6, 10, 12L)
+  expect_equal(nchar(cli::ansi_strip(bar)), 12)
+})
+
+test_that("parallel progress bar falls back to default width", {
+  bar <- parallel_progress_bar(6, 10)
+  expect_equal(nchar(cli::ansi_strip(bar)), 10)
+})
+
+test_that("parallelize_fun accepts progress_bar_width argument", {
+  expect_no_error(
+    suppressMessages(
+      parallelize_fun(1:2, function(x) x^2, verbose = FALSE, progress_bar_width = 9L)
+    )
+  )
+})
+
+test_that("parallelize_fun preserves input order for multi-core execution", {
+  result <- suppressMessages(
+    parallelize_fun(1:6, function(x) x, cores = 2, verbose = TRUE)
+  )
+
+  expect_equal(unname(unlist(result)), 1:6)
+  expect_equal(names(result), as.character(1:6))
+})
+
+test_that("cores_detect falls back to at least one core", {
+  expect_gte(cores_detect(cores = 2, num_session = 4), 1)
+})
