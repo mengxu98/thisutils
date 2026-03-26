@@ -112,7 +112,7 @@ res <- compute_lisi(
   c("batch", "group"),
   perplexity = 10
 )
-#> ◌ [2026-03-26 06:53:11] Using "exact" nearest-neighbor backend for compute_lisi
+#> ◌ [2026-03-26 07:08:54] Using "exact" nearest-neighbor backend for compute_lisi
 head(res)
 #>      batch    group
 #> 1 1.001837 1.490901
