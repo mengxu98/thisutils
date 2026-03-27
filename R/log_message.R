@@ -7,6 +7,9 @@
 #'
 #' @md
 #' @param ... The message to print.
+#' @param expr An optional expression to evaluate while capturing its standard output,
+#' messages, and warnings, then re-printing them with `log_message()` formatting.
+#' The evaluated result is returned invisibly unless it is visible by default.
 #' @param verbose Whether to print the message.
 #' Default is `TRUE`.
 #' @param message_type Type of message.
@@ -58,7 +61,8 @@
 #' Default is `.envir`.
 #'
 #' @return
-#' Formated message, or a logical value (`TRUE`/`FALSE`/`NA`) if `message_type = "ask"`.
+#' Formated message, a logical value (`TRUE`/`FALSE`/`NA`) if `message_type = "ask"`,
+#' or the evaluated result of `expr` if `expr` is supplied.
 #'
 #' @references
 #' \url{https://cli.r-lib.org/articles/index.html}
@@ -330,27 +334,52 @@
 #'     message_type = "ask"
 #'   )
 #' }
+#'
+#' # capture output from another expression
+#' fun <- function() {
+#'   cat("This is standard output\n")
+#'   message("This is a message")
+#'   warning("This is a warning")
+#'   return(1 + 1)
+#' }
+#' fun()
+#'
+#' log_message(
+#'   expr = fun(),
+#'   message_type = "running"
+#' )
 log_message <- function(
-    ...,
-    verbose = TRUE,
-    message_type = c(
-      "info", "success", "warning", "error", "running", "ask"
-    ),
-    cli_model = TRUE,
-    level = 1,
-    symbol = "  ",
-    text_color = NULL,
-    back_color = NULL,
-    text_style = NULL,
-    multiline_indent = FALSE,
-    timestamp = TRUE,
-    timestamp_format = paste0(
-      "[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] "
-    ),
-    timestamp_style = FALSE,
-    plain_text = FALSE,
-    .envir = parent.frame(),
-    .frame = .envir) {
+  ...,
+  expr = NULL,
+  verbose = TRUE,
+  message_type = c(
+    "info",
+    "success",
+    "warning",
+    "error",
+    "running",
+    "ask"
+  ),
+  cli_model = TRUE,
+  level = 1,
+  symbol = "  ",
+  text_color = NULL,
+  back_color = NULL,
+  text_style = NULL,
+  multiline_indent = FALSE,
+  timestamp = TRUE,
+  timestamp_format = paste0(
+    "[",
+    format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+    "] "
+  ),
+  timestamp_style = FALSE,
+  plain_text = FALSE,
+  .envir = parent.frame(),
+  .frame = .envir
+) {
+  expr_supplied <- !missing(expr)
+  expr_quo <- if (expr_supplied) substitute(expr) else NULL
   verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
   msg <- build_message(...)
@@ -360,12 +389,20 @@ log_message <- function(
   }
   caller_call <- get_caller_call(.frame)
 
-  if (message_type == "error") {
-    cli::cli_abort(msg, call = caller_call, .envir = .envir)
+  if (expr_supplied && message_type %in% c("error", "ask")) {
+    cli::cli_abort(
+      paste0(
+        "{.arg message_type} cannot be {.val ",
+        message_type,
+        "} when {.arg expr} is supplied"
+      ),
+      call = caller_call,
+      .envir = .envir
+    )
   }
 
-  if (!verbose) {
-    return(invisible(NULL))
+  if (!expr_supplied && message_type == "error") {
+    cli::cli_abort(msg, call = caller_call, .envir = .envir)
   }
 
   validate_params(
@@ -378,7 +415,31 @@ log_message <- function(
     .frame = .frame
   )
 
-  if (message_type == "ask") {
+  if (!expr_supplied) {
+    if (!verbose) {
+      return(invisible(NULL))
+    }
+
+    if (message_type == "ask") {
+      output_message(
+        msg = msg,
+        message_type = message_type,
+        cli_model = cli_model,
+        text_color = text_color,
+        back_color = back_color,
+        text_style = text_style,
+        timestamp = timestamp,
+        timestamp_format = timestamp_format,
+        level = level,
+        symbol = symbol,
+        multiline_indent = multiline_indent,
+        timestamp_style = timestamp_style,
+        plain_text = plain_text,
+        .envir = .envir
+      )
+      return(utils::askYesNo(msg = ""))
+    }
+
     output_message(
       msg = msg,
       message_type = message_type,
@@ -395,27 +456,62 @@ log_message <- function(
       plain_text = plain_text,
       .envir = .envir
     )
-    return(utils::askYesNo(msg = ""))
+
+    return(invisible(NULL))
   }
 
-  output_message(
-    msg = msg,
-    message_type = message_type,
-    cli_model = cli_model,
-    text_color = text_color,
-    back_color = back_color,
-    text_style = text_style,
-    timestamp = timestamp,
-    timestamp_format = timestamp_format,
-    level = level,
-    symbol = symbol,
-    multiline_indent = multiline_indent,
-    timestamp_style = timestamp_style,
-    plain_text = plain_text,
+  if (verbose && nzchar(msg)) {
+    output_message(
+      msg = msg,
+      message_type = message_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      text_style = text_style,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent,
+      timestamp_style = timestamp_style,
+      plain_text = plain_text,
+      .envir = .envir
+    )
+  }
+
+  captured <- capture_logged_expression(
+    expr = expr_quo,
     .envir = .envir
   )
 
-  invisible(NULL)
+  if (verbose) {
+    emit_logged_events(
+      events = captured$events,
+      default_message_type = message_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      text_style = text_style,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = TRUE,
+      timestamp_style = timestamp_style,
+      plain_text = plain_text,
+      .envir = .envir
+    )
+  }
+
+  if (!is.null(captured$error)) {
+    stop(captured$error)
+  }
+
+  if (isTRUE(captured$visible)) {
+    return(captured$value)
+  }
+
+  invisible(captured$value)
 }
 
 #' @title Get the verbose option
@@ -425,6 +521,7 @@ log_message <- function(
 #'
 #' @param verbose The verbose option.
 #' Default is `NULL`, which means to get the verbose option from the global options.
+#'
 #' @return The verbose option.
 #' @export
 #'
@@ -481,7 +578,8 @@ build_message <- function(...) {
   }
 
   processed_args <- lapply(
-    args, function(arg) {
+    args,
+    function(arg) {
       if (is.character(arg) && length(arg) == 1) {
         return(arg)
       } else if (is.character(arg)) {
@@ -513,17 +611,304 @@ build_message <- function(...) {
   capitalize(msg)
 }
 
+capture_logged_expression <- function(
+  expr,
+  .envir = parent.frame()
+) {
+  events <- list()
+  output_buffer <- character()
+  output_index <- 0L
+  pending_output <- character(0)
+  result <- NULL
+  visible <- FALSE
+  captured_error <- NULL
+
+  append_event <- function(type, text) {
+    events[[length(events) + 1]] <<- list(
+      type = type,
+      text = text
+    )
+  }
+
+  append_output_text <- function(text) {
+    if (!nzchar(text)) {
+      return(invisible(NULL))
+    }
+
+    combined_text <- paste0(
+      paste0(pending_output, collapse = ""),
+      text
+    )
+    lines <- strsplit(combined_text, "\n", fixed = TRUE)[[1]]
+    ends_with_newline <- substr(combined_text, nchar(combined_text), nchar(combined_text)) == "\n"
+
+    if (ends_with_newline) {
+      complete_lines <- lines
+      if (length(complete_lines) > 0 && identical(utils::tail(complete_lines, 1), "")) {
+        complete_lines <- utils::head(complete_lines, -1)
+      }
+      pending_output <<- character(0)
+    } else {
+      complete_lines <- utils::head(lines, -1)
+      pending_output <<- utils::tail(lines, 1)
+    }
+
+    for (line in complete_lines) {
+      append_event("output", line)
+    }
+
+    invisible(NULL)
+  }
+
+  flush_pending_output <- function() {
+    if (length(pending_output) == 0) {
+      return(invisible(NULL))
+    }
+
+    append_event("output", paste0(pending_output, collapse = ""))
+    pending_output <<- character(0)
+
+    invisible(NULL)
+  }
+
+  flush_output_events <- function() {
+    if (length(output_buffer) <= output_index) {
+      return(invisible(NULL))
+    }
+
+    new_lines <- output_buffer[seq.int(
+      output_index + 1L,
+      length(output_buffer)
+    )]
+    output_index <<- length(output_buffer)
+
+    for (line in new_lines) {
+      append_output_text(paste0(line, "\n"))
+    }
+
+    invisible(NULL)
+  }
+
+  rewrite_cat_calls <- function(x, helper_symbol) {
+    if (is.call(x)) {
+      pieces <- lapply(as.list(x), rewrite_cat_calls, helper_symbol = helper_symbol)
+
+      if (is.symbol(pieces[[1]]) && identical(as.character(pieces[[1]]), "cat")) {
+        pieces[[1]] <- helper_symbol
+      }
+
+      return(as.call(pieces))
+    }
+
+    if (is.pairlist(x)) {
+      return(as.pairlist(lapply(x, rewrite_cat_calls, helper_symbol = helper_symbol)))
+    }
+
+    x
+  }
+
+  helper_name <- ".__thisutils_log_message_cat__"
+  helper_symbol <- as.symbol(helper_name)
+  helper_exists <- exists(helper_name, envir = .envir, inherits = FALSE)
+  if (helper_exists) {
+    helper_old <- get(helper_name, envir = .envir, inherits = FALSE)
+  }
+  cat_exists <- exists("cat", envir = .envir, inherits = FALSE)
+  if (cat_exists) {
+    cat_old <- get("cat", envir = .envir, inherits = FALSE)
+  }
+
+  intercepted_cat <- function(
+    ...,
+    file = "",
+    sep = " ",
+    fill = FALSE,
+    labels = NULL,
+    append = FALSE
+  ) {
+    use_base_cat <- !identical(file, "") || !identical(fill, FALSE) ||
+      !is.null(labels) || !identical(append, FALSE)
+
+    if (use_base_cat) {
+      return(base::cat(
+        ...,
+        file = file,
+        sep = sep,
+        fill = fill,
+        labels = labels,
+        append = append
+      ))
+    }
+
+    pieces <- unlist(
+      lapply(list(...), as.character),
+      use.names = FALSE
+    )
+    append_output_text(paste0(paste0(pieces, collapse = sep), collapse = ""))
+
+    invisible(NULL)
+  }
+
+  assign(helper_name, intercepted_cat, envir = .envir)
+  assign("cat", intercepted_cat, envir = .envir)
+  on.exit(
+    {
+      if (helper_exists) {
+        assign(helper_name, helper_old, envir = .envir)
+      } else if (exists(helper_name, envir = .envir, inherits = FALSE)) {
+        rm(list = helper_name, envir = .envir)
+      }
+
+      if (cat_exists) {
+        assign("cat", cat_old, envir = .envir)
+      } else if (exists("cat", envir = .envir, inherits = FALSE)) {
+        rm(list = "cat", envir = .envir)
+      }
+    },
+    add = TRUE
+  )
+
+  output_con <- textConnection("output_buffer", open = "w", local = TRUE)
+  sink(output_con, type = "output")
+
+  output_sink_active <- TRUE
+  output_con_open <- TRUE
+
+  release_output_capture <- function() {
+    if (output_sink_active) {
+      sink(type = "output")
+      output_sink_active <<- FALSE
+    }
+
+    if (output_con_open) {
+      close(output_con)
+      output_con_open <<- FALSE
+    }
+
+    flush_output_events()
+    flush_pending_output()
+
+    invisible(NULL)
+  }
+
+  on.exit(
+    release_output_capture(),
+    add = TRUE
+  )
+
+  value <- tryCatch(
+    withVisible(
+      withCallingHandlers(
+        eval(
+          rewrite_cat_calls(expr, helper_symbol = helper_symbol),
+          envir = .envir
+        ),
+        message = function(m) {
+          flush_output_events()
+          flush_pending_output()
+          append_event(
+            "message",
+            sub("[\r\n]+$", "", conditionMessage(m))
+          )
+          invokeRestart("muffleMessage")
+        },
+        warning = function(w) {
+          flush_output_events()
+          flush_pending_output()
+          append_event(
+            "warning",
+            sub("[\r\n]+$", "", conditionMessage(w))
+          )
+          invokeRestart("muffleWarning")
+        }
+      )
+    ),
+    error = function(e) {
+      flush_output_events()
+      flush_pending_output()
+      captured_error <<- e
+      list(value = NULL, visible = FALSE)
+    }
+  )
+
+  release_output_capture()
+
+  result <- value$value
+  visible <- value$visible
+
+  list(
+    value = result,
+    visible = visible,
+    events = events,
+    error = captured_error
+  )
+}
+
+emit_logged_events <- function(
+  events,
+  default_message_type,
+  cli_model,
+  text_color,
+  back_color,
+  text_style,
+  timestamp,
+  timestamp_format,
+  level,
+  symbol,
+  multiline_indent,
+  timestamp_style,
+  plain_text,
+  .envir = parent.frame()
+) {
+  if (length(events) == 0) {
+    return(invisible(NULL))
+  }
+
+  for (event in events) {
+    event_message_type <- if (identical(event$type, "warning")) {
+      "warning"
+    } else {
+      default_message_type
+    }
+
+    output_message(
+      msg = event$text,
+      message_type = event_message_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      text_style = text_style,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline_indent,
+      timestamp_style = timestamp_style,
+      plain_text = plain_text,
+      .envir = .envir
+    )
+  }
+
+  invisible(NULL)
+}
+
 validate_params <- function(
-    level,
-    symbol,
-    text_color,
-    back_color,
-    text_style,
-    timestamp_style,
-    .frame) {
+  level,
+  symbol,
+  text_color,
+  back_color,
+  text_style,
+  timestamp_style,
+  .frame
+) {
   caller_call <- get_caller_call(.frame)
 
-  if (!is.numeric(level) || length(level) != 1 || level < 1 || level != round(level)) {
+  if (
+    !is.numeric(level) ||
+      length(level) != 1 ||
+      level < 1 ||
+      level != round(level)
+  ) {
     cli::cli_abort(
       "{.arg level} must be a positive integer",
       call = caller_call,
@@ -539,9 +924,7 @@ validate_params <- function(
     )
   }
 
-  validate_color_param <- function(color_value,
-                                   param_name,
-                                   caller_call) {
+  validate_color_param <- function(color_value, param_name, caller_call) {
     if (!is.null(color_value) && !check_color(color_value)) {
       error_msg <- paste0(
         "{.arg {param_name}} must be a valid color name, ",
@@ -558,7 +941,9 @@ validate_params <- function(
   validate_color_param(text_color, "text_color", caller_call)
   validate_color_param(back_color, "back_color", caller_call)
 
-  if (!is.null(text_color) && !is.null(back_color) && text_color == back_color) {
+  if (
+    !is.null(text_color) && !is.null(back_color) && text_color == back_color
+  ) {
     cli::cli_abort(
       "{.arg text_color} and {.arg back_color} cannot be the same color",
       call = caller_call,
@@ -568,7 +953,12 @@ validate_params <- function(
 
   if (!is.null(text_style)) {
     valid_styles <- c(
-      "bold", "italic", "underline", "strikethrough", "dim", "inverse"
+      "bold",
+      "italic",
+      "underline",
+      "strikethrough",
+      "dim",
+      "inverse"
     )
     if (!all(text_style %in% valid_styles)) {
       cli::cli_abort(
@@ -599,13 +989,14 @@ get_indent_part <- function(symbol, level) {
 }
 
 format_line_with_style <- function(
-    line,
-    prefix,
-    text_color,
-    back_color,
-    text_style,
-    timestamp_style,
-    .envir) {
+  line,
+  prefix,
+  text_color,
+  back_color,
+  text_style,
+  timestamp_style,
+  .envir
+) {
   if (is.null(text_color) && is.null(back_color) && is.null(text_style)) {
     return(paste0(prefix, line))
   }
@@ -634,9 +1025,10 @@ format_line_with_style <- function(
 }
 
 output_cli_message <- function(
-    message,
-    message_type,
-    .envir = parent.frame()) {
+  message,
+  message_type,
+  .envir = parent.frame()
+) {
   switch(
     EXPR = message_type,
     "info" = cli::cli_alert_info(message, .envir = .envir),
@@ -644,7 +1036,9 @@ output_cli_message <- function(
     "warning" = cli::cli_alert_warning(message, .envir = .envir),
     "running" = cli::cli_text(
       paste0(
-        cli::make_ansi_style("orange")(cli::symbol$circle_dotted), " ", message
+        cli::make_ansi_style("orange")(cli::symbol$circle_dotted),
+        " ",
+        message
       ),
       .envir = .envir
     ),
@@ -659,20 +1053,21 @@ output_cli_message <- function(
 }
 
 output_message <- function(
-    msg,
-    message_type,
-    cli_model,
-    text_color,
-    back_color,
-    text_style,
-    timestamp,
-    timestamp_format,
-    level,
-    symbol,
-    multiline_indent,
-    timestamp_style,
-    plain_text,
-    .envir = parent.frame()) {
+  msg,
+  message_type,
+  cli_model,
+  text_color,
+  back_color,
+  text_style,
+  timestamp,
+  timestamp_format,
+  level,
+  symbol,
+  multiline_indent,
+  timestamp_style,
+  plain_text,
+  .envir = parent.frame()
+) {
   if (plain_text) {
     plain_msg <- if (length(msg) == 1) {
       msg
@@ -762,11 +1157,15 @@ output_message <- function(
     if (symbol != "  ") {
       final_msg <- paste0(
         timestamp_part,
-        paste(rep(symbol, level), collapse = ""), " ", msg
+        paste(rep(symbol, level), collapse = ""),
+        " ",
+        msg
       )
     } else {
       final_msg <- paste0(
-        timestamp_part, indent_part, msg
+        timestamp_part,
+        indent_part,
+        msg
       )
     }
 
@@ -843,12 +1242,13 @@ output_message <- function(
 }
 
 style_formatting <- function(
-    msg,
-    text_color,
-    back_color,
-    text_style,
-    cli_model,
-    .envir = parent.frame()) {
+  msg,
+  text_color,
+  back_color,
+  text_style,
+  cli_model,
+  .envir = parent.frame()
+) {
   if (is.null(text_color) && is.null(back_color) && is.null(text_style)) {
     return(msg)
   }
@@ -884,12 +1284,13 @@ style_formatting <- function(
 }
 
 plain_text_output <- function(
-    text,
-    cli_model,
-    text_color,
-    back_color,
-    text_style,
-    .envir = parent.frame()) {
+  text,
+  cli_model,
+  text_color,
+  back_color,
+  text_style,
+  .envir = parent.frame()
+) {
   if (cli_model) {
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
       text <- style_formatting(
@@ -926,8 +1327,9 @@ plain_text_output <- function(
 }
 
 get_caller_call <- function(
-    frame = parent.frame(),
-    max_depth = 10) {
+  frame = parent.frame(),
+  max_depth = 10
+) {
   if (is.null(frame)) {
     return(NULL)
   }
@@ -1067,11 +1469,25 @@ check_color <- function(color) {
   }
 
   all_cli_colors <- c(
-    "black", "red", "green", "yellow",
-    "blue", "magenta", "cyan", "white",
-    "grey", "silver", "none",
-    "br_black", "br_red", "br_green", "br_yellow",
-    "br_blue", "br_magenta", "br_cyan", "br_white"
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "magenta",
+    "cyan",
+    "white",
+    "grey",
+    "silver",
+    "none",
+    "br_black",
+    "br_red",
+    "br_green",
+    "br_yellow",
+    "br_blue",
+    "br_magenta",
+    "br_cyan",
+    "br_white"
   )
 
   if (color %in% all_cli_colors) {
@@ -1124,18 +1540,19 @@ check_color <- function(color) {
 #'
 #' log_message(name)
 parse_inline_expressions <- function(
-    text,
-    env = parent.frame()) {
+  text,
+  env = parent.frame()
+) {
   vapply(
     text,
-    .replace_expressions,
+    replace_expressions,
     character(1),
     env = env,
     USE.NAMES = FALSE
   )
 }
 
-.replace_expressions <- function(text, env) {
+replace_expressions <- function(text, env) {
   pattern <- "\\{([^{}]+)\\}"
 
   max_iterations <- 10
@@ -1145,7 +1562,9 @@ parse_inline_expressions <- function(
     iteration <- iteration + 1
 
     matches <- gregexpr(pattern, text, perl = TRUE)[[1]]
-    if (matches[1] == -1) break
+    if (matches[1] == -1) {
+      break
+    }
 
     match_starts <- as.numeric(matches)
     match_lengths <- attr(matches, "match.length")
@@ -1157,7 +1576,7 @@ parse_inline_expressions <- function(
       match_length <- match_lengths[i]
 
       match <- substr(text, start_pos, start_pos + match_length - 1)
-      replacement <- .process_match(match, env)
+      replacement <- process_match(match, env)
 
       text <- paste0(
         substr(text, 1, start_pos - 1),
@@ -1170,17 +1589,17 @@ parse_inline_expressions <- function(
   text
 }
 
-.process_match <- function(match, env) {
+process_match <- function(match, env) {
   inner_content <- substr(match, 2, nchar(match) - 1)
 
   if (grepl("^\\.[a-zA-Z_]+\\s+", inner_content)) {
-    .process_format_expression(inner_content, env)
+    process_format_expression(inner_content, env)
   } else {
-    .evaluate_expression(inner_content, env)
+    evaluate_expression(inner_content, env)
   }
 }
 
-.process_format_expression <- function(content, env) {
+process_format_expression <- function(content, env) {
   parts <- strsplit(content, "\\s+", 2)[[1]]
 
   if (length(parts) != 2) {
@@ -1194,11 +1613,11 @@ parse_inline_expressions <- function(
     return(paste0("{", content, "}"))
   }
 
-  evaluated <- .evaluate_expression(format_content, env)
+  evaluated <- evaluate_expression(format_content, env)
   paste0("{", format_tag, " ", evaluated, "}")
 }
 
-.evaluate_expression <- function(expr, env) {
+evaluate_expression <- function(expr, env) {
   tryCatch(
     {
       result <- eval(parse(text = expr), envir = env)

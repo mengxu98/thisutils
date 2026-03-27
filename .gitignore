@@ -15,6 +15,7 @@ test/
 .DS_Store
 
 # R files
+*.Rcheck
 .Rhistory
 .Rproj.user
 .Ruserdata

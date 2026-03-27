@@ -6,6 +6,7 @@
 \usage{
 log_message(
   ...,
+  expr = NULL,
   verbose = TRUE,
   message_type = c("info", "success", "warning", "error", "running", "ask"),
   cli_model = TRUE,
@@ -25,6 +26,10 @@ log_message(
 }
 \arguments{
 \item{...}{The message to print.}
+
+\item{expr}{An optional expression to evaluate while capturing its standard output,
+messages, and warnings, then re-printing them with \code{log_message()} formatting.
+The evaluated result is returned invisibly unless it is visible by default.}
 
 \item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
@@ -91,7 +96,8 @@ Default is \link{parent.frame}.}
 Default is \code{.envir}.}
 }
 \value{
-Formated message, or a logical value (\code{TRUE}/\code{FALSE}/\code{NA}) if \code{message_type = "ask"}.
+Formated message, a logical value (\code{TRUE}/\code{FALSE}/\code{NA}) if \code{message_type = "ask"},
+or the evaluated result of \code{expr} if \code{expr} is supplied.
 }
 \description{
 Integrate the message printing function with the \href{https://cli.r-lib.org}{cli} package,
@@ -364,6 +370,20 @@ if (interactive()) {
     message_type = "ask"
   )
 }
+
+# capture output from another expression
+fun <- function() {
+  cat("This is standard output\n")
+  message("This is a message")
+  warning("This is a warning")
+  return(1 + 1)
+}
+fun()
+
+log_message(
+  expr = fun(),
+  message_type = "running"
+)
 }
 \references{
 \url{https://cli.r-lib.org/articles/index.html}
