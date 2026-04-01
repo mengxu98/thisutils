@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,29 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.4" id="thisutils-044">thisutils 0.4.4<a class="anchor" aria-label="anchor" href="#thisutils-044"></a></h2>
+<ul><li>
+<strong>feat</strong>:
+<ul><li>Add <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code>: compute per-cell Local Inverse Simpson’s Index (LISI) scores for categorical variables. Supports multiple nearest-neighbor backends (<code>"auto"</code>, <code>"rann"</code>, <code>"fnn"</code>, <code>"hnsw"</code>, <code>"exact"</code>) with configurable perplexity and tolerance. Includes <code><a href="../reference/compute_simpson_index.html">compute_simpson_index()</a></code> for low-level Simpson index computation from KNN graphs, backed by a C++ implementation.</li>
+<li>Enhance <code><a href="../reference/log_message.html">log_message()</a></code>: add optional <code>expr</code> support to capture standard output, messages, and warnings from another expression and re-print them with <code><a href="../reference/log_message.html">log_message()</a></code> formatting while returning the evaluated result.</li>
+<li>
+<code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code>:
+<ul><li>Suppress C/C++ level stderr output (e.g., <code>"Error : Not a matrix."</code>) and warnings during function execution in <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> via stderr redirection and <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings()</a></code>.</li>
+<li>Group error reporting by message: identical errors are now collapsed into a single line with count and up to 3 example task names, instead of printing every failure individually.</li>
+<li>Add <code>progress_bar_width</code> to <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> for direct progress bar width control; default width is now <code>10</code>.</li>
+</ul></li>
+</ul></li>
+<li>
+<strong>fix</strong>:
+<ul><li>
+<code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code>
+<ul><li>Fix result length mismatch when <code>cores = 1</code>: use <code>output_list[i] &lt;- list(result)</code> instead of <code>output_list[[i]] &lt;- result</code> to prevent <code>NULL</code> returns from shrinking the output list.</li>
+<li>Fix multi-core result ordering in verbose mode: results are now written back by original index so output order and assigned names stay aligned with input.</li>
+<li>Fix core detection fallback: when <code>parallel::detectCores(logical = FALSE)</code> is unavailable or returns an invalid value, execution now falls back safely to at least one worker instead of failing.</li>
+</ul></li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2" id="thisutils-042">thisutils 0.4.2<a class="anchor" aria-label="anchor" href="#thisutils-042"></a></h2><p class="text-muted">CRAN release: 2026-02-23</p>
 <ul><li>

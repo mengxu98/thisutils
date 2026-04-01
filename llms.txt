@@ -111,6 +111,14 @@ Please reference
   : Invoke a function with a list of arguments
 - [`is_outlier()`](https://mengxu98.github.io/thisutils/reference/is_outlier.md)
   : Detect outliers using MAD (Median Absolute Deviation)
+- [`is_apple_silicon()`](https://mengxu98.github.io/thisutils/reference/is_apple_silicon.md)
+  : Check if the system is running on Apple Silicon
+- [`is_linux()`](https://mengxu98.github.io/thisutils/reference/is_linux.md)
+  : Check if the operating system is Linux
+- [`is_osx()`](https://mengxu98.github.io/thisutils/reference/is_osx.md)
+  : Check if the operating system is macOS
+- [`is_windows()`](https://mengxu98.github.io/thisutils/reference/is_windows.md)
+  : Check if the operating system is Windows
 - [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)
   : Process matrix
 - [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)

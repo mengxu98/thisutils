@@ -1,5 +1,50 @@
 # Changelog
 
+## thisutils 0.4.4
+
+- **feat**:
+  - Add
+    [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md):
+    compute per-cell Local Inverse Simpson’s Index (LISI) scores for
+    categorical variables. Supports multiple nearest-neighbor backends
+    (`"auto"`, `"rann"`, `"fnn"`, `"hnsw"`, `"exact"`) with configurable
+    perplexity and tolerance. Includes
+    [`compute_simpson_index()`](https://mengxu98.github.io/thisutils/reference/compute_simpson_index.md)
+    for low-level Simpson index computation from KNN graphs, backed by a
+    C++ implementation.
+  - Enhance
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md):
+    add optional `expr` support to capture standard output, messages,
+    and warnings from another expression and re-print them with
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    formatting while returning the evaluated result.
+  - [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md):
+    - Suppress C/C++ level stderr output (e.g.,
+      `"Error : Not a matrix."`) and warnings during function execution
+      in
+      [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+      via stderr redirection and
+      [`suppressWarnings()`](https://rdrr.io/r/base/warning.html).
+    - Group error reporting by message: identical errors are now
+      collapsed into a single line with count and up to 3 example task
+      names, instead of printing every failure individually.
+    - Add `progress_bar_width` to
+      [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+      for direct progress bar width control; default width is now `10`.
+- **fix**:
+  - [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+    - Fix result length mismatch when `cores = 1`: use
+      `output_list[i] <- list(result)` instead of
+      `output_list[[i]] <- result` to prevent `NULL` returns from
+      shrinking the output list.
+    - Fix multi-core result ordering in verbose mode: results are now
+      written back by original index so output order and assigned names
+      stay aligned with input.
+    - Fix core detection fallback: when
+      `parallel::detectCores(logical = FALSE)` is unavailable or returns
+      an invalid value, execution now falls back safely to at least one
+      worker instead of failing.
+
 ## thisutils 0.4.2
 
 CRAN release: 2026-02-23
