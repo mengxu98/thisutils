@@ -65,7 +65,7 @@
 #' or the evaluated result of `expr` if `expr` is supplied.
 #'
 #' @references
-#' \url{https://cli.r-lib.org/articles/index.html}
+#' <https://cli.r-lib.org/articles/index.html>
 #'
 #' @export
 #' @examples
@@ -339,7 +339,6 @@
 #' fun <- function() {
 #'   cat("This is standard output\n")
 #'   message("This is a message")
-#'   warning("This is a warning")
 #'   return(1 + 1)
 #' }
 #' fun()
@@ -351,7 +350,7 @@
 log_message <- function(
   ...,
   expr = NULL,
-  verbose = TRUE,
+  verbose = NULL,
   message_type = c(
     "info",
     "success",
@@ -383,6 +382,24 @@ log_message <- function(
   verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
   msg <- build_message(...)
+  emit_message <- function(msg_text, msg_type = message_type, multiline = multiline_indent) {
+    output_message(
+      msg = msg_text,
+      message_type = msg_type,
+      cli_model = cli_model,
+      text_color = text_color,
+      back_color = back_color,
+      text_style = text_style,
+      timestamp = timestamp,
+      timestamp_format = timestamp_format,
+      level = level,
+      symbol = symbol,
+      multiline_indent = multiline,
+      timestamp_style = timestamp_style,
+      plain_text = plain_text,
+      .envir = .envir
+    )
+  }
 
   if (is.null(.envir) || !is.environment(.envir)) {
     .envir <- parent.frame()
@@ -421,62 +438,17 @@ log_message <- function(
     }
 
     if (message_type == "ask") {
-      output_message(
-        msg = msg,
-        message_type = message_type,
-        cli_model = cli_model,
-        text_color = text_color,
-        back_color = back_color,
-        text_style = text_style,
-        timestamp = timestamp,
-        timestamp_format = timestamp_format,
-        level = level,
-        symbol = symbol,
-        multiline_indent = multiline_indent,
-        timestamp_style = timestamp_style,
-        plain_text = plain_text,
-        .envir = .envir
-      )
+      emit_message(msg)
       return(utils::askYesNo(msg = ""))
     }
 
-    output_message(
-      msg = msg,
-      message_type = message_type,
-      cli_model = cli_model,
-      text_color = text_color,
-      back_color = back_color,
-      text_style = text_style,
-      timestamp = timestamp,
-      timestamp_format = timestamp_format,
-      level = level,
-      symbol = symbol,
-      multiline_indent = multiline_indent,
-      timestamp_style = timestamp_style,
-      plain_text = plain_text,
-      .envir = .envir
-    )
+    emit_message(msg)
 
     return(invisible(NULL))
   }
 
   if (verbose && nzchar(msg)) {
-    output_message(
-      msg = msg,
-      message_type = message_type,
-      cli_model = cli_model,
-      text_color = text_color,
-      back_color = back_color,
-      text_style = text_style,
-      timestamp = timestamp,
-      timestamp_format = timestamp_format,
-      level = level,
-      symbol = symbol,
-      multiline_indent = multiline_indent,
-      timestamp_style = timestamp_style,
-      plain_text = plain_text,
-      .envir = .envir
-    )
+    emit_message(msg)
   }
 
   captured <- capture_logged_expression(
@@ -541,33 +513,33 @@ log_message <- function(
 get_verbose <- function(verbose = NULL) {
   verbose_global <- getOption("log_message.verbose", NULL)
 
-  if (is.null(verbose_global)) {
-    if (is.null(verbose)) {
-      verbose <- TRUE
-    } else {
-      if (!is.logical(verbose) || length(verbose) != 1) {
-        cli::cli_alert_warning(
-          "{.arg verbose} is not a logical value, set to {.pkg TRUE}"
-        )
-        verbose <- TRUE
-      }
-    }
-  } else {
-    if (!is.logical(verbose_global) || length(verbose_global) != 1) {
+  if (!is.null(verbose)) {
+    if (!is.logical(verbose) || length(verbose) != 1) {
       cli::cli_alert_warning(
-        "{.arg log_message.verbose} is not a logical value, set to {.pkg NULL}"
+        "{.arg verbose} is not a logical value, set to {.pkg TRUE}"
       )
-      cli::cli_alert_warning(
-        "or using {.code options(log_message.verbose = TRUE/FALSE)}"
-      )
-      options(log_message.verbose = NULL)
-      verbose <- FALSE
-    } else {
-      verbose <- verbose_global
+      return(TRUE)
     }
+
+    return(verbose)
   }
 
-  verbose
+  if (is.null(verbose_global)) {
+    return(TRUE)
+  }
+
+  if (!is.logical(verbose_global) || length(verbose_global) != 1) {
+    cli::cli_alert_warning(
+      "{.arg log_message.verbose} is not a logical value, set to {.pkg NULL}"
+    )
+    cli::cli_alert_warning(
+      "or using {.code options(log_message.verbose = TRUE/FALSE)}"
+    )
+    options(log_message.verbose = NULL)
+    return(TRUE)
+  }
+
+  verbose_global
 }
 
 build_message <- function(...) {
@@ -626,7 +598,16 @@ capture_logged_expression <- function(
   append_event <- function(type, text) {
     events[[length(events) + 1]] <<- list(
       type = type,
-      text = text
+      text = text,
+      message_type = NULL
+    )
+  }
+
+  append_cli_event <- function(text, message_type) {
+    events[[length(events) + 1]] <<- list(
+      type = "message",
+      text = text,
+      message_type = message_type
     )
   }
 
@@ -806,10 +787,21 @@ capture_logged_expression <- function(
         message = function(m) {
           flush_output_events()
           flush_pending_output()
-          append_event(
-            "message",
-            sub("[\r\n]+$", "", conditionMessage(m))
+
+          message_text <- sub("[\r\n]+$", "", conditionMessage(m))
+          cli_event <- detect_cli_event(
+            text = message_text,
+            classes = class(m)
           )
+
+          if (is.null(cli_event)) {
+            append_event("message", message_text)
+          } else {
+            append_cli_event(
+              text = cli_event$text,
+              message_type = cli_event$message_type
+            )
+          }
           invokeRestart("muffleMessage")
         },
         warning = function(w) {
@@ -865,7 +857,9 @@ emit_logged_events <- function(
   }
 
   for (event in events) {
-    event_message_type <- if (identical(event$type, "warning")) {
+    event_message_type <- if (!is.null(event$message_type)) {
+      event$message_type
+    } else if (identical(event$type, "warning")) {
       "warning"
     } else {
       default_message_type
@@ -890,6 +884,86 @@ emit_logged_events <- function(
   }
 
   invisible(NULL)
+}
+
+detect_cli_event <- function(text, classes = character()) {
+  if (!length(classes) || !any(grepl("^cli", classes))) {
+    return(NULL)
+  }
+
+  info_symbol <- intToUtf8(0x2139)
+  success_symbol <- intToUtf8(0x2714)
+  warning_symbol <- intToUtf8(0x26A0)
+  danger_symbol <- intToUtf8(0x2716)
+
+  text_trimmed <- trimws(text, which = "left")
+  text_lower <- tolower(text_trimmed)
+
+  strip_literal_prefix <- function(input, prefix) {
+    trimws(substr(input, nchar(prefix) + 1L, nchar(input)), which = "left")
+  }
+
+  for (prefix in c(paste0(info_symbol, " "), "i ", "I ")) {
+    if (startsWith(text_trimmed, prefix)) {
+      return(list(
+        message_type = "info",
+        text = strip_literal_prefix(text_trimmed, prefix)
+      ))
+    }
+  }
+  if (startsWith(text_lower, "info: ")) {
+    return(list(
+      message_type = "info",
+      text = sub("^info:\\s*", "", text_trimmed, ignore.case = TRUE)
+    ))
+  }
+
+  for (prefix in c(paste0(success_symbol, " "), "v ", "V ")) {
+    if (startsWith(text_trimmed, prefix)) {
+      return(list(
+        message_type = "success",
+        text = strip_literal_prefix(text_trimmed, prefix)
+      ))
+    }
+  }
+  if (startsWith(text_lower, "success: ")) {
+    return(list(
+      message_type = "success",
+      text = sub("^success:\\s*", "", text_trimmed, ignore.case = TRUE)
+    ))
+  }
+
+  for (prefix in c("! ", paste0(warning_symbol, " "))) {
+    if (startsWith(text_trimmed, prefix)) {
+      return(list(
+        message_type = "warning",
+        text = strip_literal_prefix(text_trimmed, prefix)
+      ))
+    }
+  }
+  if (startsWith(text_lower, "warning: ")) {
+    return(list(
+      message_type = "warning",
+      text = sub("^warning:\\s*", "", text_trimmed, ignore.case = TRUE)
+    ))
+  }
+
+  for (prefix in c(paste0(danger_symbol, " "), "x ", "X ")) {
+    if (startsWith(text_trimmed, prefix)) {
+      return(list(
+        message_type = "warning",
+        text = strip_literal_prefix(text_trimmed, prefix)
+      ))
+    }
+  }
+  if (startsWith(text_lower, "danger: ") || startsWith(text_lower, "error: ")) {
+    return(list(
+      message_type = "warning",
+      text = sub("^(danger|error):\\s*", "", text_trimmed, ignore.case = TRUE)
+    ))
+  }
+
+  NULL
 }
 
 validate_params <- function(

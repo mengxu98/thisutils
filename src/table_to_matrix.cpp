@@ -1,8 +1,45 @@
 #include <Rcpp.h>
 #include <algorithm>
+#include <cstdint>
 #include <unordered_map>
+#include <string>
 
 using namespace Rcpp;
+
+namespace {
+
+std::uint64_t coordinate_key(int row_index, int col_index) {
+  return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(row_index)) << 32) |
+    static_cast<std::uint32_t>(col_index);
+}
+
+SEXP call_sparse_matrix(const IntegerVector& sparse_i_vec,
+                        const IntegerVector& sparse_j_vec,
+                        const NumericVector& sparse_x_vec,
+                        SEXP dims,
+                        SEXP dimnames) {
+  SEXP matrix_namespace = PROTECT(R_FindNamespace(Rf_mkString("Matrix")));
+  SEXP sparse_matrix_fn = PROTECT(Rf_findFun(Rf_install("sparseMatrix"), matrix_namespace));
+  SEXP call = PROTECT(Rf_lang6(
+      sparse_matrix_fn,
+      sparse_i_vec,
+      sparse_j_vec,
+      sparse_x_vec,
+      dims,
+      dimnames));
+
+  SET_TAG(CDR(call), Rf_install("i"));
+  SET_TAG(CDR(CDR(call)), Rf_install("j"));
+  SET_TAG(CDR(CDR(CDR(call))), Rf_install("x"));
+  SET_TAG(CDR(CDR(CDR(CDR(call)))), Rf_install("dims"));
+  SET_TAG(CDR(CDR(CDR(CDR(CDR(call))))), Rf_install("dimnames"));
+
+  SEXP result = Rf_eval(call, matrix_namespace);
+  UNPROTECT(3);
+  return result;
+}
+
+} // namespace
 
 //' @title Switch table to matrix
 //'
@@ -47,8 +84,8 @@ using namespace Rcpp;
 //' identical(sparse_matrix, sparse_matrix_new)
 // [[Rcpp::export]]
 SEXP table_to_matrix(DataFrame table,
-                     Nullable<CharacterVector> row_names = R_NilValue,
-                     Nullable<CharacterVector> col_names = R_NilValue,
+                     SEXP row_names = R_NilValue,
+                     SEXP col_names = R_NilValue,
                      double threshold = 0.0,
                      bool return_sparse = false)
 {
@@ -69,7 +106,7 @@ SEXP table_to_matrix(DataFrame table,
   CharacterVector filter_rows;
   CharacterVector filter_cols;
 
-  if (row_names.isNotNull())
+  if (!Rf_isNull(row_names))
   {
     CharacterVector row_names_filter(row_names);
     filter_rows = intersect(unique(table_rows), row_names_filter);
@@ -79,7 +116,7 @@ SEXP table_to_matrix(DataFrame table,
     filter_rows = unique(table_rows);
   }
 
-  if (col_names.isNotNull())
+  if (!Rf_isNull(col_names))
   {
     CharacterVector col_names_filter(col_names);
     filter_cols = intersect(unique(table_cols), col_names_filter);
@@ -146,11 +183,7 @@ SEXP table_to_matrix(DataFrame table,
 
   if (return_sparse)
   {
-    Environment Matrix_env = Environment::namespace_env("Matrix");
-    Function sparseMatrix = Matrix_env["sparseMatrix"];
-
-    std::vector<int> sparse_i, sparse_j;
-    std::vector<double> sparse_x;
+    std::unordered_map<std::uint64_t, double> value_map;
 
     for (R_xlen_t i = 0; i < table.nrows(); ++i)
     {
@@ -165,11 +198,34 @@ SEXP table_to_matrix(DataFrame table,
         double value = values[i];
         if (std::abs(value) >= threshold && value != 0.0)
         {
-          sparse_i.push_back(row_it->second + 1); // R uses 1-based indexing
-          sparse_j.push_back(col_it->second + 1);
-          sparse_x.push_back(value);
+          std::uint64_t key = coordinate_key(row_it->second, col_it->second);
+          value_map[key] += value;
         }
       }
+    }
+
+    std::vector<int> sparse_i;
+    std::vector<int> sparse_j;
+    std::vector<double> sparse_x;
+    sparse_i.reserve(value_map.size());
+    sparse_j.reserve(value_map.size());
+    sparse_x.reserve(value_map.size());
+
+    for (const auto& entry : value_map)
+    {
+      const std::uint64_t key = entry.first;
+      const int row_index = static_cast<int>(key >> 32);
+      const int col_index = static_cast<int>(key & 0xffffffffu);
+      double value = entry.second;
+
+      if (value == 0.0)
+      {
+        continue;
+      }
+
+      sparse_i.push_back(row_index + 1); // R uses 1-based indexing
+      sparse_j.push_back(col_index + 1);
+      sparse_x.push_back(value);
     }
 
     IntegerVector sparse_i_vec(sparse_i.begin(), sparse_i.end());
@@ -186,14 +242,14 @@ SEXP table_to_matrix(DataFrame table,
     SET_VECTOR_ELT(dimnames, 0, static_cast<SEXP>(sorted_rows));
     SET_VECTOR_ELT(dimnames, 1, static_cast<SEXP>(sorted_cols));
 
-    SEXP result = sparseMatrix(
-        Named("i") = sparse_i_vec,
-        Named("j") = sparse_j_vec,
-        Named("x") = sparse_x_vec,
-        Named("dims") = dims,
-        Named("dimnames") = dimnames);
+    SEXP result = PROTECT(call_sparse_matrix(
+        sparse_i_vec,
+        sparse_j_vec,
+        sparse_x_vec,
+        dims,
+        dimnames));
 
-    UNPROTECT(2);
+    UNPROTECT(3);
     return result;
   }
   else
@@ -220,7 +276,7 @@ SEXP table_to_matrix(DataFrame table,
         double value = values[i];
         if (std::abs(value) >= threshold)
         {
-          matrix(row_it->second, col_it->second) = value;
+          matrix(row_it->second, col_it->second) += value;
         }
       }
     }
