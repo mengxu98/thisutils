@@ -4,6 +4,36 @@
 
 using namespace Rcpp;
 
+namespace {
+
+SEXP call_sparse_matrix(const IntegerVector& sparse_i_vec,
+                        const IntegerVector& sparse_j_vec,
+                        const NumericVector& sparse_x_vec,
+                        SEXP dims,
+                        SEXP dimnames) {
+  SEXP matrix_namespace = PROTECT(R_FindNamespace(Rf_mkString("Matrix")));
+  SEXP sparse_matrix_fn = PROTECT(Rf_findFun(Rf_install("sparseMatrix"), matrix_namespace));
+  SEXP call = PROTECT(Rf_lang6(
+      sparse_matrix_fn,
+      sparse_i_vec,
+      sparse_j_vec,
+      sparse_x_vec,
+      dims,
+      dimnames));
+
+  SET_TAG(CDR(call), Rf_install("i"));
+  SET_TAG(CDR(CDR(call)), Rf_install("j"));
+  SET_TAG(CDR(CDR(CDR(call))), Rf_install("x"));
+  SET_TAG(CDR(CDR(CDR(CDR(call)))), Rf_install("dims"));
+  SET_TAG(CDR(CDR(CDR(CDR(CDR(call))))), Rf_install("dimnames"));
+
+  SEXP result = Rf_eval(call, matrix_namespace);
+  UNPROTECT(3);
+  return result;
+}
+
+} // namespace
+
 //' @title Switch table to matrix
 //'
 //' @md
@@ -47,8 +77,8 @@ using namespace Rcpp;
 //' identical(sparse_matrix, sparse_matrix_new)
 // [[Rcpp::export]]
 SEXP table_to_matrix(DataFrame table,
-                     Nullable<CharacterVector> row_names = R_NilValue,
-                     Nullable<CharacterVector> col_names = R_NilValue,
+                     SEXP row_names = R_NilValue,
+                     SEXP col_names = R_NilValue,
                      double threshold = 0.0,
                      bool return_sparse = false)
 {
@@ -69,7 +99,7 @@ SEXP table_to_matrix(DataFrame table,
   CharacterVector filter_rows;
   CharacterVector filter_cols;
 
-  if (row_names.isNotNull())
+  if (!Rf_isNull(row_names))
   {
     CharacterVector row_names_filter(row_names);
     filter_rows = intersect(unique(table_rows), row_names_filter);
@@ -79,7 +109,7 @@ SEXP table_to_matrix(DataFrame table,
     filter_rows = unique(table_rows);
   }
 
-  if (col_names.isNotNull())
+  if (!Rf_isNull(col_names))
   {
     CharacterVector col_names_filter(col_names);
     filter_cols = intersect(unique(table_cols), col_names_filter);
@@ -146,9 +176,6 @@ SEXP table_to_matrix(DataFrame table,
 
   if (return_sparse)
   {
-    Environment Matrix_env = Environment::namespace_env("Matrix");
-    Function sparseMatrix = Matrix_env["sparseMatrix"];
-
     std::vector<int> sparse_i, sparse_j;
     std::vector<double> sparse_x;
 
@@ -186,14 +213,14 @@ SEXP table_to_matrix(DataFrame table,
     SET_VECTOR_ELT(dimnames, 0, static_cast<SEXP>(sorted_rows));
     SET_VECTOR_ELT(dimnames, 1, static_cast<SEXP>(sorted_cols));
 
-    SEXP result = sparseMatrix(
-        Named("i") = sparse_i_vec,
-        Named("j") = sparse_j_vec,
-        Named("x") = sparse_x_vec,
-        Named("dims") = dims,
-        Named("dimnames") = dimnames);
+    SEXP result = PROTECT(call_sparse_matrix(
+        sparse_i_vec,
+        sparse_j_vec,
+        sparse_x_vec,
+        dims,
+        dimnames));
 
-    UNPROTECT(2);
+    UNPROTECT(3);
     return result;
   }
   else

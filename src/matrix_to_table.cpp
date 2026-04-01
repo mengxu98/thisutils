@@ -41,8 +41,8 @@ using namespace Rcpp;
 //' )
 // [[Rcpp::export]]
 DataFrame matrix_to_table(SEXP matrix,
-                          Nullable<CharacterVector> row_names = R_NilValue,
-                          Nullable<CharacterVector> col_names = R_NilValue,
+                          SEXP row_names = R_NilValue,
+                          SEXP col_names = R_NilValue,
                           double threshold = 0.0,
                           bool keep_zero = true)
 {
@@ -53,18 +53,18 @@ DataFrame matrix_to_table(SEXP matrix,
   std::unordered_set<std::string> col_filter_set;
   bool use_row_filter = false;
   bool use_col_filter = false;
-  if (row_names.isNotNull())
+  if (!Rf_isNull(row_names))
   {
-    CharacterVector rf = as<CharacterVector>(row_names);
+    CharacterVector rf(row_names);
     for (auto it = rf.begin(); it != rf.end(); ++it)
     {
       row_filter_set.insert(std::string(as<std::string>(*it)));
     }
     use_row_filter = rf.size() > 0;
   }
-  if (col_names.isNotNull())
+  if (!Rf_isNull(col_names))
   {
-    CharacterVector cf = as<CharacterVector>(col_names);
+    CharacterVector cf(col_names);
     for (auto it = cf.begin(); it != cf.end(); ++it)
     {
       col_filter_set.insert(std::string(as<std::string>(*it)));
