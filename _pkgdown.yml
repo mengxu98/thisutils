@@ -80,6 +80,10 @@ reference:
   - get_namespace_fun
   - invoke_fun
   - is_outlier
+  - is_apple_silicon
+  - is_linux
+  - is_osx
+  - is_windows
   - matrix_process
   - matrix_to_table
   - max_depth
