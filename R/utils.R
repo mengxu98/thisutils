@@ -789,3 +789,44 @@ check_ci_env <- function() {
 
   return(FALSE)
 }
+
+#' @title Check if the system is running on Apple Silicon
+#'
+#' @return
+#' A logical value.
+#'
+#' @export
+is_apple_silicon <- function() {
+  is_osx() &&
+    identical(tolower(Sys.info()[["machine"]]), "arm64")
+}
+
+#' @title Check if the operating system is Linux
+#'
+#' @return
+#' A logical value.
+#'
+#' @export
+is_linux <- function() {
+  identical(tolower(Sys.info()[["sysname"]]), "linux")
+}
+
+#' @title Check if the operating system is macOS
+#'
+#' @return
+#' A logical value.
+#'
+#' @export
+is_osx <- function() {
+  identical(tolower(Sys.info()[["sysname"]]), "darwin")
+}
+
+#' @title Check if the operating system is Windows
+#'
+#' @return
+#' A logical value.
+#'
+#' @export
+is_windows <- function() {
+  identical(.Platform$OS.type, "windows")
+}
