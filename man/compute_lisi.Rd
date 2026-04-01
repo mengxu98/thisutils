@@ -11,9 +11,7 @@ compute_lisi(
   perplexity = 30,
   nn_eps = 0,
   use_rann = TRUE,
-  nn_method = c("auto", "rann", "fnn", "hnsw", "exact"),
-  nn_threads = 0,
-  hnsw_ef = 100,
+  nn_method = c("auto", "rann", "fnn", "exact"),
   tol = 1e-05,
   max_iter = 50
 )
@@ -34,16 +32,8 @@ Defaults to \code{0}.}
 Defaults to \code{TRUE}.}
 
 \item{nn_method}{Nearest-neighbor backend. Defaults to \code{"auto"},
-which uses a simple heuristic: low-dimensional inputs use the package's exact C++ search,
-while larger/higher-dimensional inputs fall back to \code{RANN}, then \code{FNN},
-then the built-in exact C++ backend.
-Set to \code{"hnsw"} to use \code{RcppHNSW} for a faster, approximate search.}
-
-\item{nn_threads}{Number of threads used by the HNSW backend.
-Defaults to \code{0} which lets \code{RcppHNSW} choose automatically.}
-
-\item{hnsw_ef}{Search breadth used by the HNSW backend.
-Larger values are more accurate but slower. Defaults to \code{100}.}
+which prefers the package's exact C++ search only for very small problems.
+Larger inputs fall back to \code{RANN}, then \code{FNN}, and only use the exact backend as a last resort.}
 
 \item{tol}{Tolerance used in the binary search for the target perplexity.
 Defaults to \code{1e-5}.}

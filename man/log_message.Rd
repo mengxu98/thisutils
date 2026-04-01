@@ -7,7 +7,7 @@
 log_message(
   ...,
   expr = NULL,
-  verbose = TRUE,
+  verbose = NULL,
   message_type = c("info", "success", "warning", "error", "running", "ask"),
   cli_model = TRUE,
   level = 1,
@@ -375,7 +375,6 @@ if (interactive()) {
 fun <- function() {
   cat("This is standard output\n")
   message("This is a message")
-  warning("This is a warning")
   return(1 + 1)
 }
 fun()

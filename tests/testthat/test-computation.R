@@ -116,6 +116,16 @@ test_that("normalization errors on invalid method", {
   expect_error(normalization(1:5, method = "invalid"))
 })
 
+test_that("normalization handles degenerate inputs without NaN", {
+  expect_equal(normalization(c(1, 1, 1), method = "max_min"), c(0, 0, 0))
+  expect_equal(normalization(c(0, 0, 0), method = "sum"), c(0, 0, 0))
+  expect_equal(normalization(c(1, 1, 1), method = "z_score"), c(0, 0, 0))
+  expect_equal(
+    normalization(c(1, 1, NA), method = "softmax", na_rm = FALSE),
+    c(0.5, 0.5, NA)
+  )
+})
+
 test_that("matrix_process works with string methods", {
   m <- simulate_sparse_matrix(10, 10)
   expect_no_error(matrix_process(m, method = "raw"))

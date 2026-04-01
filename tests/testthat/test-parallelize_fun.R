@@ -98,6 +98,61 @@ test_that("parallelize_fun preserves input order for multi-core execution", {
   expect_equal(names(result), as.character(1:6))
 })
 
+test_that("parallelize_fun preserves input order for multi-core execution without verbose", {
+  result <- suppressMessages(
+    parallelize_fun(1:6, function(x) x * 2, cores = 2, verbose = FALSE)
+  )
+
+  expect_equal(unname(unlist(result)), (1:6) * 2)
+  expect_equal(names(result), as.character(1:6))
+})
+
+test_that("parallelize_fun handles uneven multi-core workloads in verbose mode", {
+  delays <- c(0.15, 0.01, 0.12, 0.02, 0.08, 0.01)
+  result <- suppressMessages(
+    parallelize_fun(1:6, function(x) {
+      Sys.sleep(delays[[x]])
+      x
+    }, cores = 2, verbose = TRUE)
+  )
+
+  expect_equal(unname(unlist(result)), 1:6)
+  expect_equal(names(result), as.character(1:6))
+})
+
+test_that("parallelize_fun exports requested dependencies in multi-core mode", {
+  offset <- 5
+  add_offset <- function(x) x + offset
+
+  result <- suppressMessages(
+    parallelize_fun(
+      1:4,
+      add_offset,
+      cores = 2,
+      verbose = FALSE,
+      export_fun = "offset"
+    )
+  )
+
+  expect_equal(unname(unlist(result)), 6:9)
+  expect_equal(names(result), as.character(1:4))
+})
+
 test_that("cores_detect falls back to at least one core", {
   expect_gte(cores_detect(cores = 2, num_session = 4), 1)
+})
+
+test_that("parallelize_fun preserves NULL results on a single core", {
+  result <- suppressMessages(
+    parallelize_fun(
+      1:3,
+      function(x) if (x == 2) NULL else x,
+      verbose = FALSE
+    )
+  )
+
+  expect_length(result, 3)
+  expect_equal(result[[1]], 1)
+  expect_null(result[[2]])
+  expect_equal(result[[3]], 3)
 })

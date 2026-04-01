@@ -168,39 +168,91 @@ normalization <- function(
   na_index <- which(is.na(x))
   x_calc <- x
   x_calc[na_index] <- NA
+  safe_fill <- function(value = 0) {
+    out <- rep_len(value, length(x_calc))
+    out[na_index] <- NA_real_
+    out
+  }
   x <- switch(
     EXPR = method,
     "max_min" = {
       min_x <- min(x_calc, na.rm = TRUE)
       max_x <- max(x_calc, na.rm = TRUE)
-      (x_calc - min_x) / (max_x - min_x)
+      range_x <- max_x - min_x
+      if (!is.finite(range_x) || range_x == 0) {
+        safe_fill(0)
+      } else {
+        (x_calc - min_x) / range_x
+      }
     },
     "maximum" = {
       max_abs_x <- max(abs(x_calc), na.rm = TRUE)
-      x_calc / max_abs_x
+      if (!is.finite(max_abs_x) || max_abs_x == 0) {
+        safe_fill(0)
+      } else {
+        x_calc / max_abs_x
+      }
     },
     "sum" = {
-      x_calc / sum(abs(x_calc), na.rm = TRUE)
+      abs_sum <- sum(abs(x_calc), na.rm = TRUE)
+      if (!is.finite(abs_sum) || abs_sum == 0) {
+        safe_fill(0)
+      } else {
+        x_calc / abs_sum
+      }
     },
     "softmax" = {
-      temp <- (x_calc - mean(x_calc, na.rm = TRUE)) / stats::sd(x_calc, na.rm = TRUE)
-      exp(temp) / sum(exp(temp), na.rm = TRUE)
+      x_mean <- mean(x_calc, na.rm = TRUE)
+      x_sd <- stats::sd(x_calc, na.rm = TRUE)
+      if (!is.finite(x_sd) || x_sd == 0) {
+        valid_count <- sum(!is.na(x_calc))
+        if (valid_count == 0) {
+          safe_fill(0)
+        } else {
+          out <- safe_fill(0)
+          out[!is.na(x_calc)] <- 1 / valid_count
+          out
+        }
+      } else {
+        temp <- (x_calc - x_mean) / x_sd
+        exp_temp <- exp(temp)
+        exp_temp / sum(exp_temp, na.rm = TRUE)
+      }
     },
     "z_score" = {
-      (x_calc - mean(x_calc, na.rm = TRUE)) / stats::sd(x_calc, na.rm = TRUE)
+      x_sd <- stats::sd(x_calc, na.rm = TRUE)
+      if (!is.finite(x_sd) || x_sd == 0) {
+        safe_fill(0)
+      } else {
+        (x_calc - mean(x_calc, na.rm = TRUE)) / x_sd
+      }
     },
     "mad" = {
-      (x_calc - stats::median(x_calc, na.rm = TRUE)) / stats::mad(x_calc, na.rm = TRUE)
+      x_mad <- stats::mad(x_calc, na.rm = TRUE)
+      if (!is.finite(x_mad) || x_mad == 0) {
+        safe_fill(0)
+      } else {
+        (x_calc - stats::median(x_calc, na.rm = TRUE)) / x_mad
+      }
     },
     "unit_vector" = {
-      x_calc / sqrt(sum(x_calc^2, na.rm = TRUE))
+      norm_x <- sqrt(sum(x_calc^2, na.rm = TRUE))
+      if (!is.finite(norm_x) || norm_x == 0) {
+        safe_fill(0)
+      } else {
+        x_calc / norm_x
+      }
     },
     "robust_scale" = {
       q1 <- stats::quantile(x_calc, 0.25, na.rm = TRUE)
       q3 <- stats::quantile(x_calc, 0.75, na.rm = TRUE)
       iqr <- q3 - q1
       med <- stats::median(x_calc, na.rm = TRUE)
-      (x_calc - med) / iqr
+      if (!is.finite(iqr) || iqr == 0) {
+        safe_fill(0)
+      } else {
+        (x_calc - med) / iqr
+      }
     }
   )
 
