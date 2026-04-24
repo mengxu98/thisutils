@@ -375,7 +375,6 @@ if (interactive()) {
 fun <- function() {
   cat("This is standard output\n")
   message("This is a message")
-  warning("This is a warning")
   return(1 + 1)
 }
 fun()
