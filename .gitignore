@@ -22,7 +22,11 @@ test/
 .RData
 .Rprofile
 revdep/
+*.tar.gz
 
 # Python files
 __pycache__/
 *.pyc
+
+# Code files
+.codex

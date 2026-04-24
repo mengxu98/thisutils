@@ -1,5 +1,27 @@
 # thisutils
 
+# thisutils 0.4.5
+
+* **feat**:
+  * Add `collapse_sparse_rows()`: collapse sparse matrix rows by group while preserving sparse output and row order.
+  * Update `compute_lisi()`: simplify nearest-neighbor backend selection by removing the `hnsw` path and using a more conservative `"auto"` strategy that prefers the package's exact backend only for very small problems.
+  * Improve `parallelize_fun()`: refactor verbose multi-core execution to collect results dynamically while preserving input order and progress reporting across uneven workloads.
+  * Improve `log_message()`: allow explicit `verbose` to override the global option and normalize captured `cli` alerts emitted inside `expr`.
+
+* **fix**:
+  * Harden `normalization()` against degenerate inputs so zero-variance or zero-sum vectors return stable values instead of `NaN`/`Inf`.
+  * Fix `matrix_to_table()` sparse `keep_zero = TRUE` handling to match dense output more reliably and make equal-magnitude sorting deterministic.
+  * Fix `table_to_matrix()` to aggregate duplicate row/column coordinates consistently in both dense and sparse output paths.
+  * Update package startup behavior to stay silent in non-interactive sessions and when verbose logging is disabled.
+  * Update package installation helpers to use `pak::pkg_install()`/`pak::pkg_remove()` with explicit library handling.
+
+* **docs**:
+  * Add a runnable example for `collapse_sparse_rows()`.
+  * Refresh `compute_lisi()` and `log_message()` documentation to match the current arguments and defaults.
+
+* **tests**:
+  * Add regression tests for `collapse_sparse_rows()` edge cases, `compute_lisi()` backend consistency, captured `cli` messages in `log_message(expr = ...)`, matrix conversion corner cases, `parallelize_fun()` ordering/export behavior, normalization on degenerate inputs, and startup suppression when verbose logging is disabled.
+
 # thisutils 0.4.4
 
 * **feat**:

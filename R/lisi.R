@@ -14,14 +14,8 @@
 #' @param use_rann Whether to prefer [RANN::nn2] over `FNN::get.knn` when `nn_method = "auto"` decides not to use the package's built-in exact C++ backend.
 #' Defaults to `TRUE`.
 #' @param nn_method Nearest-neighbor backend. Defaults to `"auto"`,
-#' which uses a simple heuristic: low-dimensional inputs use the package's exact C++ search,
-#' while larger/higher-dimensional inputs fall back to `RANN`, then `FNN`,
-#' then the built-in exact C++ backend.
-#' Set to `"hnsw"` to use `RcppHNSW` for a faster, approximate search.
-#' @param nn_threads Number of threads used by the HNSW backend.
-#' Defaults to `0` which lets `RcppHNSW` choose automatically.
-#' @param hnsw_ef Search breadth used by the HNSW backend.
-#' Larger values are more accurate but slower. Defaults to `100`.
+#' which prefers the package's exact C++ search only for very small problems.
+#' Larger inputs fall back to `RANN`, then `FNN`, and only use the exact backend as a last resort.
 #' @param tol Tolerance used in the binary search for the target perplexity.
 #' Defaults to `1e-5`.
 #' @param max_iter Maximum number of binary-search iterations.
@@ -63,9 +57,7 @@ compute_lisi <- function(
   perplexity = 30,
   nn_eps = 0,
   use_rann = TRUE,
-  nn_method = c("auto", "rann", "fnn", "hnsw", "exact"),
-  nn_threads = 0,
-  hnsw_ef = 100,
+  nn_method = c("auto", "rann", "fnn", "exact"),
   tol = 1e-5,
   max_iter = 50
 ) {
@@ -119,9 +111,7 @@ compute_lisi <- function(
     n_neighbors = n_neighbors,
     nn_eps = nn_eps,
     use_rann = use_rann,
-    nn_method = nn_method,
-    nn_threads = nn_threads,
-    hnsw_ef = hnsw_ef
+    nn_method = nn_method
   )
 
   out <- lapply(label_colnames, function(label_colname) {
@@ -274,36 +264,24 @@ lisi_knn <- function(
   n_neighbors,
   nn_eps = 0,
   use_rann = TRUE,
-  nn_method = "auto",
-  nn_threads = 0,
-  hnsw_ef = 100
+  nn_method = "auto"
 ) {
   include_self <- FALSE
   request_k <- as.integer(n_neighbors)
 
   if (identical(nn_method, "auto")) {
-    if (nrow(X) <= 10000L && ncol(X) <= 50L) {
-      nn_method <- "exact"
-    } else if (isTRUE(use_rann) && requireNamespace("RANN", quietly = TRUE)) {
-      nn_method <- "rann"
-    } else if (requireNamespace("FNN", quietly = TRUE)) {
-      nn_method <- "fnn"
-    } else {
-      nn_method <- "exact"
-    }
+    nn_method <- choose_lisi_nn_method(
+      n = nrow(X),
+      p = ncol(X),
+      n_neighbors = request_k,
+      use_rann = use_rann
+    )
   }
 
   log_message(
     "Using {.val {nn_method}} nearest-neighbor backend for {.pkg compute_lisi}",
     message_type = "running"
   )
-
-  if (identical(nn_method, "hnsw")) {
-    log_message(
-      "{.val hnsw} uses approximate nearest neighbors and may slightly change LISI values",
-      message_type = "warning"
-    )
-  }
 
   knn <- switch(
     EXPR = nn_method,
@@ -315,18 +293,6 @@ lisi_knn <- function(
     "fnn" = {
       res <- FNN::get.knn(X, k = request_k)
       list(nn.idx = res$nn.index, nn.dists = res$nn.dist)
-    },
-    "hnsw" = {
-      include_self <- TRUE
-      request_k <- request_k + 1L
-      res <- RcppHNSW::hnsw_knn(
-        X,
-        k = request_k,
-        distance = "euclidean",
-        ef = max(as.integer(hnsw_ef), request_k),
-        n_threads = as.integer(nn_threads)
-      )
-      list(nn.idx = res$idx, nn.dists = res$dist)
     },
     "exact" = {
       include_self <- TRUE
@@ -345,4 +311,37 @@ lisi_knn <- function(
   }
 
   knn
+}
+
+choose_lisi_nn_method <- function(
+  n,
+  p,
+  n_neighbors,
+  use_rann = TRUE
+) {
+  exact_score <- as.double(n) * as.double(n) * as.double(p)
+  small_exact_problem <- (
+    n <= 250L &&
+      p <= 20L &&
+      n_neighbors <= 64L &&
+      exact_score <= 1.5e6
+  )
+
+  if (small_exact_problem) {
+    return("exact")
+  }
+
+  if (isTRUE(use_rann) && requireNamespace("RANN", quietly = TRUE)) {
+    return("rann")
+  }
+
+  if (requireNamespace("FNN", quietly = TRUE)) {
+    return("fnn")
+  }
+
+  if (n <= 1000L && exact_score <= 5e7) {
+    return("exact")
+  }
+
+  "exact"
 }

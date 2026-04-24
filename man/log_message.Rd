@@ -7,7 +7,7 @@
 log_message(
   ...,
   expr = NULL,
-  verbose = TRUE,
+  verbose = NULL,
   message_type = c("info", "success", "warning", "error", "running", "ask"),
   cli_model = TRUE,
   level = 1,

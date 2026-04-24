@@ -1,10 +1,17 @@
 #include <Rcpp.h>
 #include <algorithm>
+#include <cstdint>
 #include <unordered_map>
+#include <string>
 
 using namespace Rcpp;
 
 namespace {
+
+std::uint64_t coordinate_key(int row_index, int col_index) {
+  return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(row_index)) << 32) |
+    static_cast<std::uint32_t>(col_index);
+}
 
 SEXP call_sparse_matrix(const IntegerVector& sparse_i_vec,
                         const IntegerVector& sparse_j_vec,
@@ -176,8 +183,7 @@ SEXP table_to_matrix(DataFrame table,
 
   if (return_sparse)
   {
-    std::vector<int> sparse_i, sparse_j;
-    std::vector<double> sparse_x;
+    std::unordered_map<std::uint64_t, double> value_map;
 
     for (R_xlen_t i = 0; i < table.nrows(); ++i)
     {
@@ -192,11 +198,34 @@ SEXP table_to_matrix(DataFrame table,
         double value = values[i];
         if (std::abs(value) >= threshold && value != 0.0)
         {
-          sparse_i.push_back(row_it->second + 1); // R uses 1-based indexing
-          sparse_j.push_back(col_it->second + 1);
-          sparse_x.push_back(value);
+          std::uint64_t key = coordinate_key(row_it->second, col_it->second);
+          value_map[key] += value;
         }
       }
+    }
+
+    std::vector<int> sparse_i;
+    std::vector<int> sparse_j;
+    std::vector<double> sparse_x;
+    sparse_i.reserve(value_map.size());
+    sparse_j.reserve(value_map.size());
+    sparse_x.reserve(value_map.size());
+
+    for (const auto& entry : value_map)
+    {
+      const std::uint64_t key = entry.first;
+      const int row_index = static_cast<int>(key >> 32);
+      const int col_index = static_cast<int>(key & 0xffffffffu);
+      double value = entry.second;
+
+      if (value == 0.0)
+      {
+        continue;
+      }
+
+      sparse_i.push_back(row_index + 1); // R uses 1-based indexing
+      sparse_j.push_back(col_index + 1);
+      sparse_x.push_back(value);
     }
 
     IntegerVector sparse_i_vec(sparse_i.begin(), sparse_i.end());
@@ -247,7 +276,7 @@ SEXP table_to_matrix(DataFrame table,
         double value = values[i];
         if (std::abs(value) >= threshold)
         {
-          matrix(row_it->second, col_it->second) = value;
+          matrix(row_it->second, col_it->second) += value;
         }
       }
     }

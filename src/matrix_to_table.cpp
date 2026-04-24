@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include <unordered_map>
+#include <vector>
 
 using namespace Rcpp;
 
@@ -165,62 +166,28 @@ DataFrame matrix_to_table(SEXP matrix,
 
     if (keep_zero)
     {
-      // When keep_zero is TRUE, include all row/col combinations (including zeros)
-      // Create a set of non-zero positions for quick lookup
-      std::unordered_set<std::string> nonzero_positions;
+      std::vector<int> rows_to_iterate;
+      std::vector<int> cols_to_iterate;
+
+      rows_to_iterate.reserve(nrow);
+      cols_to_iterate.reserve(ncol);
+
+      for (int row = 0; row < nrow; ++row)
+      {
+        std::string rname = as<std::string>(matrix_row_names[row]);
+        if (!use_row_filter || row_filter_set.find(rname) != row_filter_set.end())
+        {
+          rows_to_iterate.push_back(row);
+        }
+      }
+
       for (int col = 0; col < ncol; ++col)
       {
         std::string cname = as<std::string>(matrix_col_names[col]);
-        if (use_col_filter && col_filter_set.find(cname) == col_filter_set.end())
+        if (!use_col_filter || col_filter_set.find(cname) != col_filter_set.end())
         {
-          continue;
+          cols_to_iterate.push_back(col);
         }
-        int start = p[col];
-        int end = p[col + 1];
-        for (int idx = start; idx < end; ++idx)
-        {
-          int row = i[idx];
-          std::string rname = as<std::string>(matrix_row_names[row]);
-          if (use_row_filter && row_filter_set.find(rname) == row_filter_set.end())
-          {
-            continue;
-          }
-          std::string pos_key = rname + "|" + cname;
-          nonzero_positions.insert(pos_key);
-        }
-      }
-
-      CharacterVector rows_to_iterate, cols_to_iterate;
-      if (use_row_filter)
-      {
-        for (int row = 0; row < nrow; ++row)
-        {
-          std::string rname = as<std::string>(matrix_row_names[row]);
-          if (row_filter_set.find(rname) != row_filter_set.end())
-          {
-            rows_to_iterate.push_back(rname);
-          }
-        }
-      }
-      else
-      {
-        rows_to_iterate = matrix_row_names;
-      }
-
-      if (use_col_filter)
-      {
-        for (int col = 0; col < ncol; ++col)
-        {
-          std::string cname = as<std::string>(matrix_col_names[col]);
-          if (col_filter_set.find(cname) != col_filter_set.end())
-          {
-            cols_to_iterate.push_back(cname);
-          }
-        }
-      }
-      else
-      {
-        cols_to_iterate = matrix_col_names;
       }
 
       size_t total_combinations = static_cast<size_t>(rows_to_iterate.size()) * static_cast<size_t>(cols_to_iterate.size());
@@ -228,41 +195,27 @@ DataFrame matrix_to_table(SEXP matrix,
       out_cols.reserve(total_combinations);
       out_vals.reserve(total_combinations);
 
-      std::unordered_map<std::string, int> row_idx_map, col_idx_map;
-      for (int row = 0; row < nrow; ++row)
+      for (std::size_t col_pos = 0; col_pos < cols_to_iterate.size(); ++col_pos)
       {
-        row_idx_map[as<std::string>(matrix_row_names[row])] = row;
-      }
-      for (int col = 0; col < ncol; ++col)
-      {
-        col_idx_map[as<std::string>(matrix_col_names[col])] = col;
-      }
+        const int col_idx = cols_to_iterate[col_pos];
+        const std::string cname = as<std::string>(matrix_col_names[col_idx]);
+        const int start = p[col_idx];
+        const int end = p[col_idx + 1];
+        int sparse_pos = start;
 
-      // Iterate through all row/col combinations
-      for (R_xlen_t r = 0; r < rows_to_iterate.size(); ++r)
-      {
-        std::string rname = as<std::string>(rows_to_iterate[r]);
-        int row_idx = row_idx_map[rname];
-        for (R_xlen_t c = 0; c < cols_to_iterate.size(); ++c)
+        for (std::size_t row_pos = 0; row_pos < rows_to_iterate.size(); ++row_pos)
         {
-          std::string cname = as<std::string>(cols_to_iterate[c]);
-          int col_idx = col_idx_map[cname];
-          std::string pos_key = rname + "|" + cname;
+          const int row_idx = rows_to_iterate[row_pos];
+          const std::string rname = as<std::string>(matrix_row_names[row_idx]);
 
           double v = 0.0;
-          if (nonzero_positions.find(pos_key) != nonzero_positions.end())
+          while (sparse_pos < end && i[sparse_pos] < row_idx)
           {
-            // Find the actual value
-            int start = p[col_idx];
-            int end = p[col_idx + 1];
-            for (int idx = start; idx < end; ++idx)
-            {
-              if (i[idx] == row_idx)
-              {
-                v = x[idx];
-                break;
-              }
-            }
+            ++sparse_pos;
+          }
+          if (sparse_pos < end && i[sparse_pos] == row_idx)
+          {
+            v = x[sparse_pos];
           }
 
           if (std::abs(v) >= threshold)
@@ -331,8 +284,24 @@ DataFrame matrix_to_table(SEXP matrix,
   IntegerVector order_idx(out_vals.size());
   for (R_xlen_t k = 0; k < order_idx.size(); ++k)
     order_idx[k] = k;
-  std::sort(order_idx.begin(), order_idx.end(), [&out_vals](int a, int b)
-            { return std::abs(out_vals[a]) > std::abs(out_vals[b]); });
+  std::sort(order_idx.begin(), order_idx.end(), [&out_vals, &out_rows, &out_cols](int a, int b)
+            {
+              const double abs_a = std::abs(out_vals[a]);
+              const double abs_b = std::abs(out_vals[b]);
+              if (abs_a != abs_b)
+              {
+                return abs_a > abs_b;
+              }
+              if (out_rows[a] != out_rows[b])
+              {
+                return out_rows[a] < out_rows[b];
+              }
+              if (out_cols[a] != out_cols[b])
+              {
+                return out_cols[a] < out_cols[b];
+              }
+              return a < b;
+            });
 
   CharacterVector sorted_rows(order_idx.size());
   CharacterVector sorted_cols(order_idx.size());

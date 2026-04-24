@@ -54,26 +54,28 @@ check_r <- function(
       status_list[[pkg]] <- FALSE
       tryCatch(
         expr = {
-          old_lib_paths <- .libPaths()
-          .libPaths(lib)
+          if (!dir.exists(lib)) {
+            dir.create(lib, recursive = TRUE, showWarnings = FALSE)
+          }
           if (isTRUE(verbose)) {
-            pak::pak(
+            pak::pkg_install(
               pkg,
               lib = lib,
+              ask = FALSE,
               dependencies = dependencies
             )
           } else {
             invisible(
               suppressMessages(
-                pak::pak(
+                pak::pkg_install(
                   pkg,
                   lib = lib,
+                  ask = FALSE,
                   dependencies = dependencies
                 )
               )
             )
           }
-          .libPaths(old_lib_paths)
         },
         error = function(e) {
           status_list[[pkg]] <- FALSE
@@ -138,10 +140,7 @@ remove_r <- function(
       status_list[[pkg]] <- FALSE
       tryCatch(
         expr = {
-          old_lib_paths <- .libPaths()
-          .libPaths(lib)
-          pak::pkg_remove(pkg)
-          .libPaths(old_lib_paths)
+          pak::pkg_remove(pkg, lib = lib)
         },
         error = function(e) {
           log_message(

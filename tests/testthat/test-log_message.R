@@ -156,6 +156,53 @@ test_that("log_message evaluates expr silently when verbose is FALSE", {
   expect_equal(result, 7)
 })
 
+test_that("log_message remaps cli alerts captured from expr", {
+  captured <- capture.output(
+    log_message(
+      expr = {
+        cli::cli_alert_info("hello")
+        cli::cli_alert_warning("warn")
+        cli::cli_alert_success("ok")
+        cli::cli_text("plain text")
+      },
+      cli_model = FALSE,
+      timestamp = FALSE,
+      message_type = "running"
+    ),
+    type = "message"
+  )
+
+  expect_equal(
+    captured,
+    c(
+      "hello",
+      "WARNING: warn",
+      "SUCCESS: ok",
+      "RUNNING: plain text"
+    )
+  )
+})
+
+test_that("log_message avoids double cli prefixes for expr output", {
+  captured <- capture.output(
+    log_message(
+      expr = {
+        cli::cli_alert_info("hello")
+        cli::cli_alert_warning("warn")
+      },
+      cli_model = TRUE,
+      timestamp = FALSE
+    ),
+    type = "message"
+  )
+
+  expect_length(captured, 2)
+  expect_false(grepl("ℹ .*ℹ ", captured[1]))
+  expect_false(grepl("! .*!", captured[2]))
+  expect_match(captured[1], "hello$")
+  expect_match(captured[2], "warn$")
+})
+
 test_that("log_message disallows ask and error message types with expr", {
   expect_error(
     log_message(expr = 1 + 1, message_type = "ask")
@@ -194,6 +241,35 @@ test_that("get_verbose respects global option", {
   old <- options(log_message.verbose = FALSE)
   on.exit(options(old))
   expect_false(get_verbose())
+})
+
+test_that("get_verbose gives explicit argument precedence over global option", {
+  old <- options(log_message.verbose = FALSE)
+  on.exit(options(old))
+  expect_true(get_verbose(verbose = TRUE))
+})
+
+test_that("log_message explicit verbose overrides global option", {
+  old <- options(log_message.verbose = FALSE)
+  on.exit(options(old))
+
+  expect_message(
+    log_message("visible", verbose = TRUE, cli_model = FALSE, timestamp = FALSE),
+    "Visible"
+  )
+})
+
+test_that("log_message keeps visible expr results visible", {
+  captured <- withVisible(
+    log_message(
+      expr = 1 + 1,
+      cli_model = FALSE,
+      timestamp = FALSE
+    )
+  )
+
+  expect_true(captured$visible)
+  expect_equal(captured$value, 2)
 })
 
 test_that("parse_inline_expressions evaluates expressions", {

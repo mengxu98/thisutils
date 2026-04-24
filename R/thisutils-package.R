@@ -89,6 +89,9 @@ print.thisutils_logo <- function(x, ...) {
 }
 
 .onAttach <- function(libname, pkgname) {
+  if (!interactive()) {
+    return(invisible())
+  }
   verbose <- thisutils::get_verbose()
   if (isTRUE(verbose)) {
     version <- utils::packageVersion(pkgname)
