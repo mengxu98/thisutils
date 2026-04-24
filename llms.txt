@@ -99,6 +99,8 @@ Please reference
   : Check CI environment
 - [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
   : Check sparsity of matrix
+- [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md)
+  : Collapse sparse matrix rows by group
 - [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md)
   : Compute Local Inverse Simpson's Index (LISI)
 - [`compute_simpson_index()`](https://mengxu98.github.io/thisutils/reference/compute_simpson_index.md)

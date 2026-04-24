@@ -1,6 +1,66 @@
 # Changelog
 
+## thisutils 0.4.5
+
+- **feat**:
+  - Add
+    [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md):
+    collapse sparse matrix rows by group while preserving sparse output
+    and row order.
+  - Update
+    [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md):
+    simplify nearest-neighbor backend selection by removing the `hnsw`
+    path and using a more conservative `"auto"` strategy that prefers
+    the package’s exact backend only for very small problems.
+  - Improve
+    [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md):
+    refactor verbose multi-core execution to collect results dynamically
+    while preserving input order and progress reporting across uneven
+    workloads.
+  - Improve
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md):
+    allow explicit `verbose` to override the global option and normalize
+    captured `cli` alerts emitted inside `expr`.
+- **fix**:
+  - Harden
+    [`normalization()`](https://mengxu98.github.io/thisutils/reference/normalization.md)
+    against degenerate inputs so zero-variance or zero-sum vectors
+    return stable values instead of `NaN`/`Inf`.
+  - Fix
+    [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
+    sparse `keep_zero = TRUE` handling to match dense output more
+    reliably and make equal-magnitude sorting deterministic.
+  - Fix
+    [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+    to aggregate duplicate row/column coordinates consistently in both
+    dense and sparse output paths.
+  - Update package startup behavior to stay silent in non-interactive
+    sessions and when verbose logging is disabled.
+  - Update package installation helpers to use
+    [`pak::pkg_install()`](https://pak.r-lib.org/reference/pkg_install.html)/[`pak::pkg_remove()`](https://pak.r-lib.org/reference/pkg_remove.html)
+    with explicit library handling.
+- **docs**:
+  - Add a runnable example for
+    [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md).
+  - Refresh
+    [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md)
+    and
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    documentation to match the current arguments and defaults.
+- **tests**:
+  - Add regression tests for
+    [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md)
+    edge cases,
+    [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md)
+    backend consistency, captured `cli` messages in
+    `log_message(expr = ...)`, matrix conversion corner cases,
+    [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+    ordering/export behavior, normalization on degenerate inputs, and
+    startup suppression when verbose logging is disabled.
+
 ## thisutils 0.4.4
+
+CRAN release: 2026-04-02
 
 - **feat**:
   - Add

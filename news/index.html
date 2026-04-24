@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,34 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.4" id="thisutils-044">thisutils 0.4.4<a class="anchor" aria-label="anchor" href="#thisutils-044"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.5" id="thisutils-045">thisutils 0.4.5<a class="anchor" aria-label="anchor" href="#thisutils-045"></a></h2>
+<ul><li>
+<strong>feat</strong>:
+<ul><li>Add <code><a href="../reference/collapse_sparse_rows.html">collapse_sparse_rows()</a></code>: collapse sparse matrix rows by group while preserving sparse output and row order.</li>
+<li>Update <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code>: simplify nearest-neighbor backend selection by removing the <code>hnsw</code> path and using a more conservative <code>"auto"</code> strategy that prefers the package’s exact backend only for very small problems.</li>
+<li>Improve <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code>: refactor verbose multi-core execution to collect results dynamically while preserving input order and progress reporting across uneven workloads.</li>
+<li>Improve <code><a href="../reference/log_message.html">log_message()</a></code>: allow explicit <code>verbose</code> to override the global option and normalize captured <code>cli</code> alerts emitted inside <code>expr</code>.</li>
+</ul></li>
+<li>
+<strong>fix</strong>:
+<ul><li>Harden <code><a href="../reference/normalization.html">normalization()</a></code> against degenerate inputs so zero-variance or zero-sum vectors return stable values instead of <code>NaN</code>/<code>Inf</code>.</li>
+<li>Fix <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> sparse <code>keep_zero = TRUE</code> handling to match dense output more reliably and make equal-magnitude sorting deterministic.</li>
+<li>Fix <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> to aggregate duplicate row/column coordinates consistently in both dense and sparse output paths.</li>
+<li>Update package startup behavior to stay silent in non-interactive sessions and when verbose logging is disabled.</li>
+<li>Update package installation helpers to use <code><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pak::pkg_install()</a></code>/<code><a href="https://pak.r-lib.org/reference/pkg_remove.html" class="external-link">pak::pkg_remove()</a></code> with explicit library handling.</li>
+</ul></li>
+<li>
+<strong>docs</strong>:
+<ul><li>Add a runnable example for <code><a href="../reference/collapse_sparse_rows.html">collapse_sparse_rows()</a></code>.</li>
+<li>Refresh <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code> and <code><a href="../reference/log_message.html">log_message()</a></code> documentation to match the current arguments and defaults.</li>
+</ul></li>
+<li>
+<strong>tests</strong>:
+<ul><li>Add regression tests for <code><a href="../reference/collapse_sparse_rows.html">collapse_sparse_rows()</a></code> edge cases, <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code> backend consistency, captured <code>cli</code> messages in <code>log_message(expr = ...)</code>, matrix conversion corner cases, <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> ordering/export behavior, normalization on degenerate inputs, and startup suppression when verbose logging is disabled.</li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.4" id="thisutils-044">thisutils 0.4.4<a class="anchor" aria-label="anchor" href="#thisutils-044"></a></h2><p class="text-muted">CRAN release: 2026-04-02</p>
 <ul><li>
 <strong>feat</strong>:
 <ul><li>Add <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code>: compute per-cell Local Inverse Simpson’s Index (LISI) scores for categorical variables. Supports multiple nearest-neighbor backends (<code>"auto"</code>, <code>"rann"</code>, <code>"fnn"</code>, <code>"hnsw"</code>, <code>"exact"</code>) with configurable perplexity and tolerance. Includes <code><a href="../reference/compute_simpson_index.html">compute_simpson_index()</a></code> for low-level Simpson index computation from KNN graphs, backed by a C++ implementation.</li>

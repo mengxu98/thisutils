@@ -14,9 +14,7 @@ compute_lisi(
   perplexity = 30,
   nn_eps = 0,
   use_rann = TRUE,
-  nn_method = c("auto", "rann", "fnn", "hnsw", "exact"),
-  nn_threads = 0,
-  hnsw_ef = 100,
+  nn_method = c("auto", "rann", "fnn", "exact"),
   tol = 1e-05,
   max_iter = 50
 )
@@ -57,21 +55,10 @@ compute_lisi(
 
 - nn_method:
 
-  Nearest-neighbor backend. Defaults to `"auto"`, which uses a simple
-  heuristic: low-dimensional inputs use the package's exact C++ search,
-  while larger/higher-dimensional inputs fall back to `RANN`, then
-  `FNN`, then the built-in exact C++ backend. Set to `"hnsw"` to use
-  `RcppHNSW` for a faster, approximate search.
-
-- nn_threads:
-
-  Number of threads used by the HNSW backend. Defaults to `0` which lets
-  `RcppHNSW` choose automatically.
-
-- hnsw_ef:
-
-  Search breadth used by the HNSW backend. Larger values are more
-  accurate but slower. Defaults to `100`.
+  Nearest-neighbor backend. Defaults to `"auto"`, which prefers the
+  package's exact C++ search only for very small problems. Larger inputs
+  fall back to `RANN`, then `FNN`, and only use the exact backend as a
+  last resort.
 
 - tol:
 
@@ -112,7 +99,7 @@ res <- compute_lisi(
   c("batch", "group"),
   perplexity = 10
 )
-#> ◌ [2026-04-01 14:12:22] Using "exact" nearest-neighbor backend for compute_lisi
+#> ◌ [2026-04-24 08:08:30] Using "exact" nearest-neighbor backend for compute_lisi
 head(res)
 #>      batch    group
 #> 1 1.001837 1.490901

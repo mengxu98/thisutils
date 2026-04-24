@@ -39,7 +39,7 @@ votep(p)
 #> [1] 0.01 0.02 0.03 0.04 0.05
 #> 
 votep(p, alpha = 0.01)
-#> ! [2026-04-01 14:12:32] All P-values are within specified limits of alpha
+#> ! [2026-04-24 08:08:39] All P-values are within specified limits of alpha
 #> $p
 #> [1] 1
 #> 

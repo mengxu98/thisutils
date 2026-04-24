@@ -33,7 +33,7 @@ options(log_message.verbose = FALSE)
 get_verbose()
 #> [1] FALSE
 get_verbose(verbose = TRUE)
-#> [1] FALSE
+#> [1] TRUE
 
 options(log_message.verbose = TRUE)
 get_verbose()
