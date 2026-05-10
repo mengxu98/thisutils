@@ -2,6 +2,8 @@
 
 ## thisutils 0.4.5
 
+CRAN release: 2026-04-24
+
 - **feat**:
   - Add
     [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md):

@@ -1,8 +1,8 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2026-04-24T08:41Z
+last_built: 2026-05-10T14:02Z
 urls:
   reference: https://mengxu98.github.io/thisutils/reference
   article: https://mengxu98.github.io/thisutils/articles

@@ -12,6 +12,7 @@ tasks to streamline workflows.
 Install CRAN version:
 
 ``` r
+
 install.packages("thisutils")
 # or
 if (!require("pak", quietly = TRUE)) {
@@ -25,6 +26,7 @@ Install development version from
 [pak](https://github.com/r-lib/pak):
 
 ``` r
+
 if (!require("pak", quietly = TRUE)) {
   install.packages("pak")
 }
