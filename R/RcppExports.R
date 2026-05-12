@@ -5,8 +5,16 @@ compute_simpson_index_cpp <- function(D, knn_idx, batch_labels, perplexity = 15,
     .Call(`_thisutils_compute_simpson_index_cpp`, D, knn_idx, batch_labels, perplexity, tol, max_iter)
 }
 
-lisi_exact_knn_cpp <- function(X, k) {
-    .Call(`_thisutils_lisi_exact_knn_cpp`, X, k)
+compute_simpson_index_matrix_cpp <- function(D, knn_idx, batch_labels, perplexity = 15, tol = 1e-5, max_iter = 50L) {
+    .Call(`_thisutils_compute_simpson_index_matrix_cpp`, D, knn_idx, batch_labels, perplexity, tol, max_iter)
+}
+
+compute_lisi_matrix_cpp <- function(X, batch_labels, n_neighbors, perplexity = 30, tol = 1e-5, max_iter = 50L) {
+    .Call(`_thisutils_compute_lisi_matrix_cpp`, X, batch_labels, n_neighbors, perplexity, tol, max_iter)
+}
+
+lisi_exact_knn_cpp <- function(X, k, exclude_self = FALSE) {
+    .Call(`_thisutils_lisi_exact_knn_cpp`, X, k, exclude_self)
 }
 
 drop_self_from_knn_cpp <- function(nn_idx, nn_dists) {

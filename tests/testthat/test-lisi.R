@@ -87,118 +87,79 @@ test_that("compute_simpson_index errors on dimension mismatch", {
   )
 })
 
-compute_lisi_original_like_test <- function(X, meta_data, label_colnames, perplexity = 30, nn_eps = 0) {
-  N <- nrow(meta_data)
-  dknn <- RANN::nn2(X, k = perplexity * 3, eps = nn_eps)
-
-  out <- lapply(label_colnames, function(label_colname) {
-    labels <- data.frame(meta_data)[, label_colname, drop = TRUE]
-    if (any(is.na(labels))) {
-      return(rep(NA_real_, N))
-    }
-
-    nn_idx <- dknn$nn.idx[, 2:ncol(dknn$nn.idx), drop = FALSE]
-    nn_dists <- dknn$nn.dists[, 2:ncol(dknn$nn.dists), drop = FALSE]
-    labels <- as.integer(factor(labels)) - 1L
-    n_batches <- length(unique(labels))
-
-    simpson <- compute_simpson_index_original_like_test(
-      t(nn_dists),
-      t(nn_idx) - 1L,
-      labels,
-      n_batches,
-      perplexity
-    )
-
-    1 / simpson
-  })
-
-  out <- as.data.frame(out, optional = TRUE, stringsAsFactors = FALSE)
-  colnames(out) <- label_colnames
-  out
-}
-
-compute_simpson_index_original_like_test <- function(D, knn_idx, batch_labels, n_batches, perplexity = 15, tol = 1e-5) {
-  D <- as.matrix(D)
-  knn_idx <- as.matrix(knn_idx)
-  n <- ncol(D)
-  simpson <- numeric(n)
-  logU <- log(perplexity)
-
-  hbeta <- function(D, beta, idx) {
-    P <- exp(-D[, idx] * beta)
-    sumP <- sum(P)
-    if (sumP == 0) {
-      list(H = 0, P = D[, idx] * 0)
-    } else {
-      H <- log(sumP) + beta * sum(D[, idx] * P) / sumP
-      list(H = H, P = P / sumP)
-    }
-  }
-
-  for (cell in seq_len(n)) {
-    beta <- 1
-    betamin <- -Inf
-    betamax <- Inf
-    hb <- hbeta(D, beta, cell)
-    H <- hb$H
-    P <- hb$P
-    Hdiff <- H - logU
-    tries <- 0
-
-    while (abs(Hdiff) > tol && tries < 50) {
-      if (Hdiff > 0) {
-        betamin <- beta
-        beta <- if (!is.finite(betamax)) beta * 2 else (beta + betamax) / 2
-      } else {
-        betamax <- beta
-        beta <- if (!is.finite(betamin)) beta / 2 else (beta + betamin) / 2
-      }
-
-      hb <- hbeta(D, beta, cell)
-      H <- hb$H
-      P <- hb$P
-      Hdiff <- H - logU
-      tries <- tries + 1
-    }
-
-    if (H == 0) {
-      simpson[cell] <- -1
-      next
-    }
-
-    for (b in 0:(n_batches - 1L)) {
-      q <- which(batch_labels[knn_idx[, cell] + 1L] == b)
-      if (length(q) > 0) {
-        sumP <- sum(P[q])
-        simpson[cell] <- simpson[cell] + sumP * sumP
-      }
-    }
-  }
-
-  simpson
-}
-
-test_that("choose_lisi_nn_method prefers exact only for very small problems", {
+test_that("choose_lisi_nn_method defaults to exact C++", {
   expect_equal(
-    choose_lisi_nn_method(n = 200, p = 10, n_neighbors = 30, use_rann = TRUE),
+    choose_lisi_nn_method(n = 200, p = 10, n_neighbors = 30),
     "exact"
   )
   expect_equal(
-    choose_lisi_nn_method(n = 300, p = 10, n_neighbors = 30, use_rann = TRUE),
-    "rann"
+    choose_lisi_nn_method(n = 300, p = 10, n_neighbors = 30),
+    "exact"
   )
   expect_equal(
-    choose_lisi_nn_method(n = 1000, p = 30, n_neighbors = 90, use_rann = TRUE),
-    "rann"
+    choose_lisi_nn_method(n = 1000, p = 30, n_neighbors = 90),
+    "exact"
   )
   expect_equal(
-    choose_lisi_nn_method(n = 1000, p = 30, n_neighbors = 90, use_rann = FALSE),
-    "fnn"
+    choose_lisi_nn_method(n = 1000, p = 30, n_neighbors = 90),
+    "exact"
   )
 })
 
-test_that("compute_lisi exact, rann and fnn agree on small data", {
+test_that("compute_lisi computes multiple labels in one pass", {
+  set.seed(12)
+  X <- matrix(rnorm(3000), ncol = 10)
+  meta <- data.frame(
+    batch = sample(c("A", "B"), nrow(X), replace = TRUE),
+    group = sample(c("g1", "g2", "g3"), nrow(X), replace = TRUE),
+    condition = sample(c("ctrl", "stim"), nrow(X), replace = TRUE)
+  )
+
+  multi_res <- suppressMessages(
+    compute_lisi(X, meta, c("batch", "group", "condition"), perplexity = 10, nn_method = "exact")
+  )
+  single_res <- do.call(cbind, lapply(c("batch", "group", "condition"), function(label) {
+    suppressMessages(compute_lisi(X, meta, label, perplexity = 10, nn_method = "exact"))[[1]]
+  }))
+  colnames(single_res) <- c("batch", "group", "condition")
+
+  expect_equal(unname(as.matrix(multi_res)), unname(single_res), tolerance = 1e-12)
+})
+
+test_that("compute_lisi fused C++ path matches explicit KNN and Simpson path", {
+  set.seed(13)
+  X <- matrix(rnorm(3000), ncol = 10)
+  meta <- data.frame(
+    batch = sample(c("A", "B"), nrow(X), replace = TRUE),
+    group = sample(c("g1", "g2", "g3"), nrow(X), replace = TRUE)
+  )
+  perplexity <- 10
+  n_neighbors <- min(
+    nrow(X) - 1L,
+    max(1L, as.integer(ceiling(perplexity * 3)) - 1L)
+  )
+
+  fused <- suppressMessages(
+    compute_lisi(X, meta, c("batch", "group"), perplexity = perplexity)
+  )
+  knn <- suppressMessages(
+    lisi_knn(X, n_neighbors = n_neighbors, nn_method = "exact")
+  )
+  labels <- cbind(
+    batch = as.integer(factor(meta$batch)),
+    group = as.integer(factor(meta$group))
+  )
+  explicit <- 1 / compute_simpson_index_matrix(
+    D = t(knn$nn.dists),
+    knn_idx = t(knn$nn.idx),
+    batch_labels = labels,
+    perplexity = perplexity
+  )
+
+  expect_equal(unname(as.matrix(fused)), unname(explicit), tolerance = 1e-12)
+})
+
+test_that("compute_lisi auto and exact agree on small data", {
   set.seed(11)
   X <- rbind(
     matrix(rnorm(1000, mean = -1), ncol = 10),
@@ -209,30 +170,24 @@ test_that("compute_lisi exact, rann and fnn agree on small data", {
     group = sample(c("g1", "g2", "g3"), nrow(X), replace = TRUE)
   )
 
+  auto_res <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10, nn_method = "auto"))
   exact_res <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10, nn_method = "exact"))
-  rann_res <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10, nn_method = "rann"))
-  fnn_res <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10, nn_method = "fnn"))
 
-  expect_equal(rann_res, exact_res, tolerance = 1e-10)
-  expect_equal(fnn_res, exact_res, tolerance = 1e-10)
+  expect_equal(auto_res, exact_res, tolerance = 1e-10)
 })
 
-test_that("compute_lisi rann matches original LISI implementation path", {
-  set.seed(44)
-  X <- rbind(
-    matrix(rnorm(2000, mean = -1), ncol = 10),
-    matrix(rnorm(2000, mean = 1), ncol = 10)
-  )
-  meta <- data.frame(
-    batch = rep(c("A", "B"), each = nrow(X) / 2),
-    group = sample(c("g1", "g2", "g3"), nrow(X), replace = TRUE)
-  )
+test_that("removed RANN and FNN backends are rejected", {
+  X <- matrix(rnorm(100), ncol = 5)
+  meta <- data.frame(batch = rep(c("A", "B"), each = 10))
 
-  ours <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10, nn_method = "rann"))
-  orig <- compute_lisi_original_like_test(X, meta, c("batch", "group"), perplexity = 10, nn_eps = 0)
-
-  expect_equal(colnames(ours), colnames(orig))
-  expect_equal(unname(as.matrix(ours)), unname(as.matrix(orig)), tolerance = 1e-12)
+  expect_error(
+    suppressMessages(compute_lisi(X, meta, "batch", perplexity = 5, nn_method = "rann")),
+    "should be one of"
+  )
+  expect_error(
+    suppressMessages(compute_lisi(X, meta, "batch", perplexity = 5, nn_method = "fnn")),
+    "should be one of"
+  )
 })
 
 test_that("compute_lisi auto matches explicit backend strategy on different sizes", {
@@ -258,6 +213,6 @@ test_that("compute_lisi auto matches explicit backend strategy on different size
   )
 
   auto_medium <- suppressMessages(compute_lisi(X_medium, meta_medium, "batch", perplexity = 15, nn_method = "auto"))
-  rann_medium <- suppressMessages(compute_lisi(X_medium, meta_medium, "batch", perplexity = 15, nn_method = "rann"))
-  expect_equal(auto_medium, rann_medium, tolerance = 1e-10)
+  exact_medium <- suppressMessages(compute_lisi(X_medium, meta_medium, "batch", perplexity = 15, nn_method = "exact"))
+  expect_equal(auto_medium, exact_medium, tolerance = 1e-10)
 })

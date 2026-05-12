@@ -9,13 +9,8 @@
 #' @param meta_data A data frame with one row per cell.
 #' @param label_colnames Character vector of column names in `meta_data` to evaluate.
 #' @param perplexity Effective neighborhood size. Defaults to `30`.
-#' @param nn_eps Approximation factor passed to [RANN::nn2] when `RANN` is available and `use_rann = TRUE`.
-#' Defaults to `0`.
-#' @param use_rann Whether to prefer [RANN::nn2] over `FNN::get.knn` when `nn_method = "auto"` decides not to use the package's built-in exact C++ backend.
-#' Defaults to `TRUE`.
 #' @param nn_method Nearest-neighbor backend. Defaults to `"auto"`,
-#' which prefers the package's exact C++ search only for very small problems.
-#' Larger inputs fall back to `RANN`, then `FNN`, and only use the exact backend as a last resort.
+#' which uses the package's exact C++ search.
 #' @param tol Tolerance used in the binary search for the target perplexity.
 #' Defaults to `1e-5`.
 #' @param max_iter Maximum number of binary-search iterations.
@@ -55,9 +50,7 @@ compute_lisi <- function(
   meta_data,
   label_colnames,
   perplexity = 30,
-  nn_eps = 0,
-  use_rann = TRUE,
-  nn_method = c("auto", "rann", "fnn", "exact"),
+  nn_method = c("auto", "exact"),
   tol = 1e-5,
   max_iter = 50
 ) {
@@ -106,15 +99,10 @@ compute_lisi <- function(
     nrow(X) - 1L,
     max(1L, as.integer(ceiling(perplexity * 3)) - 1L)
   )
-  knn <- lisi_knn(
-    X = X,
-    n_neighbors = n_neighbors,
-    nn_eps = nn_eps,
-    use_rann = use_rann,
-    nn_method = nn_method
-  )
-
-  out <- lapply(label_colnames, function(label_colname) {
+  label_ids <- matrix(NA_integer_, nrow = nrow(X), ncol = length(label_colnames))
+  valid_label <- rep(TRUE, length(label_colnames))
+  for (i in seq_along(label_colnames)) {
+    label_colname <- label_colnames[[i]]
     labels <- meta_data[[label_colname]]
 
     if (any(is.na(labels))) {
@@ -122,23 +110,25 @@ compute_lisi <- function(
         "Cannot compute {.pkg LISI} for {.val {label_colname}} because it contains missing values",
         message_type = "warning"
       )
-      return(rep(NA_real_, nrow(X)))
+      valid_label[[i]] <- FALSE
+    } else {
+      label_ids[, i] <- as.integer(factor(labels))
     }
+  }
 
-    label_ids <- as.integer(factor(labels))
-    simpson <- compute_simpson_index(
-      D = t(knn$nn.dists),
-      knn_idx = t(knn$nn.idx),
-      batch_labels = label_ids,
+  lisi_mat <- matrix(NA_real_, nrow = nrow(X), ncol = length(label_colnames))
+  if (any(valid_label)) {
+    lisi_mat[, valid_label] <- compute_lisi_matrix_cpp(
+      X = X,
+      batch_labels = label_ids[, valid_label, drop = FALSE],
+      n_neighbors = n_neighbors,
       perplexity = perplexity,
       tol = tol,
       max_iter = max_iter
     )
+  }
 
-    1 / simpson
-  })
-
-  out <- as.data.frame(out, optional = TRUE, stringsAsFactors = FALSE)
+  out <- as.data.frame(lisi_mat, optional = TRUE, stringsAsFactors = FALSE)
   colnames(out) <- label_colnames
   rownames(out) <- rownames(meta_data) %ss% rownames(X)
   out
@@ -242,6 +232,73 @@ compute_simpson_index <- function(
   )
 }
 
+compute_simpson_index_matrix <- function(
+  D,
+  knn_idx,
+  batch_labels,
+  perplexity = 15,
+  tol = 1e-5,
+  max_iter = 50
+) {
+  D <- as.matrix(D)
+  knn_idx <- as.matrix(knn_idx)
+  batch_labels <- as.matrix(batch_labels)
+
+  if (!is.numeric(D)) {
+    log_message(
+      "D must be a numeric matrix",
+      message_type = "error"
+    )
+  }
+  if (!is.numeric(knn_idx)) {
+    log_message(
+      "knn_idx must be an integer/numeric matrix",
+      message_type = "error"
+    )
+  }
+  if (!is.numeric(batch_labels)) {
+    log_message(
+      "batch_labels must be an integer/numeric matrix",
+      message_type = "error"
+    )
+  }
+  if (!identical(dim(D), dim(knn_idx))) {
+    log_message(
+      "D and knn_idx must have the same dimensions",
+      message_type = "error"
+    )
+  }
+  if (ncol(D) != nrow(batch_labels)) {
+    log_message(
+      "nrow(batch_labels) must equal ncol(D)",
+      message_type = "error"
+    )
+  }
+  if (
+    !is.numeric(perplexity) ||
+      length(perplexity) != 1 ||
+      is.na(perplexity) ||
+      perplexity <= 0
+  ) {
+    log_message(
+      "perplexity must be a single positive number",
+      message_type = "error"
+    )
+  }
+
+  storage.mode(knn_idx) <- "integer"
+  storage.mode(batch_labels) <- "integer"
+
+  compute_simpson_index_matrix_cpp(
+    D = D,
+    knn_idx = knn_idx,
+    batch_labels = batch_labels,
+    perplexity = perplexity,
+    tol = tol,
+    max_iter = as.integer(max_iter)
+  )
+}
+
 validate_lisi_input_matrix <- function(X) {
   if (inherits(X, "sparseMatrix")) {
     X <- Matrix::as.matrix(X)
@@ -262,19 +319,15 @@ validate_lisi_input_matrix <- function(X) {
 lisi_knn <- function(
   X,
   n_neighbors,
-  nn_eps = 0,
-  use_rann = TRUE,
   nn_method = "auto"
 ) {
-  include_self <- FALSE
   request_k <- as.integer(n_neighbors)
 
   if (identical(nn_method, "auto")) {
     nn_method <- choose_lisi_nn_method(
       n = nrow(X),
       p = ncol(X),
-      n_neighbors = request_k,
-      use_rann = use_rann
+      n_neighbors = request_k
     )
   }
 
@@ -285,19 +338,8 @@ lisi_knn <- function(
 
   knn <- switch(
     EXPR = nn_method,
-    "rann" = {
-      include_self <- TRUE
-      request_k <- request_k + 1L
-      RANN::nn2(data = X, query = X, k = request_k, eps = nn_eps)
-    },
-    "fnn" = {
-      res <- FNN::get.knn(X, k = request_k)
-      list(nn.idx = res$nn.index, nn.dists = res$nn.dist)
-    },
     "exact" = {
-      include_self <- TRUE
-      request_k <- request_k + 1L
-      lisi_exact_knn_cpp(X, as.integer(request_k))
+      lisi_exact_knn_cpp(X, as.integer(request_k), exclude_self = TRUE)
     },
     log_message(
       "Unsupported nn_method: {.val {nn_method}}",
@@ -305,43 +347,13 @@ lisi_knn <- function(
     )
   )
 
-  if (include_self) {
-    storage.mode(knn$nn.idx) <- "integer"
-    knn <- drop_self_from_knn_cpp(knn$nn.idx, as.matrix(knn$nn.dists))
-  }
-
   knn
 }
 
 choose_lisi_nn_method <- function(
   n,
   p,
-  n_neighbors,
-  use_rann = TRUE
+  n_neighbors
 ) {
-  exact_score <- as.double(n) * as.double(n) * as.double(p)
-  small_exact_problem <- (
-    n <= 250L &&
-      p <= 20L &&
-      n_neighbors <= 64L &&
-      exact_score <= 1.5e6
-  )
-
-  if (small_exact_problem) {
-    return("exact")
-  }
-
-  if (isTRUE(use_rann) && requireNamespace("RANN", quietly = TRUE)) {
-    return("rann")
-  }
-
-  if (requireNamespace("FNN", quietly = TRUE)) {
-    return("fnn")
-  }
-
-  if (n <= 1000L && exact_score <= 5e7) {
-    return("exact")
-  }
-
   "exact"
 }
