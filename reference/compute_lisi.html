@@ -51,9 +51,7 @@ This is a clean-room reimplementation of the <code>immunogenomics/LISI</code>.</
 <span>  <span class="va">meta_data</span>,</span>
 <span>  <span class="va">label_colnames</span>,</span>
 <span>  perplexity <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  nn_eps <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  use_rann <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  nn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"rann"</span>, <span class="st">"fnn"</span>, <span class="st">"exact"</span><span class="op">)</span>,</span>
+<span>  nn_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"exact"</span><span class="op">)</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-05</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -79,20 +77,9 @@ This is a clean-room reimplementation of the <code>immunogenomics/LISI</code>.</
 <dd><p>Effective neighborhood size. Defaults to <code>30</code>.</p></dd>
 
 
-<dt id="arg-nn-eps">nn_eps<a class="anchor" aria-label="anchor" href="#arg-nn-eps"></a></dt>
-<dd><p>Approximation factor passed to <a href="https://jefferislab.github.io/RANN/reference/nn2.html" class="external-link">RANN::nn2</a> when <code>RANN</code> is available and <code>use_rann = TRUE</code>.
-Defaults to <code>0</code>.</p></dd>
-
-
-<dt id="arg-use-rann">use_rann<a class="anchor" aria-label="anchor" href="#arg-use-rann"></a></dt>
-<dd><p>Whether to prefer <a href="https://jefferislab.github.io/RANN/reference/nn2.html" class="external-link">RANN::nn2</a> over <code><a href="https://rdrr.io/pkg/FNN/man/get.knn.html" class="external-link">FNN::get.knn</a></code> when <code>nn_method = "auto"</code> decides not to use the package's built-in exact C++ backend.
-Defaults to <code>TRUE</code>.</p></dd>
-
-
 <dt id="arg-nn-method">nn_method<a class="anchor" aria-label="anchor" href="#arg-nn-method"></a></dt>
 <dd><p>Nearest-neighbor backend. Defaults to <code>"auto"</code>,
-which prefers the package's exact C++ search only for very small problems.
-Larger inputs fall back to <code>RANN</code>, then <code>FNN</code>, and only use the exact backend as a last resort.</p></dd>
+which uses the package's exact C++ search.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
@@ -135,7 +122,6 @@ integration of single-cell data with Harmony. <em>Nature Methods</em> (2019).
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span>, <span class="st">"group"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  perplexity <span class="op">=</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #FFAF00;">◌</span> [2026-05-10 14:02:31] Using <span style="color: #0000BB;">"exact"</span> nearest-neighbor backend for <span style="color: #0000BB;">compute_lisi</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      batch    group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.001837 1.490901</span>

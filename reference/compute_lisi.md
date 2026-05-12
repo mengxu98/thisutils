@@ -12,9 +12,7 @@ compute_lisi(
   meta_data,
   label_colnames,
   perplexity = 30,
-  nn_eps = 0,
-  use_rann = TRUE,
-  nn_method = c("auto", "rann", "fnn", "exact"),
+  nn_method = c("auto", "exact"),
   tol = 1e-05,
   max_iter = 50
 )
@@ -39,26 +37,10 @@ compute_lisi(
 
   Effective neighborhood size. Defaults to `30`.
 
-- nn_eps:
-
-  Approximation factor passed to
-  [RANN::nn2](https://jefferislab.github.io/RANN/reference/nn2.html)
-  when `RANN` is available and `use_rann = TRUE`. Defaults to `0`.
-
-- use_rann:
-
-  Whether to prefer
-  [RANN::nn2](https://jefferislab.github.io/RANN/reference/nn2.html)
-  over [`FNN::get.knn`](https://rdrr.io/pkg/FNN/man/get.knn.html) when
-  `nn_method = "auto"` decides not to use the package's built-in exact
-  C++ backend. Defaults to `TRUE`.
-
 - nn_method:
 
-  Nearest-neighbor backend. Defaults to `"auto"`, which prefers the
-  package's exact C++ search only for very small problems. Larger inputs
-  fall back to `RANN`, then `FNN`, and only use the exact backend as a
-  last resort.
+  Nearest-neighbor backend. Defaults to `"auto"`, which uses the
+  package's exact C++ search.
 
 - tol:
 
@@ -99,7 +81,6 @@ res <- compute_lisi(
   c("batch", "group"),
   perplexity = 10
 )
-#> ◌ [2026-05-10 14:02:31] Using "exact" nearest-neighbor backend for compute_lisi
 head(res)
 #>      batch    group
 #> 1 1.001837 1.490901
