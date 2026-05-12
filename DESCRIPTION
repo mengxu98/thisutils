@@ -25,9 +25,7 @@ Imports:
     Rcpp,
     rlang,
     stats,
-    utils,
-    FNN,
-    RANN
+    utils
 Suggests:
     testthat (>= 3.0.0)
 LinkingTo:
