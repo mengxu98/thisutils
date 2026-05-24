@@ -1,5 +1,7 @@
 # Changelog
 
+## thisutils 0.4.6
+
 ## thisutils 0.4.5
 
 CRAN release: 2026-04-24
@@ -68,12 +70,7 @@ CRAN release: 2026-04-02
   - Add
     [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md):
     compute per-cell Local Inverse Simpson’s Index (LISI) scores for
-    categorical variables. Supports multiple nearest-neighbor backends
-    (`"auto"`, `"rann"`, `"fnn"`, `"hnsw"`, `"exact"`) with configurable
-    perplexity and tolerance. Includes
-    [`compute_simpson_index()`](https://mengxu98.github.io/thisutils/reference/compute_simpson_index.md)
-    for low-level Simpson index computation from KNN graphs, backed by a
-    C++ implementation.
+    categorical variables.
   - Enhance
     [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md):
     add optional `expr` support to capture standard output, messages,

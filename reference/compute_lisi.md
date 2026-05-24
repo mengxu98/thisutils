@@ -12,7 +12,6 @@ compute_lisi(
   meta_data,
   label_colnames,
   perplexity = 30,
-  nn_method = c("auto", "exact"),
   tol = 1e-05,
   max_iter = 50
 )
@@ -36,11 +35,6 @@ compute_lisi(
 - perplexity:
 
   Effective neighborhood size. Defaults to `30`.
-
-- nn_method:
-
-  Nearest-neighbor backend. Defaults to `"auto"`, which uses the
-  package's exact C++ search.
 
 - tol:
 
@@ -68,12 +62,12 @@ LISI reference implementation: <https://github.com/immunogenomics/LISI>
 ``` r
 set.seed(1)
 X <- rbind(
-  matrix(stats::rnorm(100, mean = -2), ncol = 5),
-  matrix(stats::rnorm(100, mean = 2), ncol = 5)
+  matrix(stats::rnorm(100, mean = -1), ncol = 2),
+  matrix(stats::rnorm(100, mean = 1), ncol = 2)
 )
 meta_data <- data.frame(
-  batch = rep(c("A", "B"), each = 20),
-  group = sample(c("g1", "g2"), 40, replace = TRUE)
+  batch = rep(c("A", "B"), each = 50),
+  group = sample(c("g1", "g2"), 100, replace = TRUE)
 )
 
 res <- compute_lisi(
@@ -83,11 +77,11 @@ res <- compute_lisi(
 )
 head(res)
 #>      batch    group
-#> 1 1.001837 1.490901
-#> 2 1.000010 1.439122
-#> 3 1.001436 1.915155
-#> 4 1.000065 1.644454
-#> 5 1.000029 1.501060
-#> 6 1.000000 1.560663
+#> 1 1.008491 1.922116
+#> 2 1.001277 1.956112
+#> 3 1.005979 1.747556
+#> 4 1.030285 1.995189
+#> 5 1.841283 1.967195
+#> 6 1.484192 1.668199
 boxplot(res)
 ```

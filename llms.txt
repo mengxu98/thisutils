@@ -105,8 +105,6 @@ Please reference
   : Collapse sparse matrix rows by group
 - [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md)
   : Compute Local Inverse Simpson's Index (LISI)
-- [`compute_simpson_index()`](https://mengxu98.github.io/thisutils/reference/compute_simpson_index.md)
-  : Compute Simpson index from a KNN graph
 - [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
   : Download file from the Internet
 - [`get_namespace_fun()`](https://mengxu98.github.io/thisutils/reference/get_namespace_fun.md)
