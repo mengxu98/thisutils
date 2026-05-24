@@ -1,5 +1,10 @@
 # thisutils
 
+# thisutils 0.4.6
+
+# **feat**:
+  * Remove `compute_simpson_index`.
+
 # thisutils 0.4.5
 
 * **feat**:
@@ -25,7 +30,7 @@
 # thisutils 0.4.4
 
 * **feat**:
-  * Add `compute_lisi()`: compute per-cell Local Inverse Simpson's Index (LISI) scores for categorical variables. Supports multiple nearest-neighbor backends (`"auto"`, `"rann"`, `"fnn"`, `"hnsw"`, `"exact"`) with configurable perplexity and tolerance. Includes `compute_simpson_index()` for low-level Simpson index computation from KNN graphs, backed by a C++ implementation.
+  * Add `compute_lisi()`: compute per-cell Local Inverse Simpson's Index (LISI) scores for categorical variables.
   * Enhance `log_message()`: add optional `expr` support to capture standard output, messages, and warnings from another expression and re-print them with `log_message()` formatting while returning the evaluated result.
   * `parallelize_fun()`:
     * Suppress C/C++ level stderr output (e.g., `"Error : Not a matrix."`) and warnings during function execution in `parallelize_fun()` via stderr redirection and `suppressWarnings()`.
