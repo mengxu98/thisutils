@@ -9,7 +9,6 @@ compute_lisi(
   meta_data,
   label_colnames,
   perplexity = 30,
-  nn_method = c("auto", "exact"),
   tol = 1e-05,
   max_iter = 50
 )
@@ -22,9 +21,6 @@ compute_lisi(
 \item{label_colnames}{Character vector of column names in \code{meta_data} to evaluate.}
 
 \item{perplexity}{Effective neighborhood size. Defaults to \code{30}.}
-
-\item{nn_method}{Nearest-neighbor backend. Defaults to \code{"auto"},
-which uses the package's exact C++ search.}
 
 \item{tol}{Tolerance used in the binary search for the target perplexity.
 Defaults to \code{1e-5}.}
@@ -42,12 +38,12 @@ This is a clean-room reimplementation of the \code{immunogenomics/LISI}.
 \examples{
 set.seed(1)
 X <- rbind(
-  matrix(stats::rnorm(100, mean = -2), ncol = 5),
-  matrix(stats::rnorm(100, mean = 2), ncol = 5)
+  matrix(stats::rnorm(100, mean = -1), ncol = 2),
+  matrix(stats::rnorm(100, mean = 1), ncol = 2)
 )
 meta_data <- data.frame(
-  batch = rep(c("A", "B"), each = 20),
-  group = sample(c("g1", "g2"), 40, replace = TRUE)
+  batch = rep(c("A", "B"), each = 50),
+  group = sample(c("g1", "g2"), 100, replace = TRUE)
 )
 
 res <- compute_lisi(
