@@ -2,6 +2,9 @@
 
 ## thisutils 0.4.6
 
+- **feat**:
+  - Remove `compute_simpson_index`.
+
 ## thisutils 0.4.5
 
 CRAN release: 2026-04-24
