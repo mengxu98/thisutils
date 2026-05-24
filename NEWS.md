@@ -1,8 +1,6 @@
-# thisutils
-
 # thisutils 0.4.6
 
-# **feat**:
+* **feat**:
   * Remove `compute_simpson_index`.
 
 # thisutils 0.4.5
