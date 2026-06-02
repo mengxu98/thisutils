@@ -7,7 +7,7 @@
 check_r(
   packages,
   lib = .libPaths()[1],
-  dependencies = TRUE,
+  dependencies = NA,
   force = FALSE,
   verbose = TRUE
 )
@@ -19,8 +19,10 @@ By default, the package name is extracted according to the \code{packages} param
 
 \item{lib}{The location of the library directories where to install the packages.}
 
-\item{dependencies}{Whether to install dependencies of the packages.
-Default is \code{TRUE}.}
+\item{dependencies}{Which dependencies to install.
+Passed to \link[pak:pkg_install]{pak::pkg_install}.
+Default is \code{NA}, auto install hard dependencies: \emph{Depends}, \emph{Imports},
+and \emph{LinkingTo}, excluding \emph{Suggests}.}
 
 \item{force}{Whether to force the installation of packages.
 Default is \code{FALSE}.}
