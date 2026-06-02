@@ -46,7 +46,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">check_r</span><span class="op">(</span></span>
 <span>  <span class="va">packages</span>,</span>
 <span>  lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>  dependencies <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -67,8 +67,10 @@ By default, the package name is extracted according to the <code>packages</code>
 
 
 <dt id="arg-dependencies">dependencies<a class="anchor" aria-label="anchor" href="#arg-dependencies"></a></dt>
-<dd><p>Whether to install dependencies of the packages.
-Default is <code>TRUE</code>.</p></dd>
+<dd><p>Which dependencies to install.
+Passed to <a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pak::pkg_install</a>.
+Default is <code>NA</code>, auto install hard dependencies: <em>Depends</em>, <em>Imports</em>,
+and <em>LinkingTo</em>, excluding <em>Suggests</em>.</p></dd>
 
 
 <dt id="arg-force">force<a class="anchor" aria-label="anchor" href="#arg-force"></a></dt>

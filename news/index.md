@@ -1,5 +1,24 @@
 # Changelog
 
+## thisutils 0.4.8
+
+- **fix**:
+  - Fix
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md):
+    change `dependencies` default from `TRUE` to `NA`, so hard
+    dependencies (`Depends`, `Imports`, `LinkingTo`) are installed by
+    default while `Suggests` are excluded (#XXX).
+  - Improve
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+    error reporting: traverse the full error chain via
+    `rlang::cnd_message(e, inherit = TRUE)` instead of only showing the
+    top-level message; strip ANSI escape codes to avoid printing garbage
+    in the log.
+  - Eliminate duplicate “Failed to install” messages in
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+    by storing error details per-package and reporting them once in the
+    final summary.
+
 ## thisutils 0.4.6
 
 - **feat**:

@@ -37,6 +37,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.8" id="thisutils-048">thisutils 0.4.8<a class="anchor" aria-label="anchor" href="#thisutils-048"></a></h2>
+<ul><li>
+<strong>fix</strong>:
+<ul><li>Fix <code><a href="../reference/check_r.html">check_r()</a></code>: change <code>dependencies</code> default from <code>TRUE</code> to <code>NA</code>, so hard dependencies (<code>Depends</code>, <code>Imports</code>, <code>LinkingTo</code>) are installed by default while <code>Suggests</code> are excluded (#XXX).</li>
+<li>Improve <code><a href="../reference/check_r.html">check_r()</a></code> error reporting: traverse the full error chain via <code>rlang::cnd_message(e, inherit = TRUE)</code> instead of only showing the top-level message; strip ANSI escape codes to avoid printing garbage in the log.</li>
+<li>Eliminate duplicate “Failed to install” messages in <code><a href="../reference/check_r.html">check_r()</a></code> by storing error details per-package and reporting them once in the final summary.</li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.6" id="thisutils-046">thisutils 0.4.6<a class="anchor" aria-label="anchor" href="#thisutils-046"></a></h2>
 <ul><li>
 <strong>feat</strong>:

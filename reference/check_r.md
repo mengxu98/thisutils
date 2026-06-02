@@ -8,7 +8,7 @@ Check and install R packages
 check_r(
   packages,
   lib = .libPaths()[1],
-  dependencies = TRUE,
+  dependencies = NA,
   force = FALSE,
   verbose = TRUE
 )
@@ -28,7 +28,10 @@ check_r(
 
 - dependencies:
 
-  Whether to install dependencies of the packages. Default is `TRUE`.
+  Which dependencies to install. Passed to
+  [pak::pkg_install](https://pak.r-lib.org/reference/pkg_install.html).
+  Default is `NA`, auto install hard dependencies: *Depends*, *Imports*,
+  and *LinkingTo*, excluding *Suggests*.
 
 - force:
 
