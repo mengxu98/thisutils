@@ -6,8 +6,10 @@
 #' Package source can be *CRAN*, *Bioconductor* or *Github*.
 #' By default, the package name is extracted according to the `packages` parameter.
 #' @param lib The location of the library directories where to install the packages.
-#' @param dependencies Whether to install dependencies of the packages.
-#' Default is `TRUE`.
+#' @param dependencies Which dependencies to install.
+#' Passed to [pak::pkg_install].
+#' Default is `NA`, auto install hard dependencies: *Depends*, *Imports*,
+#' and *LinkingTo*, excluding *Suggests*.
 #' @param force Whether to force the installation of packages.
 #' Default is `FALSE`.
 #'
@@ -15,12 +17,14 @@
 #'
 #' @export
 check_r <- function(
-    packages,
-    lib = .libPaths()[1],
-    dependencies = TRUE,
-    force = FALSE,
-    verbose = TRUE) {
+  packages,
+  lib = .libPaths()[1],
+  dependencies = NA,
+  force = FALSE,
+  verbose = TRUE
+) {
   status_list <- list()
+  error_details <- list()
   for (pkg in packages) {
     version <- NULL
     if (grepl("/", pkg)) {
@@ -79,11 +83,11 @@ check_r <- function(
         },
         error = function(e) {
           status_list[[pkg]] <- FALSE
-          log_message(
-            "Failed to install: {.pkg {pkg_name}}. Error: {.val {e$message}}",
-            message_type = "warning",
-            verbose = verbose
+          err_msg <- tryCatch(
+            rlang::cnd_message(e, inherit = TRUE),
+            error = function(...) conditionMessage(e)
           )
+          error_details[[pkg_name]] <<- cli::ansi_strip(err_msg)
         }
       )
       status_list[[pkg]] <- check_pkg_status(
@@ -100,11 +104,22 @@ check_r <- function(
   failed <- names(status_list)[!success]
 
   if (length(failed) > 0) {
-    log_message(
-      "Failed to install: {.pkg {failed}}. Please install manually",
-      message_type = "warning",
-      verbose = verbose
-    )
+    for (pkg_name in failed) {
+      err <- error_details[[pkg_name]]
+      if (!is.null(err)) {
+        log_message(
+          "Failed to install: {.pkg {pkg_name}}. Error: {.val {err}}",
+          message_type = "warning",
+          verbose = verbose
+        )
+      } else {
+        log_message(
+          "Failed to install: {.pkg {pkg_name}}. Please install manually",
+          message_type = "warning",
+          verbose = verbose
+        )
+      }
+    }
   } else {
     log_message(
       "{.pkg {packages}} installed successfully",
@@ -125,9 +140,10 @@ check_r <- function(
 #'
 #' @export
 remove_r <- function(
-    packages,
-    lib = .libPaths()[1],
-    verbose = TRUE) {
+  packages,
+  lib = .libPaths()[1],
+  verbose = TRUE
+) {
   status_list <- list()
   for (pkg in packages) {
     pkg_installed <- check_pkg_status(pkg, lib = lib)
@@ -192,9 +208,10 @@ remove_r <- function(
 #'
 #' @export
 check_pkg_status <- function(
-    pkg,
-    version = NULL,
-    lib = .libPaths()[1]) {
+  pkg,
+  version = NULL,
+  lib = .libPaths()[1]
+) {
   installed_pkgs_info <- utils::installed.packages(lib.loc = lib)
   installed_pkgs <- installed_pkgs_info[, "Package"]
   installed_pkgs_version <- installed_pkgs_info[, "Version"]
