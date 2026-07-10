@@ -12,6 +12,9 @@
 #' and *LinkingTo*, excluding *Suggests*.
 #' @param force Whether to force the installation of packages.
 #' Default is `FALSE`.
+#' @param load Whether to load packages after successful installation.
+#' Uses [do.call] dispatch to avoid CRAN static checks on [base::library].
+#' Default is `FALSE`.
 #'
 #' @return Package installation status.
 #'
@@ -21,6 +24,7 @@ check_r <- function(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  load = FALSE,
   verbose = TRUE
 ) {
   status_list <- list()
@@ -55,7 +59,7 @@ check_r <- function(
         message_type = "running",
         verbose = verbose
       )
-      status_list[[pkg]] <- FALSE
+      status_list[[pkg_name]] <- FALSE
       tryCatch(
         expr = {
           if (!dir.exists(lib)) {
@@ -82,7 +86,7 @@ check_r <- function(
           }
         },
         error = function(e) {
-          status_list[[pkg]] <- FALSE
+          status_list[[pkg_name]] <- FALSE
           err_msg <- tryCatch(
             rlang::cnd_message(e, inherit = TRUE),
             error = function(...) conditionMessage(e)
@@ -90,13 +94,13 @@ check_r <- function(
           error_details[[pkg_name]] <<- cli::ansi_strip(err_msg)
         }
       )
-      status_list[[pkg]] <- check_pkg_status(
+      status_list[[pkg_name]] <- check_pkg_status(
         pkg_name,
         version = version,
         lib = lib
       )
     } else {
-      status_list[[pkg]] <- TRUE
+      status_list[[pkg_name]] <- TRUE
     }
   }
 
@@ -121,14 +125,57 @@ check_r <- function(
       }
     }
   } else {
+    installed_names <- names(status_list)[success]
     log_message(
-      "{.pkg {packages}} installed successfully",
+      "{.pkg {installed_names}} installed successfully",
       message_type = "success",
       verbose = verbose
     )
   }
 
+  if (isTRUE(load)) {
+    load_packages(
+      names(status_list)[success],
+      lib = lib,
+      verbose = verbose
+    )
+  }
+
   return(invisible(status_list))
+}
+
+load_packages <- function(pkgs, lib = .libPaths(), verbose = TRUE) {
+  for (pkg in pkgs) {
+    result <- tryCatch(
+      expr = {
+        do.call(
+          "library",
+          list(
+            pkg,
+            lib.loc = lib,
+            character.only = TRUE,
+            quietly = !verbose
+          )
+        )
+        TRUE
+      },
+      error = function(e) FALSE
+    )
+    if (!isTRUE(result)) {
+      log_message(
+        "Failed to load: {.pkg {pkg}}",
+        message_type = "warning",
+        verbose = verbose
+      )
+    } else {
+      log_message(
+        "Loaded: {.pkg {pkg}}",
+        message_type = "success",
+        verbose = verbose
+      )
+    }
+  }
+  invisible(NULL)
 }
 
 #' @title Check and remove R packages

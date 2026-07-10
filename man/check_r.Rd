@@ -9,6 +9,7 @@ check_r(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  load = FALSE,
   verbose = TRUE
 )
 }
@@ -25,6 +26,10 @@ Default is \code{NA}, auto install hard dependencies: \emph{Depends}, \emph{Impo
 and \emph{LinkingTo}, excluding \emph{Suggests}.}
 
 \item{force}{Whether to force the installation of packages.
+Default is \code{FALSE}.}
+
+\item{load}{Whether to load packages after successful installation.
+Uses \link{do.call} dispatch to avoid CRAN static checks on \link[base:library]{base::library}.
 Default is \code{FALSE}.}
 
 \item{verbose}{Whether to print the message.

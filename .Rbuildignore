@@ -20,3 +20,5 @@
 ^pkgdown$
 ^test$
 ^.codex
+^\.codegraph
+^\.env$
