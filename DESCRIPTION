@@ -19,6 +19,7 @@ Imports:
     cli,
     doParallel,
     foreach,
+    methods,
     Matrix,
     pak,
     parallel,
