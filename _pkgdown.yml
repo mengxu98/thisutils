@@ -61,6 +61,12 @@ reference:
   - pearson_correlation
   - sparse_cor
 
+- subtitle: "Matrix and classification helpers"
+- contents:
+  - classification_metrics_compute
+  - run_dense_topk_by_column
+  - run_sparse_topk_by_column
+
 - subtitle: "Package management"
 - contents:
   - check_pkg_status
