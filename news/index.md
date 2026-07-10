@@ -2,6 +2,11 @@
 
 ## thisutils 0.4.8
 
+- **feat**:
+  - Add
+    [`classification_metrics_compute()`](https://mengxu98.github.io/thisutils/reference/classification_metrics_compute.md)
+    plus dense and sparse column-wise top-k helpers, with native C++
+    implementations.
 - **fix**:
   - Fix
     [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md):

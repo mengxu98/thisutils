@@ -10,6 +10,7 @@ check_r(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  load = FALSE,
   verbose = TRUE
 )
 ```
@@ -36,6 +37,13 @@ check_r(
 - force:
 
   Whether to force the installation of packages. Default is `FALSE`.
+
+- load:
+
+  Whether to load packages after successful installation. Uses
+  [do.call](https://rdrr.io/r/base/do.call.html) dispatch to avoid CRAN
+  static checks on [base::library](https://rdrr.io/r/base/library.html).
+  Default is `FALSE`.
 
 - verbose:
 

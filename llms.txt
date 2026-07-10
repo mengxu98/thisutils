@@ -80,6 +80,15 @@ Please reference
 - [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
   : Sparse correlation function
 
+### Matrix and classification helpers
+
+- [`classification_metrics_compute()`](https://mengxu98.github.io/thisutils/reference/classification_metrics_compute.md)
+  : Compute classification metrics
+- [`run_dense_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk_by_column.md)
+  : Dense matrix top-k by column
+- [`run_sparse_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_by_column.md)
+  : Sparse matrix top-k by column
+
 ### Package management
 
 - [`check_pkg_status()`](https://mengxu98.github.io/thisutils/reference/check_pkg_status.md)
