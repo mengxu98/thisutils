@@ -1,5 +1,9 @@
 # thisutils 0.4.8
 
+* **feat**:
+  * Add `classification_metrics_compute()` plus dense and sparse column-wise
+    top-k helpers, with native C++ implementations.
+
 * **fix**:
   * Fix `check_r()`: change `dependencies` default from `TRUE` to `NA`, so
     hard dependencies (`Depends`, `Imports`, `LinkingTo`) are installed by
