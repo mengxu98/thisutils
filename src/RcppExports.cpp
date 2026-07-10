@@ -10,6 +10,46 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// classification_metrics
+List classification_metrics(CharacterVector predicted, CharacterVector truth, CharacterVector classes, double rare_threshold);
+RcppExport SEXP _thisutils_classification_metrics(SEXP predictedSEXP, SEXP truthSEXP, SEXP classesSEXP, SEXP rare_thresholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type predicted(predictedSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type truth(truthSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type classes(classesSEXP);
+    Rcpp::traits::input_parameter< double >::type rare_threshold(rare_thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(classification_metrics(predicted, truth, classes, rare_threshold));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sparse_topk_by_column
+List sparse_topk_by_column(S4 mat, int k, bool decreasing);
+RcppExport SEXP _thisutils_sparse_topk_by_column(SEXP matSEXP, SEXP kSEXP, SEXP decreasingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< bool >::type decreasing(decreasingSEXP);
+    rcpp_result_gen = Rcpp::wrap(sparse_topk_by_column(mat, k, decreasing));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dense_topk_by_column
+List dense_topk_by_column(NumericMatrix mat, int k, bool decreasing);
+RcppExport SEXP _thisutils_dense_topk_by_column(SEXP matSEXP, SEXP kSEXP, SEXP decreasingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< bool >::type decreasing(decreasingSEXP);
+    rcpp_result_gen = Rcpp::wrap(dense_topk_by_column(mat, k, decreasing));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_lisi_matrix
 NumericMatrix compute_lisi_matrix(const NumericMatrix& X, const IntegerMatrix& batch_labels, int n_neighbors, double perplexity, double tol, int max_iter);
 RcppExport SEXP _thisutils_compute_lisi_matrix(SEXP XSEXP, SEXP batch_labelsSEXP, SEXP n_neighborsSEXP, SEXP perplexitySEXP, SEXP tolSEXP, SEXP max_iterSEXP) {
@@ -95,6 +135,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_thisutils_classification_metrics", (DL_FUNC) &_thisutils_classification_metrics, 4},
+    {"_thisutils_sparse_topk_by_column", (DL_FUNC) &_thisutils_sparse_topk_by_column, 3},
+    {"_thisutils_dense_topk_by_column", (DL_FUNC) &_thisutils_dense_topk_by_column, 3},
     {"_thisutils_compute_lisi_matrix", (DL_FUNC) &_thisutils_compute_lisi_matrix, 6},
     {"_thisutils_lisi_exact_knn_cpp", (DL_FUNC) &_thisutils_lisi_exact_knn_cpp, 3},
     {"_thisutils_drop_self_from_knn_cpp", (DL_FUNC) &_thisutils_drop_self_from_knn_cpp, 2},
