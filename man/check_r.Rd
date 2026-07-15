@@ -9,6 +9,8 @@ check_r(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  install = TRUE,
+  timeout = Inf,
   load = FALSE,
   verbose = TRUE
 )
@@ -27,6 +29,14 @@ and \emph{LinkingTo}, excluding \emph{Suggests}.}
 
 \item{force}{Whether to force the installation of packages.
 Default is \code{FALSE}.}
+
+\item{install}{Whether missing or outdated packages may be installed.
+Set to \code{FALSE} for read-only diagnostics. Default is \code{TRUE} for backward
+compatibility.}
+
+\item{timeout}{Maximum installation time in seconds. A finite timeout runs
+installation in a supervised R subprocess and terminates only that process
+tree on timeout. Default is \code{Inf}.}
 
 \item{load}{Whether to load packages after successful installation.
 Uses \link{do.call} dispatch to avoid CRAN static checks on \link[base:library]{base::library}.
