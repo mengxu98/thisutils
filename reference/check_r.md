@@ -10,6 +10,8 @@ check_r(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  install = TRUE,
+  timeout = Inf,
   load = FALSE,
   verbose = TRUE
 )
@@ -37,6 +39,18 @@ check_r(
 - force:
 
   Whether to force the installation of packages. Default is `FALSE`.
+
+- install:
+
+  Whether missing or outdated packages may be installed. Set to `FALSE`
+  for read-only diagnostics. Default is `TRUE` for backward
+  compatibility.
+
+- timeout:
+
+  Maximum installation time in seconds. A finite timeout runs
+  installation in a supervised R subprocess and terminates only that
+  process tree on timeout. Default is `Inf`.
 
 - load:
 

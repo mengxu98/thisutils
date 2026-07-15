@@ -48,6 +48,8 @@
 <span>  lib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  install <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  load <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -77,6 +79,18 @@ and <em>LinkingTo</em>, excluding <em>Suggests</em>.</p></dd>
 <dt id="arg-force">force<a class="anchor" aria-label="anchor" href="#arg-force"></a></dt>
 <dd><p>Whether to force the installation of packages.
 Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-install">install<a class="anchor" aria-label="anchor" href="#arg-install"></a></dt>
+<dd><p>Whether missing or outdated packages may be installed.
+Set to <code>FALSE</code> for read-only diagnostics. Default is <code>TRUE</code> for backward
+compatibility.</p></dd>
+
+
+<dt id="arg-timeout">timeout<a class="anchor" aria-label="anchor" href="#arg-timeout"></a></dt>
+<dd><p>Maximum installation time in seconds. A finite timeout runs
+installation in a supervised R subprocess and terminates only that process
+tree on timeout. Default is <code>Inf</code>.</p></dd>
 
 
 <dt id="arg-load">load<a class="anchor" aria-label="anchor" href="#arg-load"></a></dt>
