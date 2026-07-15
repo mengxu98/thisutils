@@ -12,6 +12,12 @@
 #' and *LinkingTo*, excluding *Suggests*.
 #' @param force Whether to force the installation of packages.
 #' Default is `FALSE`.
+#' @param install Whether missing or outdated packages may be installed.
+#' Set to `FALSE` for read-only diagnostics. Default is `TRUE` for backward
+#' compatibility.
+#' @param timeout Maximum installation time in seconds. A finite timeout runs
+#' installation in a supervised R subprocess and terminates only that process
+#' tree on timeout. Default is `Inf`.
 #' @param load Whether to load packages after successful installation.
 #' Uses [do.call] dispatch to avoid CRAN static checks on [base::library].
 #' Default is `FALSE`.
@@ -24,9 +30,17 @@ check_r <- function(
   lib = .libPaths()[1],
   dependencies = NA,
   force = FALSE,
+  install = TRUE,
+  timeout = Inf,
   load = FALSE,
   verbose = TRUE
 ) {
+  if (!is.logical(install) || length(install) != 1L || is.na(install)) {
+    stop("`install` must be TRUE or FALSE", call. = FALSE)
+  }
+  if (!is.numeric(timeout) || length(timeout) != 1L || is.na(timeout) || timeout <= 0) {
+    stop("`timeout` must be one positive number or Inf", call. = FALSE)
+  }
   status_list <- list()
   error_details <- list()
   for (pkg in packages) {
@@ -54,6 +68,15 @@ check_r <- function(
     force_update <- force_update || isTRUE(force)
 
     if (!check_pkg || force_update) {
+      if (!isTRUE(install)) {
+        status_list[[pkg_name]] <- FALSE
+        error_details[[pkg_name]] <- if (force_update && check_pkg) {
+          "the installed version does not satisfy the request and installation is disabled"
+        } else {
+          "the package is unavailable and installation is disabled"
+        }
+        next
+      }
       log_message(
         "Installing: {.pkg {pkg_name}}...",
         message_type = "running",
@@ -65,25 +88,13 @@ check_r <- function(
           if (!dir.exists(lib)) {
             dir.create(lib, recursive = TRUE, showWarnings = FALSE)
           }
-          if (isTRUE(verbose)) {
-            pak::pkg_install(
-              pkg,
-              lib = lib,
-              ask = FALSE,
-              dependencies = dependencies
-            )
-          } else {
-            invisible(
-              suppressMessages(
-                pak::pkg_install(
-                  pkg,
-                  lib = lib,
-                  ask = FALSE,
-                  dependencies = dependencies
-                )
-              )
-            )
-          }
+          check_r_run_install(
+            pkg = pkg,
+            lib = lib,
+            dependencies = dependencies,
+            timeout = timeout,
+            verbose = verbose
+          )
         },
         error = function(e) {
           status_list[[pkg_name]] <- FALSE
@@ -142,6 +153,67 @@ check_r <- function(
   }
 
   return(invisible(status_list))
+}
+
+check_r_run_install <- function(
+  pkg,
+  lib,
+  dependencies = NA,
+  timeout = Inf,
+  verbose = TRUE
+) {
+  process <- callr::r_bg(
+    func = function(pkg, lib, dependencies, verbose) {
+      install_call <- function() {
+        pak::pkg_install(
+          pkg,
+          lib = lib,
+          ask = FALSE,
+          dependencies = dependencies
+        )
+      }
+      if (isTRUE(verbose)) {
+        install_call()
+      } else {
+        invisible(suppressMessages(install_call()))
+      }
+      invisible(TRUE)
+    },
+    args = list(
+      pkg = pkg,
+      lib = lib,
+      dependencies = dependencies,
+      verbose = verbose
+    ),
+    libpath = unique(c(lib, .libPaths())),
+    stdout = "|",
+    stderr = "|",
+    supervise = TRUE,
+    package = FALSE
+  )
+  on.exit({
+    if (isTRUE(process$is_alive())) {
+      process$kill_tree()
+    }
+  }, add = TRUE)
+
+  timeout_ms <- if (is.finite(timeout)) as.integer(min(timeout * 1000, .Machine$integer.max)) else -1L
+  process$wait(timeout = timeout_ms)
+  if (isTRUE(process$is_alive())) {
+    process$kill_tree()
+    stop(
+      sprintf("Package installation timed out after %s seconds: %s", format(timeout), pkg),
+      call. = FALSE
+    )
+  }
+  if (isTRUE(verbose)) {
+    output <- process$read_all_output_lines()
+    errors <- process$read_all_error_lines()
+    if (length(output) > 0L) writeLines(output)
+    if (length(errors) > 0L) writeLines(errors, con = stderr())
+  }
+  process$get_result()
+  invisible(TRUE)
 }
 
 load_packages <- function(pkgs, lib = .libPaths(), verbose = TRUE) {
