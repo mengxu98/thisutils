@@ -13,6 +13,7 @@ check_r(
   install = TRUE,
   timeout = Inf,
   load = FALSE,
+  cores = NULL,
   verbose = TRUE
 )
 ```
@@ -58,6 +59,13 @@ check_r(
   [do.call](https://rdrr.io/r/base/do.call.html) dispatch to avoid CRAN
   static checks on [base::library](https://rdrr.io/r/base/library.html).
   Default is `FALSE`.
+
+- cores:
+
+  Number of workers used by
+  [`pak::pkg_install()`](https://pak.r-lib.org/reference/pkg_install.html).
+  Use `NULL` (the default) to let pak select its worker count
+  automatically.
 
 - verbose:
 

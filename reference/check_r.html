@@ -51,6 +51,7 @@
 <span>  install <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  load <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -97,6 +98,11 @@ tree on timeout. Default is <code>Inf</code>.</p></dd>
 <dd><p>Whether to load packages after successful installation.
 Uses <a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a> dispatch to avoid CRAN static checks on <a href="https://rdrr.io/r/base/library.html" class="external-link">base::library</a>.
 Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dd><p>Number of workers used by <code><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pak::pkg_install()</a></code>. Use <code>NULL</code>
+(the default) to let pak select its worker count automatically.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
