@@ -16,7 +16,7 @@ BugReports: https://github.com/mengxu98/thisutils/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    callr,
+    callr (>= 3.5.0),
     cli,
     doParallel,
     foreach,

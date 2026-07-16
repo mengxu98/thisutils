@@ -12,6 +12,7 @@ check_r(
   install = TRUE,
   timeout = Inf,
   load = FALSE,
+  cores = NULL,
   verbose = TRUE
 )
 }
@@ -41,6 +42,9 @@ tree on timeout. Default is \code{Inf}.}
 \item{load}{Whether to load packages after successful installation.
 Uses \link{do.call} dispatch to avoid CRAN static checks on \link[base:library]{base::library}.
 Default is \code{FALSE}.}
+
+\item{cores}{Number of workers used by \code{\link[pak:pkg_install]{pak::pkg_install()}}. Use \code{NULL}
+(the default) to let pak select its worker count automatically.}
 
 \item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
