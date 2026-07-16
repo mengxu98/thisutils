@@ -21,6 +21,8 @@
 #' @param load Whether to load packages after successful installation.
 #' Uses [do.call] dispatch to avoid CRAN static checks on [base::library].
 #' Default is `FALSE`.
+#' @param cores Number of workers used by [pak::pkg_install()]. Use `NULL`
+#' (the default) to let pak select its worker count automatically.
 #'
 #' @return Package installation status.
 #'
@@ -33,6 +35,7 @@ check_r <- function(
   install = TRUE,
   timeout = Inf,
   load = FALSE,
+  cores = NULL,
   verbose = TRUE
 ) {
   if (!is.logical(install) || length(install) != 1L || is.na(install)) {
@@ -41,9 +44,8 @@ check_r <- function(
   if (!is.numeric(timeout) || length(timeout) != 1L || is.na(timeout) || timeout <= 0) {
     stop("`timeout` must be one positive number or Inf", call. = FALSE)
   }
-  status_list <- list()
-  error_details <- list()
-  for (pkg in packages) {
+  packages <- as.character(packages)
+  package_info <- lapply(packages, function(pkg) {
     version <- NULL
     if (grepl("/", pkg)) {
       pkg_name <- strsplit(pkg, split = "/|@|==", perl = TRUE)[[1]][[2]]
@@ -54,40 +56,90 @@ check_r <- function(
         version <- pkg_info[[2]]
       }
     }
+    list(package = pkg, name = pkg_name, version = version)
+  })
+  package_names <- vapply(package_info, `[[`, character(1), "name")
+  unique_names <- unique(package_names)
+  package_info <- lapply(unique_names, function(pkg_name) {
+    matches <- package_info[package_names == pkg_name]
+    remote <- vapply(matches, function(info) grepl("/", info$package), logical(1))
+    remote_index <- which(remote)
+    matches[[if (length(remote_index) > 0L) remote_index[[1]] else 1L]]
+  })
+  names(package_info) <- unique_names
+
+  if (!is.null(cores)) {
+    cores <- suppressWarnings(as.integer(cores[[1]]))
+    if (is.na(cores) || cores < 1L) {
+      stop("`cores` must be a positive integer or NULL.", call. = FALSE)
+    }
+    old_options <- options(Ncpus = cores)
+    on.exit(options(old_options), add = TRUE)
+  }
+
+  needs_install <- vapply(package_info, function(info) {
     check_pkg <- check_pkg_status(
-      pkg_name,
-      version = version,
+      info$name,
+      version = info$version,
       lib = lib
     )
 
     force_update <- FALSE
-    if (check_pkg && !is.null(version)) {
-      current_version <- utils::packageVersion(pkg_name)
-      force_update <- current_version < package_version(version)
+    if (check_pkg && !is.null(info$version)) {
+      current_version <- utils::packageVersion(info$name, lib.loc = lib)
+      force_update <- current_version < package_version(info$version)
     }
-    force_update <- force_update || isTRUE(force)
+    !check_pkg || force_update || isTRUE(force)
+  }, logical(1))
 
-    if (!check_pkg || force_update) {
-      if (!isTRUE(install)) {
-        status_list[[pkg_name]] <- FALSE
-        error_details[[pkg_name]] <- if (force_update && check_pkg) {
-          "the installed version does not satisfy the request and installation is disabled"
-        } else {
-          "the package is unavailable and installation is disabled"
-        }
-        next
+  error_details <- list()
+  packages_to_install <- vapply(package_info[needs_install], `[[`, character(1), "package")
+  package_names_to_install <- names(package_info)[needs_install]
+  if (length(packages_to_install) > 0L && !isTRUE(install)) {
+    for (index in seq_along(packages_to_install)) {
+      info <- package_info[[package_names_to_install[[index]]]]
+      is_outdated <- !is.null(info$version) &&
+        check_pkg_status(info$name, version = NULL, lib = lib)
+      error_details[[info$name]] <- if (is_outdated) {
+        "the installed version does not satisfy the request and installation is disabled"
+      } else {
+        "the package is unavailable and installation is disabled"
       }
+    }
+  } else if (length(packages_to_install) > 0L) {
+    log_message(
+      "Installing {.val {length(packages_to_install)}} R packages...",
+      message_type = "running",
+      verbose = verbose
+    )
+    if (!dir.exists(lib)) {
+      dir.create(lib, recursive = TRUE, showWarnings = FALSE)
+    }
+    install_packages <- function(pkgs) {
+      if (isTRUE(verbose)) {
+        pak::pkg_install(pkgs, lib = lib, ask = FALSE, dependencies = dependencies)
+      } else {
+        invisible(suppressMessages(
+          pak::pkg_install(pkgs, lib = lib, ask = FALSE, dependencies = dependencies)
+        ))
+      }
+    }
+    install_error <- if (is.finite(timeout)) {
+      NULL
+    } else {
+      tryCatch(install_packages(packages_to_install), error = identity)
+    }
+    if (is.finite(timeout) || inherits(install_error, "error")) {
       log_message(
-        "Installing: {.pkg {pkg_name}}...",
-        message_type = "running",
+        if (is.finite(timeout)) "Installing packages individually with a timeout." else "Batch installation failed; retrying packages individually.",
+        message_type = "warning",
         verbose = verbose
       )
-      status_list[[pkg_name]] <- FALSE
-      tryCatch(
-        expr = {
-          if (!dir.exists(lib)) {
-            dir.create(lib, recursive = TRUE, showWarnings = FALSE)
-          }
+      for (index in seq_along(packages_to_install)) {
+        pkg <- packages_to_install[[index]]
+        pkg_name <- package_names_to_install[[index]]
+        error <- tryCatch(
+          if (is.finite(timeout)) {
           check_r_run_install(
             pkg = pkg,
             lib = lib,
@@ -95,25 +147,30 @@ check_r <- function(
             timeout = timeout,
             verbose = verbose
           )
-        },
-        error = function(e) {
-          status_list[[pkg_name]] <- FALSE
-          err_msg <- tryCatch(
-            rlang::cnd_message(e, inherit = TRUE),
-            error = function(...) conditionMessage(e)
+          } else {
+            install_packages(pkg)
+          },
+          error = identity
+        )
+        if (inherits(error, "error")) {
+          error_details[[pkg_name]] <- tryCatch(
+            cli::ansi_strip(rlang::cnd_message(error, inherit = TRUE)),
+            error = function(...) cli::ansi_strip(conditionMessage(error))
           )
-          error_details[[pkg_name]] <<- cli::ansi_strip(err_msg)
         }
-      )
-      status_list[[pkg_name]] <- check_pkg_status(
-        pkg_name,
-        version = version,
-        lib = lib
-      )
-    } else {
-      status_list[[pkg_name]] <- TRUE
+      }
     }
   }
+
+  status_list <- lapply(package_info, function(info) {
+    check_pkg <- check_pkg_status(
+      info$name,
+      version = info$version,
+      lib = lib
+    )
+    isTRUE(check_pkg)
+  })
+  names(status_list) <- names(package_info)
 
   success <- sapply(status_list, isTRUE)
   failed <- names(status_list)[!success]
@@ -197,20 +254,35 @@ check_r_run_install <- function(
     }
   }, add = TRUE)
 
-  timeout_ms <- if (is.finite(timeout)) as.integer(min(timeout * 1000, .Machine$integer.max)) else -1L
-  process$wait(timeout = timeout_ms)
+  drain_output <- function() {
+    output <- process$read_output_lines()
+    errors <- process$read_error_lines()
+    if (isTRUE(verbose)) {
+      if (length(output) > 0L) writeLines(output)
+      if (length(errors) > 0L) writeLines(errors, con = stderr())
+    }
+  }
+
+  started_at <- Sys.time()
+  while (isTRUE(process$is_alive())) {
+    wait_ms <- 100L
+    if (is.finite(timeout)) {
+      elapsed_ms <- as.numeric(difftime(Sys.time(), started_at, units = "secs")) * 1000
+      remaining_ms <- ceiling(timeout * 1000 - elapsed_ms)
+      if (remaining_ms <= 0) break
+      wait_ms <- as.integer(min(wait_ms, remaining_ms))
+    }
+    process$wait(timeout = wait_ms)
+    drain_output()
+  }
+
+  drain_output()
   if (isTRUE(process$is_alive())) {
     process$kill_tree()
     stop(
       sprintf("Package installation timed out after %s seconds: %s", format(timeout), pkg),
       call. = FALSE
     )
-  }
-  if (isTRUE(verbose)) {
-    output <- process$read_all_output_lines()
-    errors <- process$read_all_error_lines()
-    if (length(output) > 0L) writeLines(output)
-    if (length(errors) > 0L) writeLines(errors, con = stderr())
   }
   process$get_result()
   invisible(TRUE)
