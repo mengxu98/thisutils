@@ -23,6 +23,10 @@
 #' Default is `FALSE`.
 #' @param cores Number of workers used by [pak::pkg_install()]. Use `NULL`
 #' (the default) to let pak select its worker count automatically.
+#' @details GitHub packages are normally installed with `pak`. If `pak` cannot
+#' parse a GitHub package's `DESCRIPTION` file, `check_r()` retries that package
+#' with the optional `remotes` package. This preserves the fast dependency
+#' resolution path while supporting legacy repositories with malformed metadata.
 #'
 #' @return Package installation status.
 #'
@@ -153,6 +157,18 @@ check_r <- function(
           error = identity
         )
         if (inherits(error, "error")) {
+          fallback_error <- check_r_try_remotes_fallback(
+            pkg = pkg,
+            error = error,
+            lib = lib,
+            dependencies = dependencies,
+            force = force,
+            verbose = verbose
+          )
+          if (is.null(fallback_error)) {
+            next
+          }
+          error <- fallback_error
           error_details[[pkg_name]] <- tryCatch(
             cli::ansi_strip(rlang::cnd_message(error, inherit = TRUE)),
             error = function(...) cli::ansi_strip(conditionMessage(error))
@@ -210,6 +226,58 @@ check_r <- function(
   }
 
   return(invisible(status_list))
+}
+
+check_r_try_remotes_fallback <- function(
+  pkg,
+  error,
+  lib,
+  dependencies = NA,
+  force = FALSE,
+  verbose = TRUE
+) {
+  error_message <- tryCatch(
+    cli::ansi_strip(rlang::cnd_message(error, inherit = TRUE)),
+    error = function(...) cli::ansi_strip(conditionMessage(error))
+  )
+  needs_fallback <- grepl("/", pkg, fixed = TRUE) && grepl(
+    "(can't|cannot) parse DESCRIPTION|duplicate DESCRIPTION fields",
+    error_message,
+    ignore.case = TRUE
+  )
+  if (!needs_fallback) {
+    return(error)
+  }
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    return(simpleError(
+      paste0(error_message, ". Install the optional `remotes` package to retry this GitHub package.")
+    ))
+  }
+
+  remote_parts <- strsplit(pkg, "@", fixed = TRUE)[[1]]
+  repo <- remote_parts[[1]]
+  ref <- if (length(remote_parts) > 1L) remote_parts[[2]] else "HEAD"
+  log_message(
+    "Retrying {.pkg {pkg}} with remotes because pak could not parse its DESCRIPTION file.",
+    message_type = "warning",
+    verbose = verbose
+  )
+  fallback_error <- tryCatch(
+    {
+      remotes::install_github(
+        repo = repo,
+        ref = ref,
+        lib = lib,
+        dependencies = dependencies,
+        upgrade = "never",
+        force = force,
+        quiet = !verbose
+      )
+      NULL
+    },
+    error = identity
+  )
+  fallback_error
 }
 
 check_r_run_install <- function(
