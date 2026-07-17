@@ -23,6 +23,8 @@
     [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
     by storing error details per-package and reporting them once in the
     final summary.
+  - Retry GitHub packages with `remotes` when `pak` cannot parse a
+    malformed `DESCRIPTION` file.
 
 ## thisutils 0.4.6
 

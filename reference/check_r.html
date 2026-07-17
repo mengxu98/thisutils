@@ -114,6 +114,13 @@ Default is <code>TRUE</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Package installation status.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>GitHub packages are normally installed with <code>pak</code>. If <code>pak</code> cannot
+parse a GitHub package's <code>DESCRIPTION</code> file, <code>check_r()</code> retries that package
+with the optional <code>remotes</code> package. This preserves the fast dependency
+resolution path while supporting legacy repositories with malformed metadata.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

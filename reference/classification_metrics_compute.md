@@ -23,7 +23,7 @@ classification_metrics_compute(predicted, truth, rare_threshold = 0.05)
 - rare_threshold:
 
   Proportion threshold for rare-class recall. Classes with support
-  proportion ≤ this value contribute to the `rare_recall` metric.
+  proportion \\\<=\\ this value contribute to the `rare_recall` metric.
   Default is `0.05`.
 
 ## Value

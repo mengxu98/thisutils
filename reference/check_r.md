@@ -74,3 +74,11 @@ check_r(
 ## Value
 
 Package installation status.
+
+## Details
+
+GitHub packages are normally installed with `pak`. If `pak` cannot parse
+a GitHub package's `DESCRIPTION` file, `check_r()` retries that package
+with the optional `remotes` package. This preserves the fast dependency
+resolution path while supporting legacy repositories with malformed
+metadata.
