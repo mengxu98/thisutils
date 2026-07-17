@@ -13,7 +13,7 @@ classification_metrics_compute(predicted, truth, rare_threshold = 0.05)
 \code{predicted}).}
 
 \item{rare_threshold}{Proportion threshold for rare-class recall.
-Classes with support proportion ≤ this value contribute to the
+Classes with support proportion \eqn{<=} this value contribute to the
 \code{rare_recall} metric. Default is \code{0.05}.}
 }
 \value{

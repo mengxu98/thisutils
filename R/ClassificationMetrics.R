@@ -9,7 +9,7 @@
 #' @param truth Character vector of true class labels (same length as
 #'   `predicted`).
 #' @param rare_threshold Proportion threshold for rare-class recall.
-#'   Classes with support proportion ≤ this value contribute to the
+#'   Classes with support proportion \eqn{<=} this value contribute to the
 #'   `rare_recall` metric. Default is `0.05`.
 #'
 #' @return A list with the following components:
