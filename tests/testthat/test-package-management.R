@@ -126,3 +126,51 @@ test_that("check_r batches missing packages and forwards cores to pak", {
   expect_identical(workers, 2L)
   expect_identical(result, list(foo = TRUE, bar = TRUE))
 })
+
+test_that("check_r falls back to remotes for malformed GitHub DESCRIPTION files", {
+  status <- c(yaGST = FALSE, SCEVAN = FALSE)
+  installed_repo <- NULL
+  installed_ref <- NULL
+  installed_upgrade <- NULL
+
+  testthat::local_mocked_bindings(
+    check_pkg_status = function(pkg, version = NULL, lib = NULL) status[[pkg]],
+    .package = "thisutils"
+  )
+  testthat::local_mocked_bindings(
+    pkg_install = function(...) {
+      pkg <- list(...)[[1]]
+      if (length(pkg) > 1L) {
+        stop("Could not solve package dependencies")
+      }
+      if (identical(pkg, "miccec/yaGST")) {
+        stop("Can't parse DESCRIPTION file in GitHub repo miccec/yaGST: Duplicate DESCRIPTION fields")
+      }
+      expect_identical(pkg, "AntonioDeFalco/SCEVAN")
+      expect_true(status[["yaGST"]])
+      status[["SCEVAN"]] <<- TRUE
+      invisible(NULL)
+    },
+    .package = "pak"
+  )
+  testthat::local_mocked_bindings(
+    install_github = function(repo, ref, lib, dependencies, upgrade, force, quiet) {
+      installed_repo <<- repo
+      installed_ref <<- ref
+      installed_upgrade <<- upgrade
+      status[["yaGST"]] <<- TRUE
+      invisible(NULL)
+    },
+    .package = "remotes"
+  )
+
+  result <- check_r(
+    c("miccec/yaGST", "AntonioDeFalco/SCEVAN"),
+    verbose = FALSE
+  )
+
+  expect_identical(result, list(yaGST = TRUE, SCEVAN = TRUE))
+  expect_identical(installed_repo, "miccec/yaGST")
+  expect_identical(installed_ref, "HEAD")
+  expect_identical(installed_upgrade, "never")
+})
