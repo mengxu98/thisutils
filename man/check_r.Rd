@@ -55,3 +55,9 @@ Package installation status.
 \description{
 Check and install R packages
 }
+\details{
+GitHub packages are normally installed with \code{pak}. If \code{pak} cannot
+parse a GitHub package's \code{DESCRIPTION} file, \code{check_r()} retries that package
+with the optional \code{remotes} package. This preserves the fast dependency
+resolution path while supporting legacy repositories with malformed metadata.
+}
