@@ -64,6 +64,9 @@ reference:
 - subtitle: "Matrix and classification helpers"
 - contents:
   - classification_metrics_compute
+  - fast_row_vars
+  - filter_nonzero_variance_features
+  - run_biocneighbors_knn
   - run_dense_topk_by_column
   - run_sparse_topk_by_column
 

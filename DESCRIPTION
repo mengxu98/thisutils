@@ -2,7 +2,7 @@ Type: Package
 Package: thisutils
 Title: Collection of Utility Functions for Data Analysis and Computing
 Version: 0.4.8
-Date: 2026-07-19
+Date: 2026-07-20
 Authors@R:
     c(
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054")),
@@ -33,6 +33,7 @@ Suggests:
     remotes,
     testthat (>= 3.0.0)
 LinkingTo:
+    cli,
     Rcpp
 Config/Needs/website: mengxu98/thistemplate
 Config/testthat/edition: 3
