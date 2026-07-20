@@ -13,7 +13,9 @@ parallelize_fun(
   throw_error = TRUE,
   progress_bar_width = 10L,
   timestamp_format = paste0("[", format(Sys.time(), "\%Y-\%m-\%d \%H:\%M:\%S"), "] "),
-  verbose = TRUE
+  verbose = TRUE,
+  backend = c("auto", "fork", "psock"),
+  timeout = Inf
 )
 }
 \arguments{
@@ -21,7 +23,7 @@ parallelize_fun(
 
 \item{fun}{The function to be applied to each element.}
 
-\item{cores}{The number of cores to use for parallelization with \link[foreach:foreach]{foreach::foreach}.
+\item{cores}{The number of worker processes to use for parallelization.
 Default is \code{1}.}
 
 \item{export_fun}{The functions to export the function to workers.}
@@ -41,6 +43,13 @@ Default is \code{"\%Y-\%m-\%d \%H:\%M:\%S"}.}
 
 \item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
+
+\item{backend}{Parallel backend. \code{"auto"} uses PSOCK on Windows, while
+collecting coverage, and when a non-sequential future plan is active;
+otherwise it uses fork. \code{"fork"} is unavailable on Windows.}
+
+\item{timeout}{Maximum number of seconds that a parallel worker task may run.
+\code{Inf} disables task timeouts. This is ignored when execution uses one core.}
 }
 \value{
 A list of computed results.
