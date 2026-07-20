@@ -84,29 +84,29 @@ first). Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span><span class="fu">run_dense_topk_by_column</span><span class="op">(</span><span class="va">m</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $idx</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]    6    3    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]    7    2    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]    6    2    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]    9    5   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]    9    4    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]    2    1    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]    7    1    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]    8   10    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]    5    3    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]    9    4    5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]    6    2    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]    9    5   10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]    9    4    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]    2    1    7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]    7    1    8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]    8   10    6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]    5    3    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]    9    4    5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]    1    8    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]    2    5    3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]       [,2]       [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -2.0360025 -1.0518756 -0.7783959</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -1.2720655 -0.9492349 -0.7456859</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -1.4967374 -1.4144681 -1.2023843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -1.1314671 -1.1103652 -0.3139382</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -1.5314701 -0.3533680 -0.2371309</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -1.2557505 -1.1543336 -1.0838999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -2.0061115 -1.7614451 -0.4133560</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -1.3302356 -0.8189035 -0.7262071</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.9391066 -0.7533612 -0.4781837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -1.8326439 -1.4601870 -0.7505732</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]       [,2]        [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -1.4967374 -1.4144681 -1.20238430</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -1.1314671 -1.1103652 -0.31393823</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -1.5314701 -0.3533680 -0.23713089</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -1.2557505 -1.1543336 -1.08389985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -2.0061115 -1.7614451 -0.41335601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -1.3302356 -0.8189035 -0.72620714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.9391066 -0.7533612 -0.47818370</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -1.8326439 -1.4601870 -0.75057316</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.5196884 -0.1307660  0.05590213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -1.8452639 -1.5611708 -0.82122221</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
