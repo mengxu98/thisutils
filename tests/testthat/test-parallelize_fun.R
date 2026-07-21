@@ -1,3 +1,13 @@
+local_parallel_test_workers <- function(workers = 2L, .env = parent.frame()) {
+  testthat::local_mocked_bindings(
+    cores_detect = function(cores, num_session) {
+      min(as.integer(workers), as.integer(cores), as.integer(num_session))
+    },
+    .package = "thisutils",
+    .env = .env
+  )
+}
+
 test_that("parallelize_fun works with single core", {
   result <- suppressMessages(
     parallelize_fun(1:3, function(x) x^2, verbose = FALSE)
@@ -108,6 +118,8 @@ test_that("parallelize_fun accepts progress_bar_width argument", {
 })
 
 test_that("parallelize_fun preserves input order for multi-core execution", {
+  local_parallel_test_workers()
+
   result <- suppressMessages(
     parallelize_fun(1:6, function(x) x, cores = 2, verbose = TRUE)
   )
@@ -117,6 +129,8 @@ test_that("parallelize_fun preserves input order for multi-core execution", {
 })
 
 test_that("parallelize_fun preserves input order for multi-core execution without verbose", {
+  local_parallel_test_workers()
+
   result <- suppressMessages(
     parallelize_fun(1:6, function(x) x * 2, cores = 2, verbose = FALSE)
   )
@@ -126,6 +140,8 @@ test_that("parallelize_fun preserves input order for multi-core execution withou
 })
 
 test_that("parallelize_fun handles uneven multi-core workloads in verbose mode", {
+  local_parallel_test_workers()
+
   delays <- c(0.15, 0.01, 0.12, 0.02, 0.08, 0.01)
   result <- suppressMessages(
     parallelize_fun(1:6, function(x) {
@@ -139,6 +155,8 @@ test_that("parallelize_fun handles uneven multi-core workloads in verbose mode",
 })
 
 test_that("parallelize_fun exports requested dependencies in multi-core mode", {
+  local_parallel_test_workers()
+
   offset <- 5
   add_offset <- function(x) x + offset
 
@@ -189,6 +207,7 @@ test_that("parallelize_fun preserves NULL results on a single core", {
 
 test_that("parallelize_fun reuses a bounded set of workers", {
   skip_on_os("windows")
+  local_parallel_test_workers()
 
   worker_pids <- suppressMessages(
     parallelize_fun(
@@ -212,6 +231,8 @@ test_that("parallel worker liveness checks do not terminate the process", {
 })
 
 test_that("parallelize_fun uses PSOCK while collecting coverage", {
+  local_parallel_test_workers()
+
   old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
   on.exit({
     if (is.na(old_covr)) {
@@ -235,6 +256,8 @@ test_that("parallelize_fun uses PSOCK while collecting coverage", {
 })
 
 test_that("parallelize_fun resolves a supplied closure before PSOCK serialization", {
+  local_parallel_test_workers()
+
   old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
   on.exit({
     if (is.na(old_covr)) {
@@ -257,6 +280,8 @@ test_that("parallelize_fun resolves a supplied closure before PSOCK serializatio
 })
 
 test_that("parallelize_fun reuses PSOCK workers", {
+  local_parallel_test_workers()
+
   old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
   on.exit({
     if (is.na(old_covr)) {
@@ -281,6 +306,7 @@ test_that("parallelize_fun reuses PSOCK workers", {
 
 test_that("parallelize_fun supports explicit fork and PSOCK backends", {
   skip_on_os("windows")
+  local_parallel_test_workers()
   skip_if(
     identical(Sys.getenv("R_COVR"), "true"),
     "fork-specific backend test"
@@ -305,6 +331,7 @@ test_that("parallelize_fun supports explicit fork and PSOCK backends", {
 test_that("auto uses PSOCK while a future worker plan is active", {
   skip_on_os("windows")
   skip_if_not_installed("future")
+  local_parallel_test_workers()
 
   old_plan <- future::plan()
   on.exit(future::plan(old_plan), add = TRUE)
@@ -327,6 +354,7 @@ test_that("auto completes work that uses an active future plan", {
   skip_on_os("windows")
   skip_if_not_installed("future")
   skip_if_not_installed("future.apply")
+  local_parallel_test_workers()
 
   old_plan <- future::plan()
   on.exit(future::plan(old_plan), add = TRUE)
@@ -355,6 +383,7 @@ test_that("auto completes work that uses an active future plan", {
 test_that("explicit fork warns while a future worker plan is active", {
   skip_on_os("windows")
   skip_if_not_installed("future")
+  local_parallel_test_workers()
   skip_if(
     identical(Sys.getenv("R_COVR"), "true"),
     "fork-specific warning test"
@@ -379,6 +408,8 @@ test_that("explicit fork warns while a future worker plan is active", {
 })
 
 test_that("parallel tasks fail within the requested timeout", {
+  local_parallel_test_workers()
+
   started <- proc.time()[["elapsed"]]
 
   expect_error(
@@ -402,6 +433,8 @@ test_that("parallel tasks fail within the requested timeout", {
 })
 
 test_that("timed-out PSOCK tasks leave no worker processes", {
+  local_parallel_test_workers()
+
   pid_base <- tempfile("thisutils-timeout-worker-")
   on.exit(unlink(Sys.glob(paste0(pid_base, ".*"))), add = TRUE)
 
@@ -430,6 +463,8 @@ test_that("timed-out PSOCK tasks leave no worker processes", {
 })
 
 test_that("fatal workers fail promptly with a worker error", {
+  local_parallel_test_workers()
+
   backends <- if (
     .Platform$OS.type == "windows" ||
       identical(Sys.getenv("R_COVR"), "true")
@@ -469,6 +504,8 @@ test_that("fatal workers fail promptly with a worker error", {
 })
 
 test_that("single-core and parallel modes keep the same mixed-result contract", {
+  local_parallel_test_workers()
+
   run_backend <- function(backend, verbose, cores = 2L) {
     suppressMessages(
       parallelize_fun(
@@ -508,6 +545,7 @@ test_that("single-core and parallel modes keep the same mixed-result contract", 
 
 test_that("nested fork calls retain the outer call context", {
   skip_on_os("windows")
+  local_parallel_test_workers()
   skip_if(
     identical(Sys.getenv("R_COVR"), "true"),
     "fork-specific nested-process test"
@@ -546,6 +584,8 @@ test_that("nested fork calls retain the outer call context", {
 })
 
 test_that("nested PSOCK calls resolve parallelize_fun in global closures", {
+  local_parallel_test_workers()
+
   worker <- function(i) {
     unname(unlist(parallelize_fun(
       1:3,
@@ -571,6 +611,7 @@ test_that("nested PSOCK calls resolve parallelize_fun in global closures", {
 
 test_that("an interrupted fork call cleans workers and can be followed by another call", {
   skip_on_os("windows")
+  local_parallel_test_workers()
   skip_if(
     identical(Sys.getenv("R_COVR"), "true"),
     "fork-specific interrupt test"
