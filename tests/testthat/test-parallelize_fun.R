@@ -202,6 +202,15 @@ test_that("parallelize_fun reuses a bounded set of workers", {
   expect_lte(length(unique(unlist(worker_pids))), 2L)
 })
 
+test_that("parallel worker liveness checks do not terminate the process", {
+  cl <- parallel::makePSOCKcluster(1L)
+  on.exit(try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
+  worker_pid <- parallel::clusterCall(cl, Sys.getpid)[[1L]]
+
+  expect_true(parallel_process_alive(worker_pid))
+  expect_identical(parallel::clusterCall(cl, function() TRUE), list(TRUE))
+})
+
 test_that("parallelize_fun uses PSOCK while collecting coverage", {
   old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
   on.exit({
@@ -417,11 +426,7 @@ test_that("timed-out PSOCK tasks leave no worker processes", {
   worker_files <- Sys.glob(paste0(pid_base, ".*"))
   worker_pids <- as.integer(substring(worker_files, nchar(pid_base) + 2L))
   expect_length(worker_pids, 2L)
-  expect_false(any(vapply(
-    worker_pids,
-    function(pid) isTRUE(tools::pskill(pid, 0L)),
-    logical(1)
-  )))
+  expect_false(any(vapply(worker_pids, parallel_process_alive, logical(1))))
 })
 
 test_that("fatal workers fail promptly with a worker error", {
@@ -442,7 +447,11 @@ test_that("fatal workers fail promptly with a worker error", {
           1:2,
           function(x) {
             if (x == 1L) {
-              q(save = "no", status = 3L, runLast = FALSE)
+              if (.Platform$OS.type == "windows") {
+                q(save = "no", status = 3L, runLast = FALSE)
+              } else {
+                tools::pskill(Sys.getpid(), tools::SIGKILL)
+              }
             }
             Sys.sleep(5)
             x
