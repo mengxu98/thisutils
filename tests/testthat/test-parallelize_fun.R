@@ -243,16 +243,19 @@ test_that("parallelize_fun uses PSOCK while collecting coverage", {
   }, add = TRUE)
   Sys.setenv(R_COVR = "true")
 
-  is_fork_child <- suppressMessages(
+  expect_identical(parallel_backend("auto"), "psock")
+  main_pid <- Sys.getpid()
+  worker_pids <- suppressMessages(
     parallelize_fun(
       1:4,
-      function(x) getFromNamespace("isChild", "parallel")(),
+      function(x) Sys.getpid(),
       cores = 2,
       verbose = FALSE
     )
   )
 
-  expect_false(any(unlist(is_fork_child)))
+  expect_true(all(vapply(worker_pids, is.integer, logical(1))))
+  expect_false(main_pid %in% unlist(worker_pids, use.names = FALSE))
 })
 
 test_that("parallelize_fun resolves a supplied closure before PSOCK serialization", {
