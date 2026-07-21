@@ -14,7 +14,9 @@ parallelize_fun(
   throw_error = TRUE,
   progress_bar_width = 10L,
   timestamp_format = paste0("[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] "),
-  verbose = TRUE
+  verbose = TRUE,
+  backend = c("auto", "fork", "psock"),
+  timeout = Inf
 )
 ```
 
@@ -30,9 +32,8 @@ parallelize_fun(
 
 - cores:
 
-  The number of cores to use for parallelization with
-  [foreach::foreach](https://rdrr.io/pkg/foreach/man/foreach.html).
-  Default is `1`.
+  The number of worker processes to use for parallelization. Default is
+  `1`.
 
 - export_fun:
 
@@ -60,6 +61,17 @@ parallelize_fun(
 
   Whether to print the message. Default is `TRUE`.
 
+- backend:
+
+  Parallel backend. `"auto"` uses PSOCK on Windows, while collecting
+  coverage, and when a non-sequential future plan is active; otherwise
+  it uses fork. `"fork"` is unavailable on Windows.
+
+- timeout:
+
+  Maximum number of seconds that a parallel worker task may run. `Inf`
+  disables task timeouts. This is ignored when execution uses one core.
+
 ## Value
 
 A list of computed results. If `clean_result = FALSE`, failed results
@@ -73,11 +85,11 @@ parallelize_fun(1:3, function(x) {
   Sys.sleep(0.2)
   x^2
 })
-#> ℹ [2026-07-20 04:21:41] Using 1 core
-#> ⠙ [2026-07-20 04:21:41] Running for 1 [1/3] ■■■         33% | ETA:  0s
-#> ✔ [2026-07-20 04:21:41] Completed 3 tasks in 638ms
+#> ℹ [2026-07-21 00:21:09] Using 1 core
+#> ⠙ [2026-07-21 00:21:09] Running for 1 [1/3] ■■■         33% | ETA:  0s
+#> ✔ [2026-07-21 00:21:09] Completed 3 tasks in 627ms
 #> 
-#> ℹ [2026-07-20 04:21:41] Building results
+#> ℹ [2026-07-21 00:21:09] Building results
 #> $`1`
 #> [1] 1
 #> 
@@ -92,8 +104,8 @@ parallelize_fun(list(1, 2, 3), function(x) {
   Sys.sleep(0.2)
   x^2
 }, cores = 2)
-#> ℹ [2026-07-20 04:21:41] Using 2 cores
-#> ℹ [2026-07-20 04:21:41] Building results
+#> ℹ [2026-07-21 00:21:09] Using 2 cores
+#> ℹ [2026-07-21 00:21:09] Building results
 #> [[1]]
 #> [1] 1
 #> 
@@ -109,13 +121,10 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = FALSE)
-#> ℹ [2026-07-20 04:21:42] Using 1 core
-#> ⠙ [2026-07-20 04:21:42] Running for 1 [1/5] ■■          20% | ETA:  0s
-#> ✔ [2026-07-20 04:21:42] Completed 5 tasks in 34ms
-#> 
-#> ℹ [2026-07-20 04:21:42] Building results
-#> ! [2026-07-20 04:21:42] Found 1 failed result
-#> ℹ [2026-07-20 04:21:42] ✖ Error details:
+#> ℹ [2026-07-21 00:21:10] Using 1 core
+#> ℹ [2026-07-21 00:21:10] Building results
+#> ! [2026-07-21 00:21:10] Found 1 failed result
+#> ℹ [2026-07-21 00:21:10] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "3"
 #> $`1`
 #> [1] 1
@@ -147,12 +156,12 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = TRUE)
-#> ℹ [2026-07-20 04:21:42] Using 1 core
-#> ℹ [2026-07-20 04:21:42] Building results
-#> ! [2026-07-20 04:21:42] Found 1 failed result
-#> ℹ [2026-07-20 04:21:42] ✖ Error details:
+#> ℹ [2026-07-21 00:21:10] Using 1 core
+#> ℹ [2026-07-21 00:21:10] Building results
+#> ! [2026-07-21 00:21:10] Found 1 failed result
+#> ℹ [2026-07-21 00:21:10] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "3"
-#> ℹ [2026-07-20 04:21:42] Removed 1 failed result
+#> ℹ [2026-07-21 00:21:10] Removed 1 failed result
 #> $`1`
 #> [1] 1
 #> 
@@ -172,10 +181,10 @@ parallelize_fun(1:5, function(x) {
   if (x == 4) stop("Error on element 4")
   x^2
 })
-#> ℹ [2026-07-20 04:21:42] Using 1 core
-#> ℹ [2026-07-20 04:21:42] Building results
-#> ! [2026-07-20 04:21:42] Found 2 failed results
-#> ℹ [2026-07-20 04:21:42] ✖ Error details:
+#> ℹ [2026-07-21 00:21:10] Using 1 core
+#> ℹ [2026-07-21 00:21:10] Building results
+#> ! [2026-07-21 00:21:10] Found 2 failed results
+#> ℹ [2026-07-21 00:21:10] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "2"
 #> ℹ                       ✖ Error on element 4 (1): "4"
 #> $`1`
@@ -218,9 +227,9 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, throw_error = FALSE)
-#> ℹ [2026-07-20 04:21:42] Using 1 core
-#> ℹ [2026-07-20 04:21:42] Building results
-#> ! [2026-07-20 04:21:42] Found 1 failed result
+#> ℹ [2026-07-21 00:21:10] Using 1 core
+#> ℹ [2026-07-21 00:21:10] Building results
+#> ! [2026-07-21 00:21:10] Found 1 failed result
 #> $`1`
 #> [1] 1
 #> 
