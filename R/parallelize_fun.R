@@ -533,8 +533,12 @@ parallel_elapsed <- function() {
 }
 
 parallel_process_alive <- function(pid) {
-  isTRUE(tryCatch(
-    tools::pskill(pid, 0L),
+  handle <- tryCatch(
+    ps::ps_handle(as.integer(pid)),
+    error = function(e) NULL
+  )
+  !is.null(handle) && isTRUE(tryCatch(
+    ps::ps_is_running(handle),
     error = function(e) FALSE
   ))
 }
@@ -596,7 +600,12 @@ terminate_parallel_cluster <- function(cl, worker_pids, force = FALSE) {
       parallel_process_alive,
       logical(1)
     )]
-    parallel_signal_workers(remaining, tools::SIGKILL)
+    final_signal <- if (.Platform$OS.type == "windows") {
+      tools::SIGTERM
+    } else {
+      tools::SIGKILL
+    }
+    parallel_signal_workers(remaining, final_signal)
   }
 
   try(parallel::stopCluster(cl), silent = TRUE)
