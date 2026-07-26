@@ -1,22 +1,38 @@
-#' @title Compute unbiased row variances
+#' @title Compute row variances
 #'
 #' @description
-#' Compute unbiased sample variances for each row of a dense or sparse matrix
-#' without densifying sparse input.
+#' Compute sample or population variances for each row of a dense or sparse
+#' matrix without densifying sparse input.
 #'
 #' @param x A matrix or a `Matrix` sparse matrix.
+#' @param unbiased Whether to compute the unbiased sample variance (the
+#'   default) instead of the population variance.
 #'
 #' @return A numeric vector of row variances. Row names are retained when
-#'   available. Matrices with zero or one column return `NA` for every row.
+#'   available. Matrices with zero columns return `NA` for every row. A
+#'   one-column matrix returns `NA` for sample variance and `0` for population
+#'   variance.
 #'
 #' @export
 #'
 #' @examples
 #' fast_row_vars(matrix(c(1, 2, 3, 4), nrow = 2))
-fast_row_vars <- function(x) {
+fast_row_vars <- function(x, unbiased = TRUE) {
+  if (!is.logical(unbiased) || length(unbiased) != 1L || is.na(unbiased)) {
+    log_message(
+      "{.arg unbiased} must be a single non-missing logical value",
+      message_type = "error"
+    )
+  }
+
   n <- ncol(x)
-  if (is.null(n) || n <= 1L) {
+  if (is.null(n) || n == 0L || (n == 1L && isTRUE(unbiased))) {
     out <- rep(NA_real_, nrow(x))
+    names(out) <- rownames(x)
+    return(out)
+  }
+  if (n == 1L) {
+    out <- rep(0, nrow(x))
     names(out) <- rownames(x)
     return(out)
   }
@@ -36,7 +52,8 @@ fast_row_vars <- function(x) {
     row_sum_sq <- rowSums(x * x)
   }
 
-  out <- (row_sum_sq - (row_sum * row_sum) / n) / (n - 1L)
+  denominator <- if (isTRUE(unbiased)) n - 1L else n
+  out <- (row_sum_sq - (row_sum * row_sum) / n) / denominator
   out <- pmax(as.numeric(out), 0)
   names(out) <- rownames(x)
   out

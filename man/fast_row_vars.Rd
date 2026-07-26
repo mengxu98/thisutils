@@ -2,20 +2,25 @@
 % Please edit documentation in R/row_variance.R
 \name{fast_row_vars}
 \alias{fast_row_vars}
-\title{Compute unbiased row variances}
+\title{Compute row variances}
 \usage{
-fast_row_vars(x)
+fast_row_vars(x, unbiased = TRUE)
 }
 \arguments{
 \item{x}{A matrix or a `Matrix` sparse matrix.}
+
+\item{unbiased}{Whether to compute the unbiased sample variance (the
+default) instead of the population variance.}
 }
 \value{
 A numeric vector of row variances. Row names are retained when
-  available. Matrices with zero or one column return `NA` for every row.
+  available. Matrices with zero columns return `NA` for every row. A
+  one-column matrix returns `NA` for sample variance and `0` for population
+  variance.
 }
 \description{
-Compute unbiased sample variances for each row of a dense or sparse matrix
-without densifying sparse input.
+Compute sample or population variances for each row of a dense or sparse
+matrix without densifying sparse input.
 }
 \examples{
 fast_row_vars(matrix(c(1, 2, 3, 4), nrow = 2))
