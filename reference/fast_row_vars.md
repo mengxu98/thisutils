@@ -1,12 +1,12 @@
-# Compute unbiased row variances
+# Compute row variances
 
-Compute unbiased sample variances for each row of a dense or sparse
+Compute sample or population variances for each row of a dense or sparse
 matrix without densifying sparse input.
 
 ## Usage
 
 ``` r
-fast_row_vars(x)
+fast_row_vars(x, unbiased = TRUE)
 ```
 
 ## Arguments
@@ -15,10 +15,17 @@ fast_row_vars(x)
 
   A matrix or a \`Matrix\` sparse matrix.
 
+- unbiased:
+
+  Whether to compute the unbiased sample variance (the default) instead
+  of the population variance.
+
 ## Value
 
 A numeric vector of row variances. Row names are retained when
-available. Matrices with zero or one column return \`NA\` for every row.
+available. Matrices with zero columns return \`NA\` for every row. A
+one-column matrix returns \`NA\` for sample variance and \`0\` for
+population variance.
 
 ## Examples
 

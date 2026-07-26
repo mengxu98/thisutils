@@ -85,7 +85,7 @@ Please reference
 - [`classification_metrics_compute()`](https://mengxu98.github.io/thisutils/reference/classification_metrics_compute.md)
   : Compute classification metrics
 - [`fast_row_vars()`](https://mengxu98.github.io/thisutils/reference/fast_row_vars.md)
-  : Compute unbiased row variances
+  : Compute row variances
 - [`filter_nonzero_variance_features()`](https://mengxu98.github.io/thisutils/reference/filter_nonzero_variance_features.md)
   : Keep matrix rows with nonzero variance
 - [`run_biocneighbors_knn()`](https://mengxu98.github.io/thisutils/reference/run_biocneighbors_knn.md)
