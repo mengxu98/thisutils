@@ -248,12 +248,6 @@ check_r_try_remotes_fallback <- function(
   if (!needs_fallback) {
     return(error)
   }
-  if (!requireNamespace("remotes", quietly = TRUE)) {
-    return(simpleError(
-      paste0(error_message, ". Install the optional `remotes` package to retry this GitHub package.")
-    ))
-  }
-
   remote_parts <- strsplit(pkg, "@", fixed = TRUE)[[1]]
   repo <- remote_parts[[1]]
   ref <- if (length(remote_parts) > 1L) remote_parts[[2]] else "HEAD"
