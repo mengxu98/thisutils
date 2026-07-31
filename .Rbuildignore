@@ -19,6 +19,7 @@
 ^docs$
 ^pkgdown$
 ^test$
+^tmp$
 ^.codex
 ^\.codegraph
 ^\.env$

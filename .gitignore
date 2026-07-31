@@ -10,6 +10,7 @@ pkgdown
 src-i386
 src-x64
 test/
+tmp/
 
 # macOS file
 .DS_Store
