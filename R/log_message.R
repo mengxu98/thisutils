@@ -3,7 +3,7 @@
 #' @description
 #' Integrate the message printing function with the \href{https://cli.r-lib.org}{cli} package,
 #' and the [base::message] function.
-#' The message could be suppressed by [base::suppressMessages].
+#' The message could be suppressed by `base::suppressMessages`.
 #'
 #' @md
 #' @param ... The message to print.

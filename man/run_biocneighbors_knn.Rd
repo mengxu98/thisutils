@@ -35,7 +35,7 @@ reference matrix. The wrapper standardizes matrix coercion, distance metric,
 and self-neighbor removal across consumers.
 }
 \examples{
-if (requireNamespace("BiocNeighbors", quietly = TRUE)) {
+if (nzchar(system.file(package = "BiocNeighbors"))) {
   run_biocneighbors_knn(matrix(rnorm(20), ncol = 2), k = 2)
 }
 }
