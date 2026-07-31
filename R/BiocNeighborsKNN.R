@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-#' if (requireNamespace("BiocNeighbors", quietly = TRUE)) {
+#' if (nzchar(system.file(package = "BiocNeighbors"))) {
 #'   run_biocneighbors_knn(matrix(rnorm(20), ncol = 2), k = 2)
 #' }
 run_biocneighbors_knn <- function(

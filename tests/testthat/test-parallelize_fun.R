@@ -715,22 +715,24 @@ test_that("the earliest timeout deadline determines the error class", {
 test_that("total timeouts leave no worker processes", {
   local_parallel_test_workers()
 
-  pid_base <- tempfile("thisutils-total-timeout-worker-")
-  on.exit(unlink(Sys.glob(paste0(pid_base, ".*"))), add = TRUE)
-  worker <- local({
-    path <- pid_base
-    function(x) {
-      file.create(paste0(path, ".", Sys.getpid()))
-      Sys.sleep(10)
-      x
-    }
-  })
+  observed_pids <- integer()
+  original_terminate_parallel_cluster <- terminate_parallel_cluster
+  testthat::local_mocked_bindings(
+    terminate_parallel_cluster = function(cl, worker_pids, force = FALSE) {
+      observed_pids <<- worker_pids
+      original_terminate_parallel_cluster(cl, worker_pids, force = force)
+    },
+    .package = "thisutils"
+  )
 
   expect_error(
     suppressMessages(
       parallelize_fun(
         1:4,
-        worker,
+        function(x) {
+          Sys.sleep(10)
+          x
+        },
         cores = 2,
         backend = "psock",
         total_timeout = 2,
@@ -740,10 +742,12 @@ test_that("total timeouts leave no worker processes", {
     class = "parallelize_total_timeout"
   )
 
-  worker_files <- Sys.glob(paste0(pid_base, ".*"))
-  worker_pids <- as.integer(substring(worker_files, nchar(pid_base) + 2L))
-  expect_gte(length(worker_pids), 1L)
-  expect_false(any(vapply(worker_pids, parallel_process_alive, logical(1))))
+  expect_gte(length(observed_pids), 1L)
+  expect_false(any(vapply(
+    observed_pids,
+    parallel_process_alive,
+    logical(1)
+  )))
 })
 
 test_that("timed-out PSOCK tasks leave no worker processes", {
