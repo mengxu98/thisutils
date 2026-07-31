@@ -50,7 +50,7 @@ A list with integer matrix \`idx\` and numeric matrix \`dist\`.
 ## Examples
 
 ``` r
-if (requireNamespace("BiocNeighbors", quietly = TRUE)) {
+if (nzchar(system.file(package = "BiocNeighbors"))) {
   run_biocneighbors_knn(matrix(rnorm(20), ncol = 2), k = 2)
 }
 #> $idx
