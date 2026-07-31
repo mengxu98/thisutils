@@ -102,7 +102,7 @@ or the evaluated result of \code{expr} if \code{expr} is supplied.
 \description{
 Integrate the message printing function with the \href{https://cli.r-lib.org}{cli} package,
 and the \link[base:message]{base::message} function.
-The message could be suppressed by \link[base:message]{base::suppressMessages}.
+The message could be suppressed by \link[base:suppressMessages]{base::suppressMessages}.
 }
 \examples{
 # basic usage
