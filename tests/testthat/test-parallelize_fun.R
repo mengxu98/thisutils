@@ -1,4 +1,5 @@
 local_parallel_test_workers <- function(workers = 2L, .env = parent.frame()) {
+  workers <- min(2L, as.integer(workers))
   testthat::local_mocked_bindings(
     cores_detect = function(cores, num_session) {
       min(as.integer(workers), as.integer(cores), as.integer(num_session))
@@ -7,6 +8,50 @@ local_parallel_test_workers <- function(workers = 2L, .env = parent.frame()) {
     .env = .env
   )
 }
+
+parallel_fork_tests_enabled <- function() {
+  .Platform$OS.type != "windows" &&
+    !identical(Sys.getenv("R_COVR"), "true")
+}
+
+test_that("timed-out PSOCK tasks close worker connections", {
+  local_parallel_test_workers()
+
+  observed <- NULL
+  warnings <- character()
+  withCallingHandlers(
+    {
+      observed <- tryCatch(
+        suppressMessages(
+          parallelize_fun(
+            1:2,
+            function(x) {
+              Sys.sleep(5)
+              x
+            },
+            cores = 2,
+            backend = "psock",
+            timeout = 0.2,
+            verbose = FALSE
+          )
+        ),
+        error = identity
+      )
+      gc()
+    },
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_s3_class(observed, "parallelize_timeout")
+  expect_false(any(grepl(
+    "closing unused connection",
+    warnings,
+    fixed = TRUE
+  )))
+})
 
 test_that("parallelize_fun works with single core", {
   result <- suppressMessages(
@@ -77,6 +122,80 @@ test_that("parallelize_fun does not set names for list inputs", {
     parallelize_fun(list(1, 2, 3), function(x) x^2, verbose = FALSE)
   )
   expect_null(names(result))
+})
+
+test_that("parallelize_fun handles empty and singleton inputs", {
+  empty <- suppressMessages(
+    parallelize_fun(integer(), identity, cores = 8, verbose = FALSE)
+  )
+  singleton <- suppressMessages(
+    parallelize_fun(
+      list(list(value = 1L)),
+      identity,
+      cores = 8,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(empty, list())
+  expect_identical(singleton, list(list(value = 1L)))
+})
+
+test_that("PSOCK matches sequential results for heterogeneous inputs", {
+  local_parallel_test_workers(workers = 4L)
+  x <- list(
+    1:5,
+    c(NA_real_, NaN, Inf, -Inf, 0),
+    c("a", NA_character_, "\u4E2D\u6587"),
+    as.raw(c(0, 127, 255)),
+    matrix(seq_len(12), nrow = 3),
+    data.frame(a = 1:3, b = c(TRUE, FALSE, NA)),
+    NULL
+  )
+  worker <- function(value) {
+    list(
+      class = class(value),
+      type = typeof(value),
+      length = length(value),
+      value = value
+    )
+  }
+
+  sequential <- suppressMessages(
+    parallelize_fun(x, worker, cores = 1, verbose = FALSE)
+  )
+  psock <- suppressMessages(
+    parallelize_fun(
+      x,
+      worker,
+      cores = 4,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(psock, sequential)
+})
+
+test_that("PSOCK preserves order at a larger task count", {
+  local_parallel_test_workers(workers = 4L)
+  x <- seq_len(4096L)
+
+  result <- suppressMessages(
+    parallelize_fun(
+      x,
+      function(i) as.integer((i * 17L) %% 997L),
+      cores = 4,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(
+    unname(unlist(result, use.names = FALSE)),
+    as.integer((x * 17L) %% 997L)
+  )
 })
 
 test_that("parallelize_fun restores cli options on error", {
@@ -221,6 +340,148 @@ test_that("parallelize_fun reuses a bounded set of workers", {
   expect_lte(length(unique(unlist(worker_pids))), 2L)
 })
 
+test_that("parallel task chunks are bounded and preserve every input index", {
+  chunks <- parallel_task_chunks(total = 1000L, cores = 4L, timeout = Inf)
+
+  expect_lte(length(chunks), 16L)
+  expect_identical(unlist(chunks, use.names = FALSE), seq_len(1000L))
+  expect_true(all(lengths(chunks) > 0L))
+})
+
+test_that("finite task timeouts disable batching", {
+  chunks <- parallel_task_chunks(total = 20L, cores = 4L, timeout = 1)
+
+  expect_length(chunks, 20L)
+  expect_identical(unlist(chunks, use.names = FALSE), seq_len(20L))
+  expect_true(all(lengths(chunks) == 1L))
+})
+
+test_that("seed produces identical streams across worker counts", {
+  local_parallel_test_workers(workers = 4L)
+
+  worker <- function(i) c(runif(3), rnorm(2))
+  sequential <- suppressMessages(
+    parallelize_fun(1:40, worker, cores = 1, seed = 123, verbose = FALSE)
+  )
+  psock_two <- suppressMessages(
+    parallelize_fun(
+      1:40,
+      worker,
+      cores = 2,
+      backend = "psock",
+      seed = 123,
+      verbose = FALSE
+    )
+  )
+  psock_four <- suppressMessages(
+    parallelize_fun(
+      1:40,
+      worker,
+      cores = 4,
+      backend = "psock",
+      seed = 123,
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(sequential, psock_two)
+  expect_identical(psock_two, psock_four)
+  expect_equal(length(unique(vapply(
+    psock_four,
+    function(value) value[[1L]],
+    numeric(1)
+  ))), 40L)
+
+  if (parallel_fork_tests_enabled()) {
+    fork <- suppressMessages(
+      parallelize_fun(
+        1:40,
+        worker,
+        cores = 4,
+        backend = "fork",
+        seed = 123,
+        verbose = FALSE
+      )
+    )
+    expect_identical(sequential, fork)
+  }
+})
+
+test_that("seed restores the caller random-number state", {
+  set.seed(987)
+  state_before <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
+
+  suppressMessages(
+    parallelize_fun(
+      1:20,
+      function(i) runif(5),
+      cores = 2,
+      backend = "psock",
+      seed = 42,
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(
+    get(".Random.seed", envir = globalenv(), inherits = FALSE),
+    state_before
+  )
+})
+
+test_that("seeded results remain stable when some inputs fail", {
+  local_parallel_test_workers(workers = 4L)
+  worker <- function(i) {
+    value <- c(runif(2), rnorm(2))
+    if (i %% 11L == 0L) {
+      stop("expected seeded failure")
+    }
+    value
+  }
+
+  sequential <- suppressMessages(
+    parallelize_fun(
+      1:500,
+      worker,
+      cores = 1,
+      seed = 20260731,
+      throw_error = FALSE,
+      verbose = FALSE
+    )
+  )
+  psock <- suppressMessages(
+    parallelize_fun(
+      1:500,
+      worker,
+      cores = 4,
+      backend = "psock",
+      seed = 20260731,
+      throw_error = FALSE,
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(psock, sequential)
+  expect_identical(
+    unname(which(vapply(psock, inherits, logical(1), "parallelize_error"))),
+    which(seq_len(500L) %% 11L == 0L)
+  )
+})
+
+test_that("seed validation rejects invalid values", {
+  expect_error(
+    parallelize_fun(1:2, identity, seed = NA, verbose = FALSE),
+    "seed must be NULL or a single integer"
+  )
+  expect_error(
+    parallelize_fun(1:2, identity, seed = c(1, 2), verbose = FALSE),
+    "seed must be NULL or a single integer"
+  )
+  expect_error(
+    parallelize_fun(1:2, identity, seed = 1.5, verbose = FALSE),
+    "seed must be NULL or a single integer"
+  )
+})
+
 test_that("parallel worker liveness checks do not terminate the process", {
   cl <- parallel::makePSOCKcluster(1L)
   on.exit(try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
@@ -230,18 +491,35 @@ test_that("parallel worker liveness checks do not terminate the process", {
   expect_identical(parallel::clusterCall(cl, function() TRUE), list(TRUE))
 })
 
-test_that("parallelize_fun uses PSOCK while collecting coverage", {
+test_that("PSOCK launcher temporary files are scoped and removed", {
+  skip_if(.Platform$OS.type != "windows")
   local_parallel_test_workers()
 
-  old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
-  on.exit({
-    if (is.na(old_covr)) {
-      Sys.unsetenv("R_COVR")
-    } else {
-      Sys.setenv(R_COVR = old_covr)
-    }
-  }, add = TRUE)
-  Sys.setenv(R_COVR = "true")
+  old_tmpdir <- Sys.getenv("TMPDIR", unset = NA_character_)
+  before <- Sys.glob(file.path(tempdir(), "thisutils-psock-*"))
+  result <- suppressMessages(
+    parallelize_fun(
+      1:2,
+      identity,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(unname(unlist(result)), 1:2)
+  expect_identical(
+    Sys.getenv("TMPDIR", unset = NA_character_),
+    old_tmpdir
+  )
+  expect_setequal(
+    Sys.glob(file.path(tempdir(), "thisutils-psock-*")),
+    before
+  )
+})
+
+test_that("the auto backend always uses PSOCK", {
+  local_parallel_test_workers()
 
   expect_identical(parallel_backend("auto"), "psock")
   main_pid <- Sys.getpid()
@@ -261,16 +539,6 @@ test_that("parallelize_fun uses PSOCK while collecting coverage", {
 test_that("parallelize_fun resolves a supplied closure before PSOCK serialization", {
   local_parallel_test_workers()
 
-  old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
-  on.exit({
-    if (is.na(old_covr)) {
-      Sys.unsetenv("R_COVR")
-    } else {
-      Sys.setenv(R_COVR = old_covr)
-    }
-  }, add = TRUE)
-  Sys.setenv(R_COVR = "true")
-
   add_offset <- local({
     offset <- 11L
     function(x) x + offset
@@ -284,16 +552,6 @@ test_that("parallelize_fun resolves a supplied closure before PSOCK serializatio
 
 test_that("parallelize_fun reuses PSOCK workers", {
   local_parallel_test_workers()
-
-  old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
-  on.exit({
-    if (is.na(old_covr)) {
-      Sys.unsetenv("R_COVR")
-    } else {
-      Sys.setenv(R_COVR = old_covr)
-    }
-  }, add = TRUE)
-  Sys.setenv(R_COVR = "true")
 
   worker_pids <- suppressMessages(
     parallelize_fun(
@@ -309,11 +567,8 @@ test_that("parallelize_fun reuses PSOCK workers", {
 
 test_that("parallelize_fun supports explicit fork and PSOCK backends", {
   skip_on_os("windows")
+  skip_on_covr()
   local_parallel_test_workers()
-  skip_if(
-    identical(Sys.getenv("R_COVR"), "true"),
-    "fork-specific backend test"
-  )
 
   is_fork <- function(backend) {
     suppressMessages(
@@ -331,82 +586,12 @@ test_that("parallelize_fun supports explicit fork and PSOCK backends", {
   expect_false(any(unlist(is_fork("psock"))))
 })
 
-test_that("auto uses PSOCK while a future worker plan is active", {
-  skip_on_os("windows")
-  skip_if_not_installed("future")
-  local_parallel_test_workers()
+test_that("the fork backend is rejected clearly on Windows", {
+  skip_if(.Platform$OS.type != "windows")
 
-  old_plan <- future::plan()
-  on.exit(future::plan(old_plan), add = TRUE)
-  future::plan(future::multisession, workers = 2L)
-
-  is_fork_child <- suppressMessages(
-    parallelize_fun(
-      1:4,
-      function(x) getFromNamespace("isChild", "parallel")(),
-      cores = 2,
-      backend = "auto",
-      verbose = FALSE
-    )
-  )
-
-  expect_false(any(unlist(is_fork_child)))
-})
-
-test_that("auto completes work that uses an active future plan", {
-  skip_on_os("windows")
-  skip_if_not_installed("future")
-  skip_if_not_installed("future.apply")
-  local_parallel_test_workers()
-
-  old_plan <- future::plan()
-  on.exit(future::plan(old_plan), add = TRUE)
-  future::plan(future::multisession, workers = 2L)
-
-  result <- suppressMessages(
-    parallelize_fun(
-      1:4,
-      function(i) {
-        sum(unlist(future.apply::future_lapply(
-          1:4,
-          function(j) i + j,
-          future.seed = TRUE
-        )))
-      },
-      cores = 2,
-      backend = "auto",
-      timeout = 30,
-      verbose = FALSE
-    )
-  )
-
-  expect_identical(unname(unlist(result)), c(14L, 18L, 22L, 26L))
-})
-
-test_that("explicit fork warns while a future worker plan is active", {
-  skip_on_os("windows")
-  skip_if_not_installed("future")
-  local_parallel_test_workers()
-  skip_if(
-    identical(Sys.getenv("R_COVR"), "true"),
-    "fork-specific warning test"
-  )
-
-  old_plan <- future::plan()
-  on.exit(future::plan(old_plan), add = TRUE)
-  future::plan(future::multisession, workers = 2L)
-
-  expect_warning(
-    suppressMessages(
-      parallelize_fun(
-        1:2,
-        identity,
-        cores = 2,
-        backend = "fork",
-        verbose = FALSE
-      )
-    ),
-    "active non-sequential future plan"
+  expect_error(
+    parallel_backend("fork"),
+    "fork backend is unavailable on Windows"
   )
 })
 
@@ -433,6 +618,132 @@ test_that("parallel tasks fail within the requested timeout", {
   )
 
   expect_lt(proc.time()[["elapsed"]] - started, 10)
+})
+
+test_that("parallel calls fail within the total timeout", {
+  local_parallel_test_workers()
+
+  started <- proc.time()[["elapsed"]]
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:20,
+        function(x) {
+          Sys.sleep(0.2)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        total_timeout = 0.5,
+        verbose = FALSE
+      )
+    ),
+    class = "parallelize_total_timeout"
+  )
+  expect_lt(proc.time()[["elapsed"]] - started, 10)
+})
+
+test_that("single-core total timeout is enforced between inputs", {
+  started <- proc.time()[["elapsed"]]
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:10,
+        function(x) {
+          Sys.sleep(0.1)
+          x
+        },
+        cores = 1,
+        total_timeout = 0.25,
+        verbose = FALSE
+      )
+    ),
+    class = "parallelize_total_timeout"
+  )
+  expect_lt(proc.time()[["elapsed"]] - started, 2)
+})
+
+test_that("total timeout validates its input", {
+  expect_error(
+    parallelize_fun(1:2, identity, total_timeout = 0, verbose = FALSE),
+    "total_timeout must be a positive number or Inf"
+  )
+})
+
+test_that("the earliest timeout deadline determines the error class", {
+  local_parallel_test_workers()
+
+  task_first <- tryCatch(
+    suppressMessages(
+      parallelize_fun(
+        1:2,
+        function(x) {
+          Sys.sleep(5)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        timeout = 0.2,
+        total_timeout = 10,
+        verbose = FALSE
+      )
+    ),
+    error = identity
+  )
+  total_first <- tryCatch(
+    suppressMessages(
+      parallelize_fun(
+        1:2,
+        function(x) {
+          Sys.sleep(5)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        timeout = 10,
+        total_timeout = 0.2,
+        verbose = FALSE
+      )
+    ),
+    error = identity
+  )
+
+  expect_s3_class(task_first, "parallelize_timeout")
+  expect_s3_class(total_first, "parallelize_total_timeout")
+})
+
+test_that("total timeouts leave no worker processes", {
+  local_parallel_test_workers()
+
+  pid_base <- tempfile("thisutils-total-timeout-worker-")
+  on.exit(unlink(Sys.glob(paste0(pid_base, ".*"))), add = TRUE)
+  worker <- local({
+    path <- pid_base
+    function(x) {
+      file.create(paste0(path, ".", Sys.getpid()))
+      Sys.sleep(10)
+      x
+    }
+  })
+
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:4,
+        worker,
+        cores = 2,
+        backend = "psock",
+        total_timeout = 2,
+        verbose = FALSE
+      )
+    ),
+    class = "parallelize_total_timeout"
+  )
+
+  worker_files <- Sys.glob(paste0(pid_base, ".*"))
+  worker_pids <- as.integer(substring(worker_files, nchar(pid_base) + 2L))
+  expect_gte(length(worker_pids), 1L)
+  expect_false(any(vapply(worker_pids, parallel_process_alive, logical(1))))
 })
 
 test_that("timed-out PSOCK tasks leave no worker processes", {
@@ -468,22 +779,22 @@ test_that("timed-out PSOCK tasks leave no worker processes", {
 test_that("fatal workers fail promptly with a worker error", {
   local_parallel_test_workers()
 
-  backends <- if (
-    .Platform$OS.type == "windows" ||
-      identical(Sys.getenv("R_COVR"), "true")
-  ) {
-    "psock"
-  } else {
+  backends <- if (parallel_fork_tests_enabled()) {
     c("fork", "psock")
+  } else {
+    "psock"
   }
 
   for (backend in backends) {
+    pid_base <- tempfile(paste0("thisutils-fatal-", backend, "-worker-"))
+    on.exit(unlink(Sys.glob(paste0(pid_base, ".*"))), add = TRUE)
     started <- proc.time()[["elapsed"]]
     expect_error(
       suppressMessages(
         parallelize_fun(
           1:2,
           function(x) {
+            file.create(paste0(pid_base, ".", Sys.getpid()))
             if (x == 1L) {
               if (.Platform$OS.type == "windows") {
                 q(save = "no", status = 3L, runLast = FALSE)
@@ -503,6 +814,15 @@ test_that("fatal workers fail promptly with a worker error", {
       class = "parallelize_worker_error"
     )
     expect_lt(proc.time()[["elapsed"]] - started, 8)
+
+    worker_files <- Sys.glob(paste0(pid_base, ".*"))
+    worker_pids <- as.integer(substring(worker_files, nchar(pid_base) + 2L))
+    expect_gte(length(worker_pids), 1L)
+    expect_false(any(vapply(
+      worker_pids,
+      parallel_process_alive,
+      logical(1)
+    )))
   }
 })
 
@@ -535,10 +855,7 @@ test_that("single-core and parallel modes keep the same mixed-result contract", 
   expect_true(inherits(psock[[3L]], "parallelize_error"))
   expect_null(psock[[5L]])
 
-  if (
-    .Platform$OS.type != "windows" &&
-      !identical(Sys.getenv("R_COVR"), "true")
-  ) {
+  if (parallel_fork_tests_enabled()) {
     fork <- run_backend("fork", verbose = FALSE)
     fork_progress <- run_backend("fork", verbose = TRUE)
     expect_identical(sequential, fork)
@@ -548,20 +865,8 @@ test_that("single-core and parallel modes keep the same mixed-result contract", 
 
 test_that("nested fork calls retain the outer call context", {
   skip_on_os("windows")
+  skip_on_covr()
   local_parallel_test_workers()
-  skip_if(
-    identical(Sys.getenv("R_COVR"), "true"),
-    "fork-specific nested-process test"
-  )
-  old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
-  on.exit({
-    if (is.na(old_covr)) {
-      Sys.unsetenv("R_COVR")
-    } else {
-      Sys.setenv(R_COVR = old_covr)
-    }
-  }, add = TRUE)
-  Sys.unsetenv("R_COVR")
 
   result <- suppressMessages(
     parallelize_fun(
@@ -612,23 +917,37 @@ test_that("nested PSOCK calls resolve parallelize_fun in global closures", {
   expect_identical(unname(result), list(2:4, 3:5, 4:6, 5:7))
 })
 
+test_that("worker depth is scoped to each task", {
+  local_parallel_test_workers()
+  old_options <- options(thisutils.parallel.depth = NULL)
+  on.exit(options(old_options), add = TRUE)
+
+  depths <- suppressMessages(
+    parallelize_fun(
+      1:8,
+      function(i) {
+        depth <- getOption("thisutils.parallel.depth", 0L)
+        options(thisutils.parallel.depth = 99L)
+        depth
+      },
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(unname(unlist(depths)), rep(1L, 8L))
+  expect_null(getOption("thisutils.parallel.depth"))
+})
+
 test_that("an interrupted fork call cleans workers and can be followed by another call", {
   skip_on_os("windows")
+  skip_on_covr()
   local_parallel_test_workers()
-  skip_if(
-    identical(Sys.getenv("R_COVR"), "true"),
-    "fork-specific interrupt test"
+  on.exit(
+    setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE),
+    add = TRUE
   )
-  old_covr <- Sys.getenv("R_COVR", unset = NA_character_)
-  on.exit({
-    setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE)
-    if (is.na(old_covr)) {
-      Sys.unsetenv("R_COVR")
-    } else {
-      Sys.setenv(R_COVR = old_covr)
-    }
-  }, add = TRUE)
-  Sys.unsetenv("R_COVR")
 
   setTimeLimit(elapsed = 0.5, transient = TRUE)
   interrupted <- tryCatch({

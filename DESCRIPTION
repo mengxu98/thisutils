@@ -2,7 +2,7 @@ Type: Package
 Package: thisutils
 Title: Collection of Utility Functions for Data Analysis and Computing
 Version: 0.4.8
-Date: 2026-07-26
+Date: 2026-07-31
 Authors@R:
     c(
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054")),
@@ -29,8 +29,6 @@ Imports:
     utils
 Suggests:
     BiocNeighbors,
-    future,
-    future.apply,
     remotes,
     testthat (>= 3.1.7)
 LinkingTo:
