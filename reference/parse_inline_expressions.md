@@ -49,5 +49,5 @@ name
 #> [1] "{.pkg testing}"
 
 log_message(name)
-#> ℹ [2026-08-03 16:18:25] testing
+#> ℹ [2026-08-04 13:52:01] testing
 ```

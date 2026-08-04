@@ -1,5 +1,14 @@
 # Changelog
 
+## thisutils 0.4.9
+
+- **fix**:
+  - [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    now emits an actual R warning for `message_type = "warning"`, so
+    warnings are visible to
+    [`tryCatch()`](https://rdrr.io/r/base/conditions.html), `warn = 2`,
+    and [`warning()`](https://rdrr.io/r/base/warning.html) handlers.
+
 ## thisutils 0.4.8
 
 - **feat**:
