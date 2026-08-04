@@ -446,7 +446,7 @@ log_message <- function(
 
     if (identical(message_type, "warning")) {
       plain_warning <- tryCatch(
-        cli::strip_ansi(cli::format_inline(msg, .envir = .envir)),
+        cli::ansi_strip(cli::format_inline(msg, .envir = .envir)),
         error = function(e) msg
       )
       rlang::warn(plain_warning, call. = NULL)
