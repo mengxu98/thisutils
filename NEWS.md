@@ -1,3 +1,8 @@
+# thisutils 0.4.9
+
+* **fix**:
+  * `log_message()` now emits an actual R warning for `message_type = "warning"`, so warnings are visible to `tryCatch()`, `warn = 2`, and `warning()` handlers.
+
 # thisutils 0.4.8
 
 * **feat**:
