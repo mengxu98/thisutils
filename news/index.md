@@ -2,6 +2,8 @@
 
 ## thisutils 0.4.9
 
+CRAN release: 2026-08-04
+
 - **fix**:
   - [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
     now emits an actual R warning for `message_type = "warning"`, so
