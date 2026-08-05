@@ -19,13 +19,17 @@ on:
           Comma-separated list of R-hub platforms to use.
           Full list: https://r-hub.github.io/containers/
         type: string
-        default: 'linux,windows,macos'
+        default: 'r-devel-linux-x86_64-debian-clang,r-devel-linux-x86_64-debian-gcc,clang22,gcc16,r-devel-windows-x86_64,r-patched-linux-x86_64,r-release-linux-x86_64,r-release-macos-arm64,r-release-macos-x86_64,r-release-windows-x86_64,r-oldrel-macos-arm64,r-oldrel-macos-x86_64,r-oldrel-windows-x86_64'
       name:
         description: 'Run name. You can leave this empty.'
         type: string
       id:
         description: 'Unique ID. You can leave this empty.'
         type: string
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master, dev]
 
 jobs:
 
@@ -39,7 +43,7 @@ jobs:
     # NO NEED TO CHECKOUT HERE
     - uses: r-hub/actions/setup@v1
       with:
-        config: ${{ github.event.inputs.config }}
+        config: ${{ github.event.inputs.config || 'r-devel-linux-x86_64-debian-clang,r-devel-linux-x86_64-debian-gcc,clang22,gcc16,r-devel-windows-x86_64,r-patched-linux-x86_64,r-release-linux-x86_64,r-release-macos-arm64,r-release-macos-x86_64,r-release-windows-x86_64,r-oldrel-macos-arm64,r-oldrel-macos-x86_64,r-oldrel-windows-x86_64' }}
       id: rhub-setup
 
   linux-containers:
