@@ -948,12 +948,17 @@ test_that("an interrupted fork call cleans workers and can be followed by anothe
   skip_on_os("windows")
   skip_on_covr()
   local_parallel_test_workers()
-  on.exit(
-    setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE),
-    add = TRUE
-  )
 
-  setTimeLimit(elapsed = 0.5, transient = TRUE)
+  main_pid <- Sys.getpid()
+  interrupter <- callr::r_bg(
+    function(main_pid) {
+      Sys.sleep(0.8)
+      tools::pskill(main_pid, tools::SIGINT)
+    },
+    args = list(main_pid = main_pid)
+  )
+  on.exit(interrupter$kill(), add = TRUE)
+
   interrupted <- tryCatch({
     parallelize_fun(
       1:4,
@@ -965,13 +970,275 @@ test_that("an interrupted fork call cleans workers and can be followed by anothe
       verbose = FALSE
     )
     NULL
-  }, error = identity)
-  setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE)
+  }, interrupt = identity)
 
-  expect_s3_class(interrupted, "error")
+  expect_s3_class(interrupted, "interrupt")
   expect_length(getFromNamespace("children", "parallel")(), 0L)
   expect_identical(
     unname(unlist(parallelize_fun(1:3, identity, cores = 2, verbose = FALSE))),
     1:3
   )
+})
+
+test_that("verbose error reporting groups repeated failures", {
+  messages <- character()
+  result <- withCallingHandlers(
+    parallelize_fun(
+      c(a = 1L, b = 2L, c = 3L, d = 4L, e = 5L, f = 6L, g = 7L, h = 8L),
+      function(x) {
+        if (x %% 2L == 0L) stop("even failure")
+        stop("odd failure")
+      },
+      cores = 1,
+      verbose = TRUE,
+      throw_error = TRUE
+    ),
+    message = function(m) {
+      messages <<- c(messages, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    },
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  combined <- paste(messages, collapse = "\n")
+  expect_true(grepl("Error details", combined, fixed = TRUE))
+  expect_true(grepl("even failure", combined, fixed = TRUE))
+  expect_true(grepl("odd failure", combined, fixed = TRUE))
+  expect_true(grepl("and 1 more", combined, fixed = TRUE))
+  expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
+})
+
+test_that("single-core verbose progress handles list inputs", {
+  result <- suppressMessages(
+    parallelize_fun(list(1, 2, 3), function(x) x * 2L, verbose = TRUE)
+  )
+  expect_identical(unname(result), list(2, 4, 6))
+})
+
+test_that("multi-core verbose progress handles named and list inputs", {
+  local_parallel_test_workers()
+
+  named <- suppressMessages(
+    parallelize_fun(
+      c(a = 1L, b = 2L, c = 3L),
+      identity,
+      cores = 2,
+      backend = "psock",
+      verbose = TRUE
+    )
+  )
+  listed <- suppressMessages(
+    parallelize_fun(
+      list(1, 2, 3),
+      identity,
+      cores = 2,
+      backend = "psock",
+      verbose = TRUE
+    )
+  )
+
+  expect_identical(named, list(a = 1L, b = 2L, c = 3L))
+  expect_identical(listed, list(1, 2, 3))
+})
+
+test_that("export_fun supports functions without an environment", {
+  local_parallel_test_workers()
+
+  offset <- 4L
+
+  result <- suppressMessages(
+    parallelize_fun(
+      1:4,
+      as.integer,
+      cores = 2,
+      backend = "psock",
+      export_fun = "offset",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(unname(unlist(result)), 1:4)
+})
+
+test_that("a worker returning an invalid batch raises a worker error", {
+  local_parallel_test_workers()
+
+  testthat::local_mocked_bindings(
+    parallel_psock_worker_task = function(indices) 42L,
+    .package = "thisutils"
+  )
+
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:3,
+        identity,
+        cores = 2,
+        backend = "psock",
+        verbose = FALSE
+      )
+    ),
+    "Worker returned an invalid task batch"
+  )
+})
+
+test_that("empty inputs produce no task chunks", {
+  expect_identical(parallel_task_chunks(total = 0L, cores = 2L, timeout = Inf), list())
+  expect_identical(parallel_task_chunks(total = 0L, cores = 2L, timeout = 1), list())
+})
+
+test_that("the total deadline is enforced while polling workers", {
+  local_parallel_test_workers()
+
+  started <- proc.time()[["elapsed"]]
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:4,
+        function(x) {
+          Sys.sleep(30)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        total_timeout = 0.3,
+        verbose = FALSE
+      )
+    ),
+    class = "parallelize_total_timeout"
+  )
+  expect_lt(proc.time()[["elapsed"]] - started, 10)
+})
+
+test_that("dead workers are detected while polling", {
+  local_parallel_test_workers()
+
+  testthat::local_mocked_bindings(
+    parallel_process_alive = function(pid) FALSE,
+    .package = "thisutils"
+  )
+
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:4,
+        function(x) {
+          Sys.sleep(5)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        verbose = FALSE
+      )
+    ),
+    "exited before returning a result"
+  )
+})
+
+test_that("force cleanup escalates to SIGKILL for surviving workers", {
+  local_parallel_test_workers()
+
+  sent_signals <- integer()
+  testthat::local_mocked_bindings(
+    parallel_signal_workers = function(pids, signal) {
+      sent_signals <<- c(sent_signals, as.integer(signal))
+      invisible(NULL)
+    },
+    .package = "thisutils"
+  )
+
+  expect_error(
+    suppressMessages(
+      parallelize_fun(
+        1:2,
+        function(x) {
+          Sys.sleep(2)
+          x
+        },
+        cores = 2,
+        backend = "psock",
+        timeout = 0.3,
+        verbose = FALSE
+      )
+    ),
+    class = "parallelize_timeout"
+  )
+
+  final_signal <- if (.Platform$OS.type == "windows") {
+    tools::SIGTERM
+  } else {
+    tools::SIGKILL
+  }
+  expect_true(tools::SIGTERM %in% sent_signals)
+  expect_true(final_signal %in% sent_signals)
+})
+
+test_that("scheduler fallback errors clearly when parallel changes", {
+  local_parallel_test_workers()
+
+  testthat::local_mocked_bindings(
+    get_namespace_fun = function(ns, name) NULL,
+    .package = "thisutils"
+  )
+
+  expect_error(
+    suppressMessages(
+      parallelize_fun(1:2, identity, cores = 2, verbose = FALSE)
+    ),
+    "This R version does not provide the parallel scheduler function"
+  )
+})
+
+test_that("seed restores a clean random-number state", {
+  local_parallel_test_workers()
+
+  has_seed <- exists(".Random.seed", envir = globalenv(), inherits = FALSE)
+  if (has_seed) {
+    saved_seed <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
+    rm(".Random.seed", envir = globalenv())
+  }
+  saved_kind <- RNGkind()
+  on.exit({
+    do.call(RNGkind, as.list(saved_kind))
+    if (has_seed) {
+      assign(".Random.seed", saved_seed, envir = globalenv())
+    }
+  }, add = TRUE)
+
+  suppressMessages(
+    parallelize_fun(
+      1:6,
+      function(i) runif(2),
+      cores = 2,
+      backend = "psock",
+      seed = 7,
+      verbose = FALSE
+    )
+  )
+
+  expect_false(exists(".Random.seed", envir = globalenv(), inherits = FALSE))
+})
+
+test_that("worker depth falls back for invalid options", {
+  old_options <- options(thisutils.parallel.depth = -1L)
+  on.exit(options(old_options), add = TRUE)
+
+  expect_identical(parallel_worker_depth(), 0L)
+})
+
+test_that("parallel progress bar handles degenerate inputs", {
+  expect_equal(nchar(cli::ansi_strip(parallel_progress_bar(6, 10, 0L))), 10)
+  expect_identical(parallel_progress_bar(1, 0), "")
+  expect_equal(nchar(cli::ansi_strip(parallel_progress_bar(NaN, 10))), 10)
+})
+
+test_that("cores_detect handles missing sessions and degenerate hardware", {
+  expect_identical(cores_detect(cores = 2, num_session = NULL), 1)
+
+  testthat::local_mocked_bindings(
+    detectCores = function(...) 1L,
+    .package = "parallel"
+  )
+
+  expect_identical(cores_detect(cores = 2, num_session = 4), 1L)
 })
