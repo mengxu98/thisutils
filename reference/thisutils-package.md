@@ -1,8 +1,9 @@
-# Collection of Utility Functions for Data Analysis and Computing
+# Reliable Utilities for Reusable Research Workflows
 
-Provides utility functions for data analysis and computing. Includes
-functions for logging, parallel processing, and other computational
-tasks to streamline workflows.
+Reusable building blocks for matrix representation, numerically stable
+and resource-controlled computation, neighborhood and classification
+evaluation, consistent serial/parallel execution, structured messages,
+and research-package interoperability.
 
 ## Source
 
@@ -18,4 +19,4 @@ Useful links:
 
 ## Author
 
-Meng Xu (Maintainer), <mengxu98@qq.com>
+Xu Meng (Maintainer), <mengxu98@qq.com>

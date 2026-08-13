@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,7 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -38,6 +39,39 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="thisutils-050">thisutils 0.5.0<a class="anchor" aria-label="anchor" href="#thisutils-050"></a></h2>
+<ul><li>
+<strong>compatibility</strong>:
+<ul><li>Preserve the historical <code>matrix_to_table(keep_zero = TRUE)</code> and <code>run_dense_topk_by_column(decreasing = FALSE)</code> defaults. Compact table output and decreasing dense top-k remain explicit choices.</li>
+<li>Preserve the stored-entry semantics and zero-value padding of <code><a href="../reference/run_sparse_topk_by_column.html">run_sparse_topk_by_column()</a></code>. The new <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> includes implicit sparse zeros by default so it matches ordinary dense-matrix semantics.</li>
+</ul></li>
+<li>
+<strong>feat</strong>:
+<ul><li>Add <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> and <code><a href="../reference/run_sparse_topk_stored.html">run_sparse_topk_stored()</a></code> with an explicit <code>by = "col"</code> or <code>by = "row"</code> direction. The earlier column-wise names remain available as compatibility wrappers.</li>
+<li>Allow <code>parallelize_fun(verbose = TRUE, progress = FALSE)</code> to retain standardized <code><a href="../reference/log_message.html">log_message()</a></code> lifecycle output without a dynamic terminal progress bar.</li>
+<li>Make Pearson <code><a href="../reference/sparse_cor.html">sparse_cor()</a></code> blockwise and add correlation threshold, dense working-memory, and opt-in sparse output-size controls. The output limit defaults to <code>Inf</code> for compatibility. Spearman and Kendall paths now check their dense allocation boundary before conversion.</li>
+<li>Expose exact LISI neighbor-search strategy, C++ thread count, and dense input-memory controls through <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code>.</li>
+</ul></li>
+<li>
+<strong>fix</strong>:
+<ul><li>Detect cancellation-prone row variance calculations and recompute only the affected dense or sparse rows with a stable two-pass calculation, preserving the existing fast path for ordinary inputs.</li>
+<li>Pad stored-entry sparse top-k results with <code>NA</code> values instead of zeros.</li>
+<li>Replace infinite correlations with zero when <code>remove_inf = TRUE</code>.</li>
+<li>Summarize failed structured or matrix-valued tasks by their task name or shape, preventing verbose error reporting from masking the original worker error.</li>
+</ul></li>
+<li>
+<strong>docs</strong>:
+<ul><li>Document sparse expansion, implicit-zero, dense-intermediate, and CPU boundaries, and reorganize the package reference around sparse and resource-controlled research workflows.</li>
+<li>Add a full-workflow vignette that connects semantic, numerical, resource, and execution contracts, plus an R Journal-oriented benchmark plan.</li>
+<li>Demonstrate stable verbose lifecycle messages separately from dynamic progress output in report-oriented examples.</li>
+<li>Add a package-wide workflow vignette spanning representation, neighborhood evaluation, execution, messages, and optional dependency diagnostics.</li>
+</ul></li>
+<li>
+<strong>tests</strong>:
+<ul><li>Exercise fork interruption from an external parent process and verify that workers are reaped before a subsequent fork call. Clarify that the in-process interrupt-sender test covers the default PSOCK backend.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.9" id="thisutils-049">thisutils 0.4.9<a class="anchor" aria-label="anchor" href="#thisutils-049"></a></h2><p class="text-muted">CRAN release: 2026-08-04</p>
 <ul><li>
@@ -360,7 +394,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Meng Xu, Haoliang Zhu.</p>
+  <p>Developed by Xu Meng, Haoliang Zhu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

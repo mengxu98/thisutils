@@ -35,11 +35,24 @@ matrix_to_table(
 
 - keep_zero:
 
-  Whether to keep zero values in the table. Defaults to `false`.
+  Whether to keep zero values in the table. Defaults to `true` for
+  backward compatibility.
 
 ## Value
 
 A table with three columns: `row`, `col`, and `value`.
+
+## Details
+
+With `keep_zero = FALSE`, sparse input is traversed through its stored
+entries and implicit zeros are not materialized. The backward-compatible
+default, `keep_zero = TRUE`, emits every selected matrix position,
+including implicit sparse zeros, and therefore requires time and output
+memory proportional to the selected `nrow * ncol`. When zeros are
+omitted, an all-zero row or column is absent from the table and cannot
+be reconstructed by
+[`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+without separate dimension metadata.
 
 ## See also
 

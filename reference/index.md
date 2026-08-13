@@ -4,19 +4,16 @@
 
 - [`thisutils`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)
   [`thisutils-package`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)
-  : Collection of Utility Functions for Data Analysis and Computing
+  : Reliable Utilities for Reusable Research Workflows
 - [`thisutils_logo()`](https://mengxu98.github.io/thisutils/reference/thisutils_logo.md)
   : The logo of thisutils
 - [`print(`*`<thisutils_logo>`*`)`](https://mengxu98.github.io/thisutils/reference/print.thisutils_logo.md)
   : Print logo
 
-### Parallel processing
+### Controlled execution
 
 - [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
   : Parallelize a function
-
-### Logging messages
-
 - [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)
   : Get the verbose option
 - [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
@@ -24,68 +21,74 @@
 - [`parse_inline_expressions()`](https://mengxu98.github.io/thisutils/reference/parse_inline_expressions.md)
   : Parse inline expressions
 
-### ASCII art
+### Sparse matrix semantics
 
-- [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
-  : Add a package file and print package information
-- [`figlet()`](https://mengxu98.github.io/thisutils/reference/figlet.md)
-  : The figlet function
-- [`figlet_font()`](https://mengxu98.github.io/thisutils/reference/figlet_font.md)
-  : Get a figlet font
-
-### Correlation functions
-
-- [`pearson_correlation()`](https://mengxu98.github.io/thisutils/reference/pearson_correlation.md)
-  : Correlation and covariance calculation for sparse matrix
-- [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
-  : Sparse correlation function
-
-### Matrix and classification helpers
-
-- [`classification_metrics_compute()`](https://mengxu98.github.io/thisutils/reference/classification_metrics_compute.md)
-  : Compute classification metrics
-- [`fast_row_vars()`](https://mengxu98.github.io/thisutils/reference/fast_row_vars.md)
-  : Compute row variances
-- [`filter_nonzero_variance_features()`](https://mengxu98.github.io/thisutils/reference/filter_nonzero_variance_features.md)
-  : Keep matrix rows with nonzero variance
-- [`run_biocneighbors_knn()`](https://mengxu98.github.io/thisutils/reference/run_biocneighbors_knn.md)
-  : Find nearest neighbors with BiocNeighbors
-- [`run_dense_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk_by_column.md)
-  : Dense matrix top-k by column
-- [`run_sparse_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_by_column.md)
-  : Sparse matrix top-k by column
-
-### Package management
-
-- [`check_pkg_status()`](https://mengxu98.github.io/thisutils/reference/check_pkg_status.md)
-  : Check if a package is installed with the specified version
-- [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
-  : Check and install R packages
-- [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md)
-  : Check and remove R packages
-
-### Utility functions
-
-- [`` `%ss%` ``](https://mengxu98.github.io/thisutils/reference/grapes-ss-grapes.md)
-  : Value selection operator
 - [`as_matrix()`](https://mengxu98.github.io/thisutils/reference/as_matrix.md)
   : Convert matrix into dense/sparse matrix
-- [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
-  : Capitalize the first letter of each word
-- [`check_ci_env()`](https://mengxu98.github.io/thisutils/reference/check_ci_env.md)
-  : Check CI environment
 - [`check_sparsity()`](https://mengxu98.github.io/thisutils/reference/check_sparsity.md)
   : Check sparsity of matrix
 - [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md)
   : Collapse sparse matrix rows by group
+- [`fast_row_vars()`](https://mengxu98.github.io/thisutils/reference/fast_row_vars.md)
+  : Compute row variances
+- [`filter_nonzero_variance_features()`](https://mengxu98.github.io/thisutils/reference/filter_nonzero_variance_features.md)
+  : Keep matrix rows with nonzero variance
+- [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
+  : Switch matrix to table
+- [`pearson_correlation()`](https://mengxu98.github.io/thisutils/reference/pearson_correlation.md)
+  : Correlation and covariance calculation for sparse matrix
+- [`run_dense_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk_by_column.md)
+  : Dense matrix top-k by column
+- [`run_sparse_topk()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk.md)
+  : Sparse matrix top-k selection
+- [`run_sparse_topk_stored()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_stored.md)
+  : Stored sparse entries top-k selection
+- [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
+  : Resource-controlled sparse correlation
+- [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
+  : Switch table to matrix
+
+### Compatibility interfaces
+
+- [`run_sparse_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_by_column.md)
+  : Compatibility wrapper for column-wise sparse top-k selection
+- [`run_sparse_stored_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_sparse_stored_topk_by_column.md)
+  : Compatibility wrapper for stored column-wise sparse top-k selection
+
+### Neighborhood and evaluation metrics
+
+- [`classification_metrics_compute()`](https://mengxu98.github.io/thisutils/reference/classification_metrics_compute.md)
+  : Compute classification metrics
 - [`compute_lisi()`](https://mengxu98.github.io/thisutils/reference/compute_lisi.md)
   : Compute Local Inverse Simpson's Index (LISI)
-- [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
-  : Download file from the Internet
+- [`run_biocneighbors_knn()`](https://mengxu98.github.io/thisutils/reference/run_biocneighbors_knn.md)
+  : Find nearest neighbors with BiocNeighbors
+
+### Research-package interoperability
+
+- [`add_pkg_file()`](https://mengxu98.github.io/thisutils/reference/add_pkg_file.md)
+  : Add a package file and print package information
+- [`check_pkg_status()`](https://mengxu98.github.io/thisutils/reference/check_pkg_status.md)
+  : Check if a package is installed with the specified version
+- [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+  : Check and install R packages
 - [`get_namespace_fun()`](https://mengxu98.github.io/thisutils/reference/get_namespace_fun.md)
   : Get a function from a namespace
 - [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
   : Invoke a function with a list of arguments
+- [`remove_r()`](https://mengxu98.github.io/thisutils/reference/remove_r.md)
+  : Check and remove R packages
+
+### Additional statistical and utility helpers
+
+- [`` `%ss%` ``](https://mengxu98.github.io/thisutils/reference/grapes-ss-grapes.md)
+  : Value selection operator
+- [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
+  : Capitalize the first letter of each word
+- [`check_ci_env()`](https://mengxu98.github.io/thisutils/reference/check_ci_env.md)
+  : Check CI environment
+- [`download()`](https://mengxu98.github.io/thisutils/reference/download.md)
+  : Download file from the Internet
 - [`is_outlier()`](https://mengxu98.github.io/thisutils/reference/is_outlier.md)
   : Detect outliers using MAD (Median Absolute Deviation)
 - [`is_apple_silicon()`](https://mengxu98.github.io/thisutils/reference/is_apple_silicon.md)
@@ -98,8 +101,6 @@
   : Check if the operating system is Windows
 - [`matrix_process()`](https://mengxu98.github.io/thisutils/reference/matrix_process.md)
   : Process matrix
-- [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
-  : Switch matrix to table
 - [`max_depth()`](https://mengxu98.github.io/thisutils/reference/max_depth.md)
   : Maximum depth of a list
 - [`maximump()`](https://mengxu98.github.io/thisutils/reference/maximump.md)
@@ -120,8 +121,6 @@
   : Generate a simulated sparse matrix
 - [`sump()`](https://mengxu98.github.io/thisutils/reference/sump.md) :
   Sum P-value
-- [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
-  : Switch table to matrix
 - [`try_get()`](https://mengxu98.github.io/thisutils/reference/try_get.md)
   : Try to evaluate an expression a set number of times before failing
 - [`unnest_fun()`](https://mengxu98.github.io/thisutils/reference/unnest_fun.md)
@@ -130,3 +129,10 @@
   Vote P-value
 - [`wilkinsonp()`](https://mengxu98.github.io/thisutils/reference/wilkinsonp.md)
   : Wilkinson's P-value
+
+### Presentation helpers
+
+- [`figlet()`](https://mengxu98.github.io/thisutils/reference/figlet.md)
+  : The figlet function
+- [`figlet_font()`](https://mengxu98.github.io/thisutils/reference/figlet_font.md)
+  : Get a figlet font

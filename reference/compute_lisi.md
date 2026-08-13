@@ -13,7 +13,10 @@ compute_lisi(
   label_colnames,
   perplexity = 30,
   tol = 1e-05,
-  max_iter = 50
+  max_iter = 50,
+  knn_algorithm = c("auto", "brute_force", "clustered"),
+  n_threads = NULL,
+  max_dense_bytes = Inf
 )
 ```
 
@@ -45,9 +48,35 @@ compute_lisi(
 
   Maximum number of binary-search iterations. Defaults to `50`.
 
+- knn_algorithm:
+
+  Exact nearest-neighbor search strategy. `"auto"` uses clustered exact
+  search when there are at least 4096 observations and the requested
+  neighborhood is less than one quarter of the data; otherwise it uses
+  brute force. `"brute_force"` and `"clustered"` force either exact
+  strategy.
+
+- n_threads:
+
+  Number of C++ worker threads. `NULL` (the default) preserves the
+  earlier automatic hardware-thread selection. Supply a positive integer
+  to control CPU use explicitly.
+
+- max_dense_bytes:
+
+  Maximum estimated bytes allowed for the dense input and its C++
+  row-major copy. The default, `Inf`, preserves earlier behavior; supply
+  a finite value to enable the guard.
+
 ## Value
 
 A data frame with one row per cell and one column per label.
+
+## Details
+
+Both nearest-neighbor strategies are exact. Sparse `X` is converted to a
+dense matrix before neighbor search; this conversion is included in the
+`max_dense_bytes` check.
 
 ## References
 

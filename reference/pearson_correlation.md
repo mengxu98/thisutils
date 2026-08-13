@@ -5,22 +5,36 @@ Correlation and covariance calculation for sparse matrix
 ## Usage
 
 ``` r
-pearson_correlation(x, y = NULL)
+pearson_correlation(x, y = NULL, max_dense_bytes = Inf)
 ```
 
 ## Arguments
 
 - x:
 
-  Sparse matrix or character vector.
+  A numeric matrix or sparse `Matrix` with observations in rows.
 
 - y:
 
-  Sparse matrix or character vector.
+  An optional numeric matrix or sparse `Matrix` with the same number of
+  rows as `x`.
+
+- max_dense_bytes:
+
+  Maximum estimated bytes allowed for the dense covariance, correlation,
+  and cross-product matrices. The default is \`Inf\` for backward
+  compatibility. Supply a finite value to enable the guard.
 
 ## Value
 
 A list with covariance and correlation matrices.
+
+## Details
+
+This lower-level helper deliberately returns dense covariance and
+correlation matrices and therefore requires memory proportional to
+\`ncol(x) \* ncol(y)\`. Prefer \[sparse_cor()\] when a sparse, blockwise
+result is sufficient.
 
 ## Examples
 

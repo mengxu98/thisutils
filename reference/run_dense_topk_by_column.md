@@ -23,7 +23,7 @@ run_dense_topk_by_column(x, k, decreasing = FALSE)
 - decreasing:
 
   Whether to sort in decreasing order (largest values first). Default is
-  `FALSE`.
+  `FALSE` for backward compatibility.
 
 ## Value
 

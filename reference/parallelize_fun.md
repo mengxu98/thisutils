@@ -18,7 +18,8 @@ parallelize_fun(
   backend = c("auto", "fork", "psock"),
   timeout = Inf,
   total_timeout = Inf,
-  seed = NULL
+  seed = NULL,
+  progress = verbose
 )
 ```
 
@@ -39,7 +40,10 @@ parallelize_fun(
 
 - export_fun:
 
-  The functions to export the function to workers.
+  Character vector naming functions or other objects from the
+  environment of `fun` that PSOCK workers need. Objects referenced from
+  a global environment are not discovered automatically; list them here
+  or include them in each element of `x`.
 
 - clean_result:
 
@@ -90,6 +94,15 @@ parallelize_fun(
   results reproducible across worker counts and scheduling order. The
   caller's random number state is restored when the call finishes.
 
+- progress:
+
+  Whether to draw a dynamic terminal progress bar. The default follows
+  `verbose`. Set this to `FALSE` while keeping `verbose = TRUE` to emit
+  concise lifecycle messages through
+  [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+  without terminal timing output, for example in reports and persistent
+  logs.
+
 ## Value
 
 A list of computed results. If `clean_result = FALSE`, failed results
@@ -103,11 +116,11 @@ parallelize_fun(1:3, function(x) {
   Sys.sleep(0.2)
   x^2
 })
-#> ℹ [2026-08-05 09:06:08] Using 1 core
-#> ⠙ [2026-08-05 09:06:08] Running for 1 [1/3] ■■■         33% | ETA:  0s
-#> ✔ [2026-08-05 09:06:08] Completed 3 tasks in 628ms
+#> ℹ [2026-08-13 03:16:56] Using 1 core
+#> ⠙ [2026-08-13 03:16:56] Running for 1 [1/3] ■■■         33% | ETA:  0s
+#> ✔ [2026-08-13 03:16:56] Completed 3 tasks in 634ms
 #> 
-#> ℹ [2026-08-05 09:06:08] Building results
+#> ℹ [2026-08-13 03:16:56] Building results
 #> $`1`
 #> [1] 1
 #> 
@@ -122,8 +135,8 @@ parallelize_fun(list(1, 2, 3), function(x) {
   Sys.sleep(0.2)
   x^2
 }, cores = 2)
-#> ℹ [2026-08-05 09:06:08] Using 2 cores
-#> ℹ [2026-08-05 09:06:08] Building results
+#> ℹ [2026-08-13 03:16:57] Using 2 cores
+#> ℹ [2026-08-13 03:16:57] Building results
 #> [[1]]
 #> [1] 1
 #> 
@@ -139,11 +152,14 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = FALSE)
-#> ℹ [2026-08-05 09:06:10] Using 1 core
-#> ℹ [2026-08-05 09:06:10] Building results
-#> ! [2026-08-05 09:06:10] Found 1 failed result
+#> ℹ [2026-08-13 03:16:59] Using 1 core
+#> ⠙ [2026-08-13 03:16:59] Running for 1 [1/5] ■■          20% | ETA:  0s
+#> ✔ [2026-08-13 03:16:59] Completed 5 tasks in 23ms
+#> 
+#> ℹ [2026-08-13 03:16:59] Building results
+#> ! [2026-08-13 03:16:59] Found 1 failed result
 #> Warning: Found 1 failed result
-#> ℹ [2026-08-05 09:06:10] ✖ Error details:
+#> ℹ [2026-08-13 03:16:59] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "3"
 #> $`1`
 #> [1] 1
@@ -175,13 +191,13 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, clean_result = TRUE)
-#> ℹ [2026-08-05 09:06:10] Using 1 core
-#> ℹ [2026-08-05 09:06:10] Building results
-#> ! [2026-08-05 09:06:10] Found 1 failed result
+#> ℹ [2026-08-13 03:16:59] Using 1 core
+#> ℹ [2026-08-13 03:16:59] Building results
+#> ! [2026-08-13 03:16:59] Found 1 failed result
 #> Warning: Found 1 failed result
-#> ℹ [2026-08-05 09:06:10] ✖ Error details:
+#> ℹ [2026-08-13 03:16:59] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "3"
-#> ℹ [2026-08-05 09:06:10] Removed 1 failed result
+#> ℹ [2026-08-13 03:16:59] Removed 1 failed result
 #> $`1`
 #> [1] 1
 #> 
@@ -201,11 +217,11 @@ parallelize_fun(1:5, function(x) {
   if (x == 4) stop("Error on element 4")
   x^2
 })
-#> ℹ [2026-08-05 09:06:10] Using 1 core
-#> ℹ [2026-08-05 09:06:10] Building results
-#> ! [2026-08-05 09:06:10] Found 2 failed results
+#> ℹ [2026-08-13 03:16:59] Using 1 core
+#> ℹ [2026-08-13 03:16:59] Building results
+#> ! [2026-08-13 03:16:59] Found 2 failed results
 #> Warning: Found 2 failed results
-#> ℹ [2026-08-05 09:06:10] ✖ Error details:
+#> ℹ [2026-08-13 03:16:59] ✖ Error details:
 #> ℹ                       ✖ Error on element 3 (1): "2"
 #> ℹ                       ✖ Error on element 4 (1): "4"
 #> $`1`
@@ -248,9 +264,9 @@ parallelize_fun(1:5, function(x) {
   if (x == 3) stop("Error on element 3")
   x^2
 }, throw_error = FALSE)
-#> ℹ [2026-08-05 09:06:10] Using 1 core
-#> ℹ [2026-08-05 09:06:10] Building results
-#> ! [2026-08-05 09:06:10] Found 1 failed result
+#> ℹ [2026-08-13 03:16:59] Using 1 core
+#> ℹ [2026-08-13 03:16:59] Building results
+#> ! [2026-08-13 03:16:59] Found 1 failed result
 #> Warning: Found 1 failed result
 #> $`1`
 #> [1] 1

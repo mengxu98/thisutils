@@ -1,6 +1,9 @@
-# Sparse correlation function
+# Resource-controlled sparse correlation
 
-Safe correlation function which returns a sparse matrix.
+Compute correlations from matrix-like input and return a sparse matrix.
+Pearson cross-products remain sparse and correlations are evaluated in
+column blocks so block-local working memory is bounded independently of
+the full output dimensions.
 
 ## Usage
 
@@ -8,10 +11,14 @@ Safe correlation function which returns a sparse matrix.
 sparse_cor(
   x,
   y = NULL,
-  method = "pearson",
+  method = c("pearson", "spearman", "kendall"),
   allow_neg = TRUE,
   remove_na = TRUE,
   remove_inf = TRUE,
+  threshold = 0,
+  block_size = 256L,
+  max_dense_bytes = Inf,
+  max_output_entries = Inf,
   ...
 )
 ```
@@ -20,15 +27,16 @@ sparse_cor(
 
 - x:
 
-  Sparse matrix or character vector.
+  A numeric matrix or sparse `Matrix` with observations in rows.
 
 - y:
 
-  Sparse matrix or character vector.
+  An optional numeric matrix or sparse `Matrix` with the same number of
+  rows as `x`.
 
 - method:
 
-  Method to use for calculating the correlation coefficient.
+  Correlation coefficient: `"pearson"`, `"spearman"`, or `"kendall"`.
 
 - allow_neg:
 
@@ -40,16 +48,52 @@ sparse_cor(
 
 - remove_inf:
 
-  Logical. Whether to replace infinite values with 1.
+  Logical. Whether to replace infinite values with 0.
+
+- threshold:
+
+  Non-negative absolute correlation threshold. Values with absolute
+  magnitude below this threshold are omitted from the sparse output.
+
+- block_size:
+
+  Maximum number of target columns in each Pearson working block. The
+  effective size may be reduced to honor `max_dense_bytes`.
+
+- max_dense_bytes:
+
+  Maximum estimated bytes allowed for block-local Pearson working arrays
+  or dense rank-correlation arrays. The default is `Inf` for backward
+  compatibility. Supply a finite value to enable this guard.
+
+- max_output_entries:
+
+  Maximum number of stored values allowed in the sparse result. The
+  default, `Inf`, preserves the historical unbounded output behavior;
+  set a finite value to fail before returning an output that exceeds the
+  workflow's storage budget.
 
 - ...:
 
   Other arguments passed to
-  [stats::cor](https://rdrr.io/r/stats/cor.html) function.
+  [`stats::cor()`](https://rdrr.io/r/stats/cor.html) for Spearman and
+  Kendall correlations.
 
 ## Value
 
-A correlation matrix.
+A sparse correlation matrix.
+
+## Details
+
+Pearson input and cross-products remain sparse. Centering, scaling, and
+thresholding are fused in a column-block scan rather than materializing
+a dense correlation block. The final sparse result can nevertheless
+contain up to `ncol(x) * ncol(y)` stored values when `threshold = 0`;
+use `threshold` and `max_output_entries` to make this boundary explicit.
+
+Spearman and Kendall correlation require ranking and currently densify
+the input and full correlation result. Their estimated peak working size
+is checked against `max_dense_bytes` before conversion.
 
 ## Examples
 
@@ -89,9 +133,9 @@ c[1:5, 1:5]
 #> col_4 -0.02022058 -0.00276169  0.03481704  1.00000000 -0.05034769
 #> col_5  0.00827069 -0.03594182 -0.03144989 -0.05034769  1.00000000
 all.equal(a, c)
-#> [1] "Attributes: < Component “i”: Numeric: lengths (5047, 5050) differ >"  
-#> [2] "Attributes: < Component “p”: Mean relative difference: 0.0008422367 >"
-#> [3] "Attributes: < Component “x”: Numeric: lengths (5047, 5050) differ >"  
+#> [1] "Attributes: < Component “i”: Numeric: lengths (5046, 5050) differ >"  
+#> [2] "Attributes: < Component “p”: Mean relative difference: 0.0008776063 >"
+#> [3] "Attributes: < Component “x”: Numeric: lengths (5046, 5050) differ >"  
 
 b[1:5, 1:5]
 #> 5 x 5 sparse Matrix of class "dgCMatrix"
@@ -130,21 +174,21 @@ system.time(
   sparse_cor(m1)
 )
 #>    user  system elapsed 
-#>   0.003   0.000   0.002 
+#>   0.003   0.000   0.003 
 system.time(
   cor(as_matrix(m1))
 )
 #>    user  system elapsed 
-#>   0.003   0.000   0.002 
+#>   0.006   0.000   0.006 
 
 system.time(
   sparse_cor(m1, m2)
 )
 #>    user  system elapsed 
-#>   0.002   0.000   0.001 
+#>   0.002   0.000   0.002 
 system.time(
   cor(as_matrix(m1), as_matrix(m2))
 )
 #>    user  system elapsed 
-#>   0.006   0.000   0.006 
+#>   0.013   0.000   0.013 
 ```

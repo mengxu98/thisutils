@@ -9,7 +9,7 @@ This is a clean-room reimplementation of the immunogenomics/LISI."><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,7 +17,8 @@ This is a clean-room reimplementation of the immunogenomics/LISI."><meta propert
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -54,7 +55,10 @@ This is a clean-room reimplementation of the <code>immunogenomics/LISI</code>.</
 <span>  <span class="va">label_colnames</span>,</span>
 <span>  perplexity <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-05</span>,</span>
-<span>  max_iter <span class="op">=</span> <span class="fl">50</span></span>
+<span>  max_iter <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  knn_algorithm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"brute_force"</span>, <span class="st">"clustered"</span><span class="op">)</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_dense_bytes <span class="op">=</span> <span class="cn">Inf</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -87,10 +91,36 @@ Defaults to <code>1e-5</code>.</p></dd>
 <dd><p>Maximum number of binary-search iterations.
 Defaults to <code>50</code>.</p></dd>
 
+
+<dt id="arg-knn-algorithm">knn_algorithm<a class="anchor" aria-label="anchor" href="#arg-knn-algorithm"></a></dt>
+<dd><p>Exact nearest-neighbor search strategy. <code>"auto"</code>
+uses clustered exact search when there are at least 4096 observations and
+the requested neighborhood is less than one quarter of the data; otherwise
+it uses brute force. <code>"brute_force"</code> and <code>"clustered"</code> force either exact
+strategy.</p></dd>
+
+
+<dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
+<dd><p>Number of C++ worker threads. <code>NULL</code> (the default) preserves
+the earlier automatic hardware-thread selection. Supply a positive integer
+to control CPU use explicitly.</p></dd>
+
+
+<dt id="arg-max-dense-bytes">max_dense_bytes<a class="anchor" aria-label="anchor" href="#arg-max-dense-bytes"></a></dt>
+<dd><p>Maximum estimated bytes allowed for the dense input
+and its C++ row-major copy. The default, <code>Inf</code>, preserves earlier behavior;
+supply a finite value to enable the guard.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame with one row per cell and one column per label.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Both nearest-neighbor strategies are exact. Sparse <code>X</code> is converted to a
+dense matrix before neighbor search; this conversion is included in the
+<code>max_dense_bytes</code> check.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -135,7 +165,7 @@ integration of single-cell data with Harmony. <em>Nature Methods</em> (2019).
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Meng Xu, Haoliang Zhu.</p>
+  <p>Developed by Xu Meng, Haoliang Zhu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

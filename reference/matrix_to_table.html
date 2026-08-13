@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,7 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -76,12 +77,23 @@ Defaults to <code>0</code>.</p></dd>
 
 
 <dt id="arg-keep-zero">keep_zero<a class="anchor" aria-label="anchor" href="#arg-keep-zero"></a></dt>
-<dd><p>Whether to keep zero values in the table. Defaults to <code>false</code>.</p></dd>
+<dd><p>Whether to keep zero values in the table. Defaults to <code>true</code>
+for backward compatibility.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A table with three columns: <code>row</code>, <code>col</code>, and <code>value</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>With <code>keep_zero = FALSE</code>, sparse input is traversed through its stored entries
+and implicit zeros are not materialized. The backward-compatible default,
+<code>keep_zero = TRUE</code>, emits every selected matrix position, including implicit
+sparse zeros, and therefore requires time and output memory proportional to
+the selected <code>nrow * ncol</code>. When zeros are omitted, an all-zero row or column
+is absent from the table and cannot be reconstructed by <code><a href="table_to_matrix.html">table_to_matrix()</a></code>
+without separate dimension metadata.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -125,7 +137,7 @@ Defaults to <code>0</code>.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Meng Xu, Haoliang Zhu.</p>
+  <p>Developed by Xu Meng, Haoliang Zhu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

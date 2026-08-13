@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Collection of Utility Functions for Data Analysis and Computing • thisutils</title>
+<title>Reliable Utilities for Reusable Research Workflows • thisutils</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Collection of Utility Functions for Data Analysis and Computing">
-<meta name="description" content="Provides utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.">
-<meta property="og:description" content="Provides utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Reliable Utilities for Reusable Research Workflows">
+<meta name="description" content="Provides reusable building blocks for research packages across matrix representation, numerical computation, neighborhood evaluation, controlled execution, and runtime interoperability. Core tools preserve declared sparse semantics, expose dense-memory and output boundaries, standardize neighborhood and classification results, and align serial and parallel result and error behavior. Additional helpers support structured messages, optional dependency checks, and common statistical workflows.">
+<meta property="og:description" content="Provides reusable building blocks for research packages across matrix representation, numerical computation, neighborhood evaluation, controlled execution, and runtime interoperability. Core tools preserve declared sparse semantics, expose dense-memory and output boundaries, standardize neighborhood and classification results, and align serial and parallel result and error behavior. Additional helpers support structured messages, optional dependency checks, and common statistical workflows.">
 <meta property="og:image" content="https://mengxu98.github.io/thisutils/logo.svg">
 </head>
 <body>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
@@ -69,7 +70,15 @@
 <h2 id="introduction">
 <strong>Introduction</strong><a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><a href="https://mengxu98.github.io/thisutils/">thisutils</a> is an R package for providing utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.</p>
+<p><a href="https://mengxu98.github.io/thisutils/">thisutils</a> provides reliable building blocks shared by research packages across data representation, numerical and neighborhood evaluation, repeated execution, structured messages, and optional runtime dependencies. Its core design goals are explicit semantics, bounded resource use, stable result schemas, and controllable side effects.</p>
+<p>The main functionality is organized around four connected layers:</p>
+<ul>
+<li>preserving sparse-matrix meaning during conversion, aggregation, and top-k selection;</li>
+<li>computing stable matrix summaries, blockwise correlations, exact neighborhoods, LISI scores, and standardized evaluation metrics;</li>
+<li>repeating tasks with structured messages and aligned serial/parallel result, error, random-number, timeout, and cleanup behavior; and</li>
+<li>checking optional dependencies and namespaces without requiring an installation side effect.</li>
+</ul>
+<p>Additional statistical, text, and presentation helpers remain available, but they are not presented as new statistical methods.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">
@@ -91,10 +100,82 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"mengxu98/thisutils"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="usage">
-<strong>Usage</strong><a class="anchor" aria-label="anchor" href="#usage"></a>
+<h2 id="core-usage">
+<strong>Core usage</strong><a class="anchor" aria-label="anchor" href="#core-usage"></a>
 </h2>
-<p>Please reference <a href="https://mengxu98.github.io/thisutils/reference/index.html">here</a>.</p>
+<p>The workflow can begin with explicit representation conversion and aggregation:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mengxu98.github.io/thisutils/">thisutils</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span></span>
+<span>  i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, j <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">compact</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/matrix_to_table.html">matrix_to_table</a></span><span class="op">(</span><span class="va">graph</span>, keep_zero <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">roundtrip</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/table_to_matrix.html">table_to_matrix</a></span><span class="op">(</span><span class="va">compact</span>, return_sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">collapsed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/collapse_sparse_rows.html">collapse_sparse_rows</a></span><span class="op">(</span><span class="va">graph</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"group1"</span>, <span class="st">"group1"</span>, <span class="st">"group2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Sparse and dense top-k operations use ordinary matrix semantics by default. For adjacency matrices, where only stored entries represent graph edges, use the explicitly named stored-entry helper:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/run_sparse_topk.html">run_sparse_topk</a></span><span class="op">(</span><span class="va">graph</span>, k <span class="op">=</span> <span class="fl">2</span>, by <span class="op">=</span> <span class="st">"col"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/run_sparse_topk_stored.html">run_sparse_topk_stored</a></span><span class="op">(</span><span class="va">graph</span>, k <span class="op">=</span> <span class="fl">2</span>, by <span class="op">=</span> <span class="st">"col"</span><span class="op">)</span></span></code></pre></div>
+<p>Correlation and neighborhood computations expose their resource boundaries:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_sparse_matrix.html">simulate_sparse_matrix</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">correlation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sparse_cor.html">sparse_cor</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  block_size <span class="op">=</span> <span class="fl">64</span>,</span>
+<span>  max_dense_bytes <span class="op">=</span> <span class="fl">256</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">embedding</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">lisi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/compute_lisi.html">compute_lisi</a></span><span class="op">(</span></span>
+<span>  <span class="va">embedding</span>,</span>
+<span>  <span class="va">metadata</span>,</span>
+<span>  <span class="st">"batch"</span>,</span>
+<span>  perplexity <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  knn_algorithm <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Neighborhood results and labels can be summarized through fixed output schemas, while optional dependencies can be inspected without modifying the user library:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">neighbors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_biocneighbors_knn.html">run_biocneighbors_knn</a></span><span class="op">(</span></span>
+<span>  <span class="va">embedding</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  exclude_self <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n_threads <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">neighbors</span><span class="op">$</span><span class="va">idx</span>, <span class="fl">1L</span>, <span class="kw">function</span><span class="op">(</span><span class="va">index</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">batch</span><span class="op">[</span><span class="va">index</span><span class="op">]</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/classification_metrics_compute.html">classification_metrics_compute</a></span><span class="op">(</span><span class="va">predicted</span>, <span class="va">metadata</span><span class="op">$</span><span class="va">batch</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dependency_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/check_r.html">check_r</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Matrix"</span>, <span class="st">"BiocNeighbors"</span><span class="op">)</span>,</span>
+<span>  install <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Independent sparse workflows can then use the same execution contract in serial or PSOCK mode. A per-input seed makes stochastic results independent of the requested worker count:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>first <span class="op">=</span> <span class="va">x</span>, second <span class="op">=</span> <span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parallelize_fun.html">parallelize_fun</a></span><span class="op">(</span></span>
+<span>  <span class="va">jobs</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="fu">thisutils</span><span class="fu">::</span><span class="fu"><a href="reference/sparse_cor.html">sparse_cor</a></span><span class="op">(</span></span>
+<span>    <span class="va">mat</span>,</span>
+<span>    threshold <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>    block_size <span class="op">=</span> <span class="fl">64</span>,</span>
+<span>    max_dense_bytes <span class="op">=</span> <span class="fl">256</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  backend <span class="op">=</span> <span class="st">"psock"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">2026</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  timestamp_format <span class="op">=</span> <span class="st">""</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>See the <a href="https://mengxu98.github.io/thisutils/reference/index.html">function reference</a> for the complete API. Run <code><a href="articles/research-package-workflows.html">vignette("research-package-workflows", package = "thisutils")</a></code> for a connected example installed with the package.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -125,7 +206,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Meng Xu <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-8300-1054" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Xu Meng <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-8300-1054" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Haoliang Zhu <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0004-9766-5179" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
@@ -148,7 +229,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Meng Xu, Haoliang Zhu.</p>
+  <p>Developed by Xu Meng, Haoliang Zhu.</p>
 </div>
 
 <div class="pkgdown-footer-right">
