@@ -4,7 +4,7 @@ For each column or row of a sparse `dgCMatrix`, extract the top `k`
 matrix elements and their indices. By default, unstored positions
 participate with their matrix value of zero. For column-wise selection,
 this gives the same semantics as
-[`run_dense_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk_by_column.md).
+[`run_dense_topk()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk.md).
 
 ## Usage
 

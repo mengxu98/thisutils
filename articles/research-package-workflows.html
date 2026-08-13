@@ -212,7 +212,7 @@ should include that object in each task or name it in
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span>, backend_is_function <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/is.function.html" class="external-link">is.function</a></span><span class="op">(</span><span class="va">backend</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              Matrix       BiocNeighbors backend_is_function </span></span>
-<span><span class="co">#&gt;               FALSE               FALSE               FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt;                TRUE                TRUE                TRUE</span></span></code></pre></div>
 <p><code>install = FALSE</code> is useful inside package workflows
 because availability checking remains read-only. Installation, when
 intentionally enabled, can be bounded with the <code>timeout</code>

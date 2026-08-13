@@ -3,9 +3,8 @@
 ## thisutils 0.5.0
 
 - **compatibility**:
-  - Preserve the historical `matrix_to_table(keep_zero = TRUE)` and
-    `run_dense_topk_by_column(decreasing = FALSE)` defaults. Compact
-    table output and decreasing dense top-k remain explicit choices.
+  - Preserve the historical `matrix_to_table(keep_zero = TRUE)` default.
+    Compact table output remains an explicit choice.
   - Preserve the stored-entry semantics and zero-value padding of
     [`run_sparse_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_by_column.md).
     The new
@@ -13,6 +12,10 @@
     includes implicit sparse zeros by default so it matches ordinary
     dense-matrix semantics.
 - **feat**:
+  - Add
+    [`run_dense_topk()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk.md)
+    with an explicit `by = "col"` or `by = "row"` direction and a
+    decreasing top-k default.
   - Add
     [`run_sparse_topk()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk.md)
     and

@@ -43,12 +43,13 @@
 <h2 class="pkg-version" data-toc-text="0.5.0" id="thisutils-050">thisutils 0.5.0<a class="anchor" aria-label="anchor" href="#thisutils-050"></a></h2>
 <ul><li>
 <strong>compatibility</strong>:
-<ul><li>Preserve the historical <code>matrix_to_table(keep_zero = TRUE)</code> and <code>run_dense_topk_by_column(decreasing = FALSE)</code> defaults. Compact table output and decreasing dense top-k remain explicit choices.</li>
+<ul><li>Preserve the historical <code>matrix_to_table(keep_zero = TRUE)</code> default. Compact table output remains an explicit choice.</li>
 <li>Preserve the stored-entry semantics and zero-value padding of <code><a href="../reference/run_sparse_topk_by_column.html">run_sparse_topk_by_column()</a></code>. The new <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> includes implicit sparse zeros by default so it matches ordinary dense-matrix semantics.</li>
 </ul></li>
 <li>
 <strong>feat</strong>:
-<ul><li>Add <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> and <code><a href="../reference/run_sparse_topk_stored.html">run_sparse_topk_stored()</a></code> with an explicit <code>by = "col"</code> or <code>by = "row"</code> direction. The earlier column-wise names remain available as compatibility wrappers.</li>
+<ul><li>Add <code><a href="../reference/run_dense_topk.html">run_dense_topk()</a></code> with an explicit <code>by = "col"</code> or <code>by = "row"</code> direction and a decreasing top-k default.</li>
+<li>Add <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> and <code><a href="../reference/run_sparse_topk_stored.html">run_sparse_topk_stored()</a></code> with an explicit <code>by = "col"</code> or <code>by = "row"</code> direction. The earlier column-wise names remain available as compatibility wrappers.</li>
 <li>Allow <code>parallelize_fun(verbose = TRUE, progress = FALSE)</code> to retain standardized <code><a href="../reference/log_message.html">log_message()</a></code> lifecycle output without a dynamic terminal progress bar.</li>
 <li>Make Pearson <code><a href="../reference/sparse_cor.html">sparse_cor()</a></code> blockwise and add correlation threshold, dense working-memory, and opt-in sparse output-size controls. The output limit defaults to <code>Inf</code> for compatibility. Spearman and Kendall paths now check their dense allocation boundary before conversion.</li>
 <li>Expose exact LISI neighbor-search strategy, C++ thread count, and dense input-memory controls through <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code>.</li>

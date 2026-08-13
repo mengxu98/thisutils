@@ -122,7 +122,9 @@ Default is <code>TRUE</code>.</p></dd>
     <p>GitHub packages are normally installed with <code>pak</code>. If <code>pak</code> cannot
 parse a GitHub package's <code>DESCRIPTION</code> file, <code>check_r()</code> retries that package
 with the optional <code>remotes</code> package. This preserves the fast dependency
-resolution path while supporting legacy repositories with malformed metadata.</p>
+resolution path while supporting legacy repositories with malformed metadata.
+When <code>PKG_SUBPROCESS_TIMEOUT</code> is unset, the pak subprocess startup window is
+temporarily increased to 30 seconds and restored before returning.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

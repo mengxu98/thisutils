@@ -110,8 +110,8 @@ for a connected example installed with the package.
   : Switch matrix to table
 - [`pearson_correlation()`](https://mengxu98.github.io/thisutils/reference/pearson_correlation.md)
   : Correlation and covariance calculation for sparse matrix
-- [`run_dense_topk_by_column()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk_by_column.md)
-  : Dense matrix top-k by column
+- [`run_dense_topk()`](https://mengxu98.github.io/thisutils/reference/run_dense_topk.md)
+  : Dense matrix top-k selection
 - [`run_sparse_topk()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk.md)
   : Sparse matrix top-k selection
 - [`run_sparse_topk_stored()`](https://mengxu98.github.io/thisutils/reference/run_sparse_topk_stored.md)

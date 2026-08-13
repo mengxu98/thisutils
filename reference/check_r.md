@@ -81,4 +81,6 @@ GitHub packages are normally installed with `pak`. If `pak` cannot parse
 a GitHub package's `DESCRIPTION` file, `check_r()` retries that package
 with the optional `remotes` package. This preserves the fast dependency
 resolution path while supporting legacy repositories with malformed
-metadata.
+metadata. When `PKG_SUBPROCESS_TIMEOUT` is unset, the pak subprocess
+startup window is temporarily increased to 30 seconds and restored
+before returning.

@@ -158,7 +158,7 @@ backend <- if (isTRUE(status[["BiocNeighbors"]])) {
 
 c(unlist(status), backend_is_function = is.function(backend))
 #>              Matrix       BiocNeighbors backend_is_function 
-#>               FALSE               FALSE               FALSE
+#>                TRUE                TRUE                TRUE
 ```
 
 `install = FALSE` is useful inside package workflows because
