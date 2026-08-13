@@ -49,6 +49,7 @@ check_r <- function(
     stop("`timeout` must be one positive number or Inf", call. = FALSE)
   }
   packages <- as.character(packages)
+  search_libs <- unique(c(lib, .libPaths()))
   package_info <- lapply(packages, function(pkg) {
     version <- NULL
     if (grepl("/", pkg)) {
@@ -85,12 +86,12 @@ check_r <- function(
     check_pkg <- check_pkg_status(
       info$name,
       version = info$version,
-      lib = lib
+      lib = search_libs
     )
 
     force_update <- FALSE
     if (check_pkg && !is.null(info$version)) {
-      current_version <- utils::packageVersion(info$name, lib.loc = lib)
+      current_version <- utils::packageVersion(info$name, lib.loc = search_libs)
       force_update <- current_version < package_version(info$version)
     }
     !check_pkg || force_update || isTRUE(force)
@@ -103,7 +104,7 @@ check_r <- function(
     for (index in seq_along(packages_to_install)) {
       info <- package_info[[package_names_to_install[[index]]]]
       is_outdated <- !is.null(info$version) &&
-        check_pkg_status(info$name, version = NULL, lib = lib)
+        check_pkg_status(info$name, version = NULL, lib = search_libs)
       error_details[[info$name]] <- if (is_outdated) {
         "the installed version does not satisfy the request and installation is disabled"
       } else {
@@ -182,7 +183,7 @@ check_r <- function(
     check_pkg <- check_pkg_status(
       info$name,
       version = info$version,
-      lib = lib
+      lib = search_libs
     )
     isTRUE(check_pkg)
   })
@@ -220,7 +221,7 @@ check_r <- function(
   if (isTRUE(load)) {
     load_packages(
       names(status_list)[success],
-      lib = lib,
+      lib = search_libs,
       verbose = verbose
     )
   }

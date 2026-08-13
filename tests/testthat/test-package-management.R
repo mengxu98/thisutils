@@ -24,7 +24,22 @@ test_that("check_r loads each successful package from the requested library", {
 
   expect_identical(status, list(foo = TRUE, bar = TRUE))
   expect_identical(loaded, c("foo", "bar"))
-  expect_identical(loaded_lib, lib)
+  expect_identical(loaded_lib, unique(c(lib, .libPaths())))
+})
+
+test_that("check_r recognizes packages in later library paths", {
+  first_lib <- tempfile("thisutils-first-library-")
+  dir.create(first_lib)
+
+  status <- check_r(
+    "stats",
+    lib = first_lib,
+    install = FALSE,
+    verbose = FALSE
+  )
+
+  expect_identical(status, list(stats = TRUE))
+  expect_false(dir.exists(file.path(first_lib, "stats")))
 })
 
 test_that("check_r supports read-only package diagnostics", {
