@@ -288,7 +288,7 @@ managers such as <code>callr</code> and <code>processx</code> in
 long-lived sessions.</p>
 </div>
 <div class="section level2">
-<h2 id="scope-and-downstream-reuse">Scope and downstream reuse<a class="anchor" aria-label="anchor" href="#scope-and-downstream-reuse"></a>
+<h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
 </h2>
 <p>Together, the four contracts distinguish what sparse data mean, how
 summaries are calculated, which allocations are permitted, and how
@@ -297,13 +297,6 @@ distributed-computing framework: Spearman and Kendall correlation still
 require dense ranking, output size must be bounded separately from
 working memory, and PSOCK worker startup can outweigh parallel gains for
 short tasks.</p>
-<p>The same infrastructure is reused by domain-specific research
-packages. For example, <code>scop</code> uses the controlled execution
-primitive in single-cell workflows, while <code>multiCSN</code> uses it
-for independent model- and network-level tasks. These packages
-illustrate downstream reuse only; neither is required to install
-<code>thisutils</code> or reproduce this vignette and its
-benchmarks.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

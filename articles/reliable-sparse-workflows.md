@@ -236,7 +236,7 @@ Explicit fork workers remain available on Unix-like systems, but are
 opt-in because R’s fork signal handler can conflict with child-process
 managers such as `callr` and `processx` in long-lived sessions.
 
-## Scope and downstream reuse
+## Scope
 
 Together, the four contracts distinguish what sparse data mean, how
 summaries are calculated, which allocations are permitted, and how
@@ -245,10 +245,3 @@ distributed-computing framework: Spearman and Kendall correlation still
 require dense ranking, output size must be bounded separately from
 working memory, and PSOCK worker startup can outweigh parallel gains for
 short tasks.
-
-The same infrastructure is reused by domain-specific research packages.
-For example, `scop` uses the controlled execution primitive in
-single-cell workflows, while `multiCSN` uses it for independent model-
-and network-level tasks. These packages illustrate downstream reuse
-only; neither is required to install `thisutils` or reproduce this
-vignette and its benchmarks.
