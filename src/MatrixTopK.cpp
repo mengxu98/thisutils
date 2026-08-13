@@ -45,12 +45,17 @@ static bool column_topk_asc(const ColumnTopKEntry& a, const ColumnTopKEntry& b) 
 }
 
 // [[Rcpp::export]]
-List sparse_topk_by_column(S4 mat, int k, bool decreasing = true) {
+List sparse_topk_by_column(
+    S4 mat,
+    int k,
+    bool decreasing = true,
+    bool include_implicit_zeros = true) {
   if (k < 1) {
     stop("k must be positive");
   }
 
   IntegerVector dims = mat.slot("Dim");
+  const int n_rows = dims[0];
   const int n_cols = dims[1];
   IntegerVector row_idx = mat.slot("i");
   IntegerVector col_ptr = mat.slot("p");
@@ -59,18 +64,21 @@ List sparse_topk_by_column(S4 mat, int k, bool decreasing = true) {
   IntegerMatrix idx(n_cols, k);
   NumericMatrix top_values(n_cols, k);
   std::fill(idx.begin(), idx.end(), NA_INTEGER);
-  std::fill(top_values.begin(), top_values.end(), 0.0);
+  std::fill(top_values.begin(), top_values.end(), NA_REAL);
 
   for (int col = 0; col < n_cols; ++col) {
     const int start = col_ptr[col];
     const int end = col_ptr[col + 1];
     const int n_entries = end - start;
-    if (n_entries <= 0) {
+    if (n_entries <= 0 && !include_implicit_zeros) {
       continue;
     }
 
     std::vector<ColumnTopKEntry> entries;
-    entries.reserve(n_entries);
+    entries.reserve(
+      static_cast<std::size_t>(n_entries) +
+      static_cast<std::size_t>(include_implicit_zeros ? std::min(k, n_rows - n_entries) : 0)
+    );
     for (int ptr = start; ptr < end; ++ptr) {
       ColumnTopKEntry entry;
       entry.row = row_idx[ptr] + 1;
@@ -78,8 +86,27 @@ List sparse_topk_by_column(S4 mat, int k, bool decreasing = true) {
       entries.push_back(entry);
     }
 
-    const int take = std::min(k, n_entries);
-    if (take < n_entries) {
+    // A sparse matrix represents every unstored position as zero. Only the
+    // first k implicit-zero row indices are needed: no top-k result can contain
+    // more than k zeros, and ties are resolved by increasing row index.
+    if (include_implicit_zeros) {
+      int ptr = start;
+      int implicit_added = 0;
+      for (int row = 0; row < n_rows && implicit_added < k; ++row) {
+        while (ptr < end && row_idx[ptr] < row) {
+          ++ptr;
+        }
+        if (ptr < end && row_idx[ptr] == row) {
+          continue;
+        }
+        entries.push_back(ColumnTopKEntry{row + 1, 0.0});
+        ++implicit_added;
+      }
+    }
+
+    const int n_candidates = static_cast<int>(entries.size());
+    const int take = std::min(k, n_candidates);
+    if (take < n_candidates) {
       if (decreasing) {
         std::partial_sort(entries.begin(), entries.begin() + take, entries.end(), column_topk_desc);
         std::sort(entries.begin(), entries.begin() + take, column_topk_desc);

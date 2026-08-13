@@ -4,18 +4,30 @@
 \alias{pearson_correlation}
 \title{Correlation and covariance calculation for sparse matrix}
 \usage{
-pearson_correlation(x, y = NULL)
+pearson_correlation(x, y = NULL, max_dense_bytes = Inf)
 }
 \arguments{
-\item{x}{Sparse matrix or character vector.}
+\item{x}{A numeric matrix or sparse \code{Matrix} with observations in rows.}
 
-\item{y}{Sparse matrix or character vector.}
+\item{y}{An optional numeric matrix or sparse \code{Matrix} with the same number
+of rows as \code{x}.}
+
+\item{max_dense_bytes}{Maximum estimated bytes allowed for the dense
+covariance, correlation, and cross-product matrices. The default is
+`Inf` for backward compatibility. Supply a finite value to enable the
+guard.}
 }
 \value{
 A list with covariance and correlation matrices.
 }
 \description{
 Correlation and covariance calculation for sparse matrix
+}
+\details{
+This lower-level helper deliberately returns dense covariance and
+correlation matrices and therefore requires memory proportional to
+`ncol(x) * ncol(y)`. Prefer [sparse_cor()] when a sparse, blockwise result is
+sufficient.
 }
 \examples{
 m1 <- simulate_sparse_matrix(

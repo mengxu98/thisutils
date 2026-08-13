@@ -13,6 +13,22 @@
 #' Defaults to `1e-5`.
 #' @param max_iter Maximum number of binary-search iterations.
 #' Defaults to `50`.
+#' @param knn_algorithm Exact nearest-neighbor search strategy. `"auto"`
+#'   uses clustered exact search when there are at least 4096 observations and
+#'   the requested neighborhood is less than one quarter of the data; otherwise
+#'   it uses brute force. `"brute_force"` and `"clustered"` force either exact
+#'   strategy.
+#' @param n_threads Number of C++ worker threads. `NULL` (the default) preserves
+#'   the earlier automatic hardware-thread selection. Supply a positive integer
+#'   to control CPU use explicitly.
+#' @param max_dense_bytes Maximum estimated bytes allowed for the dense input
+#'   and its C++ row-major copy. The default, `Inf`, preserves earlier behavior;
+#'   supply a finite value to enable the guard.
+#'
+#' @details
+#' Both nearest-neighbor strategies are exact. Sparse `X` is converted to a
+#' dense matrix before neighbor search; this conversion is included in the
+#' `max_dense_bytes` check.
 #'
 #' @return A data frame with one row per cell and one column per label.
 #' @export
@@ -49,8 +65,44 @@ compute_lisi <- function(
   label_colnames,
   perplexity = 30,
   tol = 1e-5,
-  max_iter = 50
+  max_iter = 50,
+  knn_algorithm = c("auto", "brute_force", "clustered"),
+  n_threads = NULL,
+  max_dense_bytes = Inf
 ) {
+  knn_algorithm <- match.arg(knn_algorithm)
+  if (
+    !is.null(n_threads) && (
+      !is.numeric(n_threads) || length(n_threads) != 1L ||
+        is.na(n_threads) || !is.finite(n_threads) || n_threads < 1 ||
+        n_threads > .Machine$integer.max || n_threads != floor(n_threads)
+    )
+  ) {
+    log_message(
+      "{.arg n_threads} must be NULL or a single positive integer",
+      message_type = "error"
+    )
+  }
+  if (
+    !is.numeric(max_dense_bytes) || length(max_dense_bytes) != 1L ||
+      is.na(max_dense_bytes) || max_dense_bytes < 0 ||
+      (!is.finite(max_dense_bytes) && !identical(max_dense_bytes, Inf))
+  ) {
+    log_message(
+      "{.arg max_dense_bytes} must be a single non-negative number or {.val Inf}",
+      message_type = "error"
+    )
+  }
+  if (is.null(dim(X))) {
+    X <- as.matrix(X)
+  }
+  estimated_dense_bytes <- 2 * 8 * prod(dim(X))
+  if (estimated_dense_bytes > max_dense_bytes) {
+    log_message(
+      "Estimated dense input and C++ copy require {format(round(estimated_dense_bytes / 1024^2, 1), nsmall = 1)} MiB, above {.arg max_dense_bytes}",
+      message_type = "error"
+    )
+  }
   if (inherits(X, "sparseMatrix")) {
     X <- Matrix::as.matrix(X)
   }
@@ -133,7 +185,9 @@ compute_lisi <- function(
       n_neighbors = n_neighbors,
       perplexity = perplexity,
       tol = tol,
-      max_iter = max_iter
+      max_iter = max_iter,
+      knn_algorithm = knn_algorithm,
+      n_threads = if (is.null(n_threads)) 0L else as.integer(n_threads)
     )
   }
 

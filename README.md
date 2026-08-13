@@ -8,7 +8,11 @@
 
 ## **Introduction**
 
-[thisutils](https://mengxu98.github.io/thisutils/) is an R package for providing utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
+[thisutils](https://mengxu98.github.io/thisutils/) provides reliable building
+blocks for research workflows: sparse-matrix conversion and top-k selection,
+correlations, neighborhoods and LISI scores, repeated execution with structured
+messages, and optional dependency checks — with explicit semantics and bounded
+resource use.
 
 ## **Installation**
 
@@ -32,6 +36,37 @@ if (!require("pak", quietly = TRUE)) {
 pak::pak("mengxu98/thisutils")
 ```
 
-## **Usage**
+## **Quick start**
 
-Please reference [here](https://mengxu98.github.io/thisutils/reference/index.html).
+``` r
+library(Matrix)
+library(thisutils)
+
+x <- Matrix(
+  c(-3, 0, 2, -1, 4, 0),
+  nrow = 3,
+  sparse = TRUE,
+  dimnames = list(paste0("r", 1:3), paste0("c", 1:2))
+)
+
+# Implicit zeros for ordinary matrices; stored entries only for graphs
+run_sparse_topk(x, k = 2, by = "col")
+run_sparse_topk_stored(x, k = 2, by = "col")
+
+# Blockwise correlation with a bounded dense working block
+sparse_cor(simulate_sparse_matrix(200, 50), threshold = 0.2, block_size = 64)
+
+# Repeat tasks with aligned serial/parallel results and per-input seeds
+parallelize_fun(
+  list(first = x, second = x),
+  function(mat) thisutils::sparse_cor(mat, threshold = 0.2, block_size = 64),
+  cores = 2,
+  backend = "psock",
+  seed = 2026
+)
+```
+
+See the [function reference](https://mengxu98.github.io/thisutils/reference/index.html)
+for the complete API, and run
+`vignette("research-package-workflows", package = "thisutils")` for a connected
+example installed with the package.

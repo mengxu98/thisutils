@@ -14,7 +14,17 @@ using namespace Rcpp;
 //' @param col_names Character vector of column names to filter by.
 //' @param threshold The threshold for filtering values based on absolute values.
 //' Defaults to `0`.
-//' @param keep_zero Whether to keep zero values in the table. Defaults to `false`.
+//' @param keep_zero Whether to keep zero values in the table. Defaults to `true`
+//'   for backward compatibility.
+//'
+//' @details
+//' With `keep_zero = FALSE`, sparse input is traversed through its stored entries
+//' and implicit zeros are not materialized. The backward-compatible default,
+//' `keep_zero = TRUE`, emits every selected matrix position, including implicit
+//' sparse zeros, and therefore requires time and output memory proportional to
+//' the selected `nrow * ncol`. When zeros are omitted, an all-zero row or column
+//' is absent from the table and cannot be reconstructed by [table_to_matrix()]
+//' without separate dimension metadata.
 //'
 //' @return A table with three columns: `row`, `col`, and `value`.
 //' @export
@@ -151,8 +161,15 @@ DataFrame matrix_to_table(SEXP matrix,
     ncol = Dim[1];
 
     List Dimnames = spmat.slot("Dimnames");
-    CharacterVector rnames = Dimnames[0];
-    CharacterVector cnames = Dimnames[1];
+    SEXP rnames_sexp = Dimnames[0];
+    SEXP cnames_sexp = Dimnames[1];
+    if (Rf_isNull(rnames_sexp) || TYPEOF(rnames_sexp) != STRSXP ||
+        Rf_isNull(cnames_sexp) || TYPEOF(cnames_sexp) != STRSXP)
+    {
+      stop("Input matrix must have both row and column names");
+    }
+    CharacterVector rnames(rnames_sexp);
+    CharacterVector cnames(cnames_sexp);
     if (rnames.size() == 0 || cnames.size() == 0)
     {
       stop("Input matrix must have both row and column names");

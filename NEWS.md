@@ -1,3 +1,53 @@
+# thisutils 0.5.0
+
+* **compatibility**:
+  * Preserve the historical `matrix_to_table(keep_zero = TRUE)` and
+    `run_dense_topk_by_column(decreasing = FALSE)` defaults. Compact table
+    output and decreasing dense top-k remain explicit choices.
+  * Preserve the stored-entry semantics and zero-value padding of
+    `run_sparse_topk_by_column()`. The new `run_sparse_topk()` includes implicit
+    sparse zeros by default so it matches ordinary dense-matrix semantics.
+
+* **feat**:
+  * Add `run_sparse_topk()` and `run_sparse_topk_stored()` with an explicit
+    `by = "col"` or `by = "row"` direction. The earlier column-wise names
+    remain available as compatibility wrappers.
+  * Allow `parallelize_fun(verbose = TRUE, progress = FALSE)` to retain
+    standardized `log_message()` lifecycle output without a dynamic terminal
+    progress bar.
+  * Make Pearson `sparse_cor()` blockwise and add correlation threshold, dense
+    working-memory, and opt-in sparse output-size controls. The output limit
+    defaults to `Inf` for compatibility. Spearman and Kendall paths now check
+    their dense allocation boundary before conversion.
+  * Expose exact LISI neighbor-search strategy, C++ thread count, and dense
+    input-memory controls through `compute_lisi()`.
+
+* **fix**:
+  * Detect cancellation-prone row variance calculations and recompute only the
+    affected dense or sparse rows with a stable two-pass calculation, preserving
+    the existing fast path for ordinary inputs.
+  * Pad stored-entry sparse top-k results with `NA` values instead of zeros.
+  * Replace infinite correlations with zero when `remove_inf = TRUE`.
+  * Summarize failed structured or matrix-valued tasks by their task name or
+    shape, preventing verbose error reporting from masking the original worker
+    error.
+
+* **docs**:
+  * Document sparse expansion, implicit-zero, dense-intermediate, and CPU
+    boundaries, and reorganize the package reference around sparse and
+    resource-controlled research workflows.
+  * Add a full-workflow vignette that connects semantic, numerical, resource,
+    and execution contracts, plus an R Journal-oriented benchmark plan.
+  * Demonstrate stable verbose lifecycle messages separately from dynamic
+    progress output in report-oriented examples.
+  * Add a package-wide workflow vignette spanning representation, neighborhood
+    evaluation, execution, messages, and optional dependency diagnostics.
+
+* **tests**:
+  * Exercise fork interruption from an external parent process and verify that
+    workers are reaped before a subsequent fork call. Clarify that the
+    in-process interrupt-sender test covers the default PSOCK backend.
+
 # thisutils 0.4.9
 
 * **fix**:

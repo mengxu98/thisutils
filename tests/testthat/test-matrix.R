@@ -18,13 +18,14 @@ test_that("as_matrix returns sparse as-is when return_sparse = TRUE", {
 })
 
 test_that("matrix_to_table works on dense matrix", {
-  m <- matrix(c(1, 2, 3, 4), nrow = 2)
+  m <- matrix(c(1, 0, 3, 4), nrow = 2)
   rownames(m) <- c("r1", "r2")
   colnames(m) <- c("c1", "c2")
   result <- matrix_to_table(m)
   expect_true(is.data.frame(result))
   expect_equal(ncol(result), 3)
   expect_true(all(c("row", "col", "value") %in% colnames(result)))
+  expect_true(any(result$value == 0))
 })
 
 test_that("matrix_to_table works on sparse matrix", {
@@ -36,6 +37,20 @@ test_that("matrix_to_table works on sparse matrix", {
   expect_true(all(result$value != 0))
 })
 
+test_that("matrix_to_table rejects unnamed matrices without a native crash", {
+  dense <- matrix(c(1, 3, 4, 2), nrow = 2)
+  sparse <- Matrix::Matrix(dense, sparse = TRUE)
+
+  expect_error(
+    matrix_to_table(dense),
+    "must have both row and column names"
+  )
+  expect_error(
+    matrix_to_table(sparse),
+    "must have both row and column names"
+  )
+})
+
 test_that("matrix_to_table keep_zero TRUE on sparse matches dense output", {
   m_sparse <- simulate_sparse_matrix(5, 4, sparsity = 0.7, seed = 2)
   m_dense <- as.matrix(m_sparse)
@@ -45,6 +60,22 @@ test_that("matrix_to_table keep_zero TRUE on sparse matches dense output", {
 
   expect_equal(sparse_result, dense_result)
   expect_equal(nrow(sparse_result), nrow(m_sparse) * ncol(m_sparse))
+})
+
+test_that("matrix_to_table compact sparse output remains opt-in", {
+  dense <- matrix(
+    c(0, 2, 0, 0, 0, 3),
+    nrow = 3,
+    dimnames = list(paste0("r", 1:3), paste0("c", 1:2))
+  )
+  sparse <- Matrix::Matrix(dense, sparse = TRUE)
+
+  sparse_compact <- matrix_to_table(sparse, keep_zero = FALSE)
+  dense_compact <- matrix_to_table(dense, keep_zero = FALSE)
+  expect_equal(sparse_compact, dense_compact)
+  expect_equal(nrow(sparse_compact), 2)
+  expect_false("r1" %in% sparse_compact$row)
+  expect_equal(nrow(matrix_to_table(sparse)), length(sparse))
 })
 
 test_that("matrix_to_table with threshold", {

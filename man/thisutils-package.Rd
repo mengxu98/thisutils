@@ -4,12 +4,15 @@
 \name{thisutils-package}
 \alias{thisutils}
 \alias{thisutils-package}
-\title{Collection of Utility Functions for Data Analysis and Computing}
+\title{Reliable Utilities for Reusable Research Workflows}
 \source{
 \url{https://mengxu98.github.io/thisutils/}
 }
 \description{
-Provides utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
+Reusable building blocks for matrix representation, numerically stable and
+resource-controlled computation, neighborhood and classification
+evaluation, consistent serial/parallel execution, structured messages, and
+research-package interoperability.
 }
 \seealso{
 Useful links:
@@ -20,5 +23,5 @@ Useful links:
 
 }
 \author{
-Meng Xu (Maintainer), \email{mengxu98@qq.com}
+Xu Meng (Maintainer), \email{mengxu98@qq.com}
 }

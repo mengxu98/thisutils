@@ -2,31 +2,25 @@
 % Please edit documentation in R/MatrixTopK.R
 \name{run_sparse_topk_by_column}
 \alias{run_sparse_topk_by_column}
-\title{Sparse matrix top-k by column}
+\title{Compatibility wrapper for column-wise sparse top-k selection}
 \usage{
 run_sparse_topk_by_column(x, k, decreasing = TRUE)
 }
 \arguments{
 \item{x}{A \code{dgCMatrix} (or something coercible to one).}
 
-\item{k}{Number of top entries to retain per column. Must be a positive
-integer.}
+\item{k}{Number of stored entries to retain per column.}
 
-\item{decreasing}{Whether to sort in decreasing order (largest values
-first). Default is \code{TRUE}.}
+\item{decreasing}{Whether to sort in decreasing order. Defaults to \code{TRUE}.}
 }
 \value{
-A list with two components:
-\describe{
-\item{idx}{Integer matrix (\verb{ncol × k}) of 1-based row indices.}
-\item{value}{Numeric matrix (\verb{ncol × k}) of corresponding values.}
-}
+A list with \code{idx} and \code{value} matrices. Columns with fewer than \code{k}
+stored entries use \code{NA} indices and zero values for the remaining ranks.
 }
 \description{
-For each column of a sparse \code{dgCMatrix}, extract the top \code{k} entries (rows
-and values) sorted by value.
-}
-\examples{
-m <- Matrix::rsparsematrix(10, 20, density = 0.3)
-run_sparse_topk_by_column(m, k = 3)
+\code{run_sparse_topk_by_column()} preserves the column-wise interface used in
+earlier releases: only explicitly stored entries participate, and missing
+ranks are padded with \code{NA} indices and zero values. New code should call
+\code{\link[=run_sparse_topk]{run_sparse_topk()}} or \code{\link[=run_sparse_topk_stored]{run_sparse_topk_stored()}} to select the intended
+sparse-zero semantics explicitly.
 }

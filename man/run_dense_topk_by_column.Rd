@@ -13,7 +13,7 @@ run_dense_topk_by_column(x, k, decreasing = FALSE)
 integer.}
 
 \item{decreasing}{Whether to sort in decreasing order (largest values
-first). Default is \code{FALSE}.}
+first). Default is \code{FALSE} for backward compatibility.}
 }
 \value{
 A list with two components:
