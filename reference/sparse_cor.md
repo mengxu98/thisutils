@@ -190,5 +190,5 @@ system.time(
   cor(as_matrix(m1), as_matrix(m2))
 )
 #>    user  system elapsed 
-#>   0.011   0.000   0.010 
+#>   0.010   0.000   0.011 
 ```
