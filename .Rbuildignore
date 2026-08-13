@@ -3,6 +3,13 @@
 ^revdep$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.Rprofile$
+^\.Rhistory$
+^thisutils\.Rcheck$
+^thisutils_[0-9.]+\.tar\.gz$
+(^|/)\.DS_Store$
+(^|/)__pycache__$
+^.*\.py[co]$
 ^LICENSE\.md$
 ^_pkgdown\.yml$
 ^\.github$
@@ -20,6 +27,6 @@
 ^pkgdown$
 ^test$
 ^tmp$
-^.codex
+^\.codex
 ^\.codegraph
 ^\.env$
