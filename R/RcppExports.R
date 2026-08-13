@@ -5,20 +5,20 @@ classification_metrics <- function(predicted, truth, classes, rare_threshold = 0
     .Call(`_thisutils_classification_metrics`, predicted, truth, classes, rare_threshold)
 }
 
-sparse_topk_by_column <- function(mat, k, decreasing = TRUE) {
-    .Call(`_thisutils_sparse_topk_by_column`, mat, k, decreasing)
+sparse_topk_by_column <- function(mat, k, decreasing = TRUE, include_implicit_zeros = TRUE) {
+    .Call(`_thisutils_sparse_topk_by_column`, mat, k, decreasing, include_implicit_zeros)
 }
 
 dense_topk_by_column <- function(mat, k, decreasing = FALSE) {
     .Call(`_thisutils_dense_topk_by_column`, mat, k, decreasing)
 }
 
-compute_lisi_matrix <- function(X, batch_labels, n_neighbors, perplexity = 30, tol = 1e-5, max_iter = 50L) {
-    .Call(`_thisutils_compute_lisi_matrix`, X, batch_labels, n_neighbors, perplexity, tol, max_iter)
+compute_lisi_matrix <- function(X, batch_labels, n_neighbors, perplexity = 30, tol = 1e-5, max_iter = 50L, knn_algorithm = "auto", n_threads = 0L) {
+    .Call(`_thisutils_compute_lisi_matrix`, X, batch_labels, n_neighbors, perplexity, tol, max_iter, knn_algorithm, n_threads)
 }
 
-lisi_exact_knn_cpp <- function(X, k, exclude_self = FALSE) {
-    .Call(`_thisutils_lisi_exact_knn_cpp`, X, k, exclude_self)
+lisi_exact_knn_cpp <- function(X, k, exclude_self = FALSE, n_threads = 0L) {
+    .Call(`_thisutils_lisi_exact_knn_cpp`, X, k, exclude_self, n_threads)
 }
 
 drop_self_from_knn_cpp <- function(nn_idx, nn_dists) {
@@ -33,7 +33,17 @@ drop_self_from_knn_cpp <- function(nn_idx, nn_dists) {
 #' @param col_names Character vector of column names to filter by.
 #' @param threshold The threshold for filtering values based on absolute values.
 #' Defaults to `0`.
-#' @param keep_zero Whether to keep zero values in the table. Defaults to `false`.
+#' @param keep_zero Whether to keep zero values in the table. Defaults to `true`
+#'   for backward compatibility.
+#'
+#' @details
+#' With `keep_zero = FALSE`, sparse input is traversed through its stored entries
+#' and implicit zeros are not materialized. The backward-compatible default,
+#' `keep_zero = TRUE`, emits every selected matrix position, including implicit
+#' sparse zeros, and therefore requires time and output memory proportional to
+#' the selected `nrow * ncol`. When zeros are omitted, an all-zero row or column
+#' is absent from the table and cannot be reconstructed by [table_to_matrix()]
+#' without separate dimension metadata.
 #'
 #' @return A table with three columns: `row`, `col`, and `value`.
 #' @export
@@ -61,6 +71,10 @@ drop_self_from_knn_cpp <- function(nn_idx, nn_dists) {
 #' )
 matrix_to_table <- function(matrix, row_names = NULL, col_names = NULL, threshold = 0.0, keep_zero = TRUE) {
     .Call(`_thisutils_matrix_to_table`, matrix, row_names, col_names, threshold, keep_zero)
+}
+
+sparse_pearson_block_cpp <- function(cross_products, x_means, y_means, x_sds, y_sds, n_observations, allow_neg, remove_na, remove_inf, threshold) {
+    .Call(`_thisutils_sparse_pearson_block_cpp`, cross_products, x_means, y_means, x_sds, y_sds, n_observations, allow_neg, remove_na, remove_inf, threshold)
 }
 
 #' @title Split indices.

@@ -28,7 +28,12 @@ run_biocneighbors_knn <- function(
   exclude_self = FALSE,
   n_threads = 1L
 ) {
-  check_r("BiocNeighbors", verbose = FALSE)
+  if (!requireNamespace("BiocNeighbors", quietly = TRUE)) {
+    stop(
+      "Package 'BiocNeighbors' is required for `run_biocneighbors_knn()`.",
+      call. = FALSE
+    )
+  }
   metric <- match.arg(metric)
   distance <- switch(metric,
     euclidean = "Euclidean",

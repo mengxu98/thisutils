@@ -17,7 +17,8 @@ parallelize_fun(
   backend = c("auto", "fork", "psock"),
   timeout = Inf,
   total_timeout = Inf,
-  seed = NULL
+  seed = NULL,
+  progress = verbose
 )
 }
 \arguments{
@@ -28,7 +29,10 @@ parallelize_fun(
 \item{cores}{The number of worker processes to use for parallelization.
 Default is \code{1}.}
 
-\item{export_fun}{The functions to export the function to workers.}
+\item{export_fun}{Character vector naming functions or other objects from
+the environment of \code{fun} that PSOCK workers need. Objects referenced from
+a global environment are not discovered automatically; list them here or
+include them in each element of \code{x}.}
 
 \item{clean_result}{Whether to remove failed results from output.
 If \code{FALSE}, failed results are kept as error objects.
@@ -64,6 +68,11 @@ running.}
 deterministic independent L'Ecuyer-CMRG random-number stream, making results
 reproducible across worker counts and scheduling order. The caller's random
 number state is restored when the call finishes.}
+
+\item{progress}{Whether to draw a dynamic terminal progress bar. The default
+follows \code{verbose}. Set this to \code{FALSE} while keeping \code{verbose = TRUE} to emit
+concise lifecycle messages through \code{\link[=log_message]{log_message()}} without terminal timing
+output, for example in reports and persistent logs.}
 }
 \value{
 A list of computed results.

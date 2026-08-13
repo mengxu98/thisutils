@@ -40,61 +40,60 @@ reference:
   - thisutils_logo
   - print.thisutils_logo
 
-- subtitle: "Parallel processing"
+- subtitle: "Controlled execution"
 - contents:
   - parallelize_fun
-
-- subtitle: "Logging messages"
-- contents:
   - get_verbose
   - log_message
   - parse_inline_expressions
 
-- subtitle: "ASCII art"
+- subtitle: "Sparse matrix semantics"
 - contents:
-  - add_pkg_file
-  - figlet
-  - figlet_font
-
-- subtitle: "Correlation functions"
-- contents:
-  - pearson_correlation
-  - sparse_cor
-
-- subtitle: "Matrix and classification helpers"
-- contents:
-  - classification_metrics_compute
-  - fast_row_vars
-  - filter_nonzero_variance_features
-  - run_biocneighbors_knn
-  - run_dense_topk_by_column
-  - run_sparse_topk_by_column
-
-- subtitle: "Package management"
-- contents:
-  - check_pkg_status
-  - check_r
-  - remove_r
-
-- subtitle: "Utility functions"
-- contents:
-  - '%ss%'
   - as_matrix
-  - capitalize
-  - check_ci_env
   - check_sparsity
   - collapse_sparse_rows
+  - fast_row_vars
+  - filter_nonzero_variance_features
+  - matrix_to_table
+  - pearson_correlation
+  - run_dense_topk_by_column
+  - run_sparse_topk
+  - run_sparse_topk_stored
+  - sparse_cor
+  - table_to_matrix
+
+- subtitle: "Compatibility interfaces"
+- contents:
+  - run_sparse_topk_by_column
+  - run_sparse_stored_topk_by_column
+
+- subtitle: "Neighborhood and evaluation metrics"
+- contents:
+  - classification_metrics_compute
   - compute_lisi
-  - download
+  - run_biocneighbors_knn
+
+- subtitle: "Research-package interoperability"
+- contents:
+  - add_pkg_file
+  - check_pkg_status
+  - check_r
   - get_namespace_fun
   - invoke_fun
+  - remove_r
+
+- subtitle: "Additional statistical and utility helpers"
+- contents:
+  - '%ss%'
+  - capitalize
+  - check_ci_env
+  - download
   - is_outlier
   - is_apple_silicon
   - is_linux
   - is_osx
   - is_windows
   - matrix_process
-  - matrix_to_table
   - max_depth
   - maximump
   - meanp
@@ -105,8 +104,18 @@ reference:
   - split_indices
   - simulate_sparse_matrix
   - sump
-  - table_to_matrix
   - try_get
   - unnest_fun
   - votep
   - wilkinsonp
+
+- subtitle: "Presentation helpers"
+- contents:
+  - figlet
+  - figlet_font
+
+articles:
+- title: "Research-package workflows"
+  contents:
+  - research-package-workflows
+  - reliable-sparse-workflows

@@ -47,3 +47,35 @@ test_that("row-variance helpers preserve edge cases and sparse type", {
   expect_identical(dim(filtered), c(1L, 3L))
   expect_identical(filter_nonzero_variance_features(mat, integer()), mat[integer(), , drop = FALSE])
 })
+
+test_that("fast_row_vars is stable for data with a large offset", {
+  dense <- matrix(
+    1e12 + c(1, 2, 3, 4, 10, 12, 14, 16),
+    nrow = 2,
+    byrow = TRUE,
+    dimnames = list(c("a", "b"), NULL)
+  )
+  expected <- apply(dense, 1L, stats::var)
+
+  expect_equal(fast_row_vars(dense), expected, tolerance = 1e-12)
+  expect_equal(
+    fast_row_vars(Matrix::Matrix(dense, sparse = TRUE)),
+    expected,
+    tolerance = 1e-12
+  )
+})
+
+test_that("fast_row_vars propagates missing and non-finite rows", {
+  dense <- rbind(
+    missing = c(1, NA, 3),
+    infinite = c(1, Inf, 3),
+    finite = c(1, 2, 3)
+  )
+
+  dense_result <- fast_row_vars(dense)
+  sparse_result <- fast_row_vars(Matrix::Matrix(dense, sparse = TRUE))
+
+  expect_true(is.na(dense_result[["missing"]]))
+  expect_true(is.nan(dense_result[["infinite"]]))
+  expect_equal(sparse_result, dense_result)
+})

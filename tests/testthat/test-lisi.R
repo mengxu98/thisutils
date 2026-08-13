@@ -177,3 +177,112 @@ test_that("compute_lisi remains stable on different sizes", {
   second_medium <- suppressMessages(compute_lisi(X_medium, meta_medium, "batch", perplexity = 15))
   expect_equal(first_medium, second_medium, tolerance = 1e-10)
 })
+
+test_that("LISI exact search strategies agree", {
+  set.seed(31)
+  X <- matrix(rnorm(1200), ncol = 6)
+  meta <- data.frame(
+    batch = sample(c("A", "B", "C"), nrow(X), replace = TRUE)
+  )
+
+  brute <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "brute_force",
+    n_threads = 1
+  )
+  clustered <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "clustered",
+    n_threads = 1
+  )
+  automatic <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "auto",
+    n_threads = 1
+  )
+
+  expect_equal(clustered, brute, tolerance = 1e-10)
+  expect_equal(automatic, brute, tolerance = 1e-10)
+})
+
+test_that("LISI thread count is explicit and deterministic", {
+  set.seed(32)
+  X <- matrix(rnorm(1800), ncol = 6)
+  meta <- data.frame(batch = sample(c("A", "B"), nrow(X), replace = TRUE))
+
+  serial <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "brute_force",
+    n_threads = 1
+  )
+  parallel <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "brute_force",
+    n_threads = 2
+  )
+  automatic <- compute_lisi(
+    X,
+    meta,
+    "batch",
+    perplexity = 8,
+    knn_algorithm = "brute_force"
+  )
+
+  expect_identical(parallel, serial)
+  expect_identical(automatic, serial)
+})
+
+test_that("compute_lisi exposes dense conversion and control validation", {
+  set.seed(33)
+  X <- matrix(rnorm(120), ncol = 6)
+  sparse_X <- Matrix::Matrix(X, sparse = TRUE)
+  meta <- data.frame(batch = rep(c("A", "B"), each = 10))
+
+  expect_equal(
+    compute_lisi(sparse_X, meta, "batch", perplexity = 5),
+    compute_lisi(X, meta, "batch", perplexity = 5),
+    tolerance = 1e-12
+  )
+  expect_error(
+    compute_lisi(sparse_X, meta, "batch", max_dense_bytes = 1),
+    "Estimated dense input"
+  )
+  expect_error(
+    compute_lisi(X, meta, "batch", n_threads = 0),
+    "positive integer"
+  )
+  expect_error(
+    compute_lisi(X, meta, "batch", knn_algorithm = "approximate"),
+    "arg"
+  )
+})
+
+test_that("internal exact KNN supports automatic and explicit thread controls", {
+  set.seed(34)
+  X <- matrix(rnorm(900), ncol = 5)
+
+  serial <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE, n_threads = 1)
+  parallel <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE, n_threads = 2)
+  automatic <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE)
+  expect_identical(parallel, serial)
+  expect_identical(automatic, serial)
+  expect_error(
+    lisi_exact_knn_cpp(X, k = 5, n_threads = -1),
+    "non-negative"
+  )
+})

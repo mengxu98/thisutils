@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-#' @title Collection of Utility Functions for Data Analysis and Computing
+#' @title Reliable Utilities for Reusable Research Workflows
 #'
 #' @useDynLib thisutils, .registration = TRUE
 #'
 #' @description
-#' Provides utility functions for data analysis and computing. Includes functions for logging, parallel processing, and other computational tasks to streamline workflows.
+#' Reusable building blocks for matrix representation, numerically stable and
+#' resource-controlled computation, neighborhood and classification
+#' evaluation, consistent serial/parallel execution, structured messages, and
+#' research-package interoperability.
 #'
-#' @author Meng Xu (Maintainer), \email{mengxu98@qq.com}
+#' @author Xu Meng (Maintainer), \email{mengxu98@qq.com}
 #'
 #' @source \url{https://mengxu98.github.io/thisutils/}
 #'

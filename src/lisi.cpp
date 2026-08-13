@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <numeric>
+#include <string>
 #include <thread>
 #include <unordered_map>
 #include <utility>
@@ -675,8 +676,10 @@ struct ClusteredLisiMatrixWorker {
 };
 
 template<class Worker_>
-void run_parallel_worker(const Worker_& worker, int n) {
-  unsigned int thread_count = std::thread::hardware_concurrency();
+void run_parallel_worker(const Worker_& worker, int n, int n_threads) {
+  unsigned int thread_count = n_threads == 0
+    ? std::thread::hardware_concurrency()
+    : static_cast<unsigned int>(n_threads);
   if (thread_count == 0) {
     thread_count = 1;
   }
@@ -715,7 +718,9 @@ NumericMatrix compute_lisi_matrix(
     int n_neighbors,
     double perplexity = 30,
     double tol = 1e-5,
-    int max_iter = 50) {
+    int max_iter = 50,
+    std::string knn_algorithm = "auto",
+    int n_threads = 0) {
   const int n = X.nrow();
   const int p = X.ncol();
   const int n_labels = batch_labels.ncol();
@@ -738,6 +743,15 @@ NumericMatrix compute_lisi_matrix(
   if (max_iter < 1) {
     stop("max_iter must be at least 1.");
   }
+  if (
+      knn_algorithm != "auto" &&
+      knn_algorithm != "brute_force" &&
+      knn_algorithm != "clustered") {
+    stop("knn_algorithm must be one of 'auto', 'brute_force', or 'clustered'.");
+  }
+  if (n_threads < 0) {
+    stop("n_threads must be non-negative, where zero selects hardware threads.");
+  }
 
   std::vector<double> x_row_major = make_row_major_checked(X);
 
@@ -757,7 +771,8 @@ NumericMatrix compute_lisi_matrix(
   NumericMatrix out(n, n_labels);
   std::fill(out.begin(), out.end(), NA_REAL);
 
-  const bool use_clustered_search = n >= 4096 && n_neighbors * 4 < n;
+  const bool use_clustered_search = knn_algorithm == "clustered" ||
+    (knn_algorithm == "auto" && n >= 4096 && n_neighbors * 4 < n);
   if (use_clustered_search) {
     ClusterIndex cluster_index = build_cluster_index(x_row_major.data(), n, p);
     ClusteredLisiMatrixWorker worker(
@@ -771,7 +786,7 @@ NumericMatrix compute_lisi_matrix(
       tol,
       max_iter
     );
-    run_parallel_worker(worker, n);
+    run_parallel_worker(worker, n, n_threads);
   } else {
     LisiMatrixWorker worker(
       x_row_major.data(),
@@ -786,14 +801,18 @@ NumericMatrix compute_lisi_matrix(
       tol,
       max_iter
     );
-    run_parallel_worker(worker, n);
+    run_parallel_worker(worker, n, n_threads);
   }
 
   return out;
 }
 
 // [[Rcpp::export]]
-List lisi_exact_knn_cpp(const NumericMatrix& X, int k, bool exclude_self = false) {
+List lisi_exact_knn_cpp(
+    const NumericMatrix& X,
+    int k,
+    bool exclude_self = false,
+    int n_threads = 0) {
   const int n = X.nrow();
   const int p = X.ncol();
 
@@ -803,6 +822,9 @@ List lisi_exact_knn_cpp(const NumericMatrix& X, int k, bool exclude_self = false
   const int max_k = exclude_self ? n - 1 : n;
   if (k < 1 || k > max_k) {
     stop("k must be between 1 and the number of available neighbors.");
+  }
+  if (n_threads < 0) {
+    stop("n_threads must be non-negative, where zero selects hardware threads.");
   }
 
   std::vector<double> x_row_major = make_row_major_checked(X);
@@ -820,34 +842,7 @@ List lisi_exact_knn_cpp(const NumericMatrix& X, int k, bool exclude_self = false
     exclude_self
   );
 
-  unsigned int thread_count = std::thread::hardware_concurrency();
-  if (thread_count == 0) {
-    thread_count = 1;
-  }
-  thread_count = std::min<unsigned int>(thread_count, static_cast<unsigned int>(n));
-
-  if (thread_count <= 1 || n < 128) {
-    worker.run(0, n);
-  } else {
-    std::vector<std::thread> threads;
-    threads.reserve(thread_count);
-    const std::size_t block = (static_cast<std::size_t>(n) + thread_count - 1) / thread_count;
-
-    for (unsigned int t = 0; t < thread_count; ++t) {
-      const std::size_t begin = static_cast<std::size_t>(t) * block;
-      const std::size_t end = std::min<std::size_t>(begin + block, static_cast<std::size_t>(n));
-      if (begin >= end) {
-        break;
-      }
-      threads.emplace_back([&worker, begin, end]() {
-        worker.run(begin, end);
-      });
-    }
-
-    for (std::thread& thread : threads) {
-      thread.join();
-    }
-  }
+  run_parallel_worker(worker, n, n_threads);
 
   return List::create(
     Named("nn.idx") = nn_idx,

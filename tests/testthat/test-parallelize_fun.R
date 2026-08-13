@@ -218,6 +218,29 @@ test_that("parallelize_fun with verbose progress bar", {
   )
 })
 
+test_that("verbose lifecycle messages can be emitted without dynamic progress", {
+  messages <- character()
+  result <- withCallingHandlers(
+    parallelize_fun(
+      1:3,
+      function(x) x^2,
+      verbose = TRUE,
+      progress = FALSE,
+      timestamp_format = ""
+    ),
+    message = function(condition) {
+      messages <<- c(messages, conditionMessage(condition))
+      invokeRestart("muffleMessage")
+    }
+  )
+  messages <- cli::ansi_strip(paste(messages, collapse = "\n"))
+
+  expect_identical(unname(unlist(result)), c(1, 4, 9))
+  expect_match(messages, "Using 1 core", fixed = TRUE)
+  expect_match(messages, "Building results", fixed = TRUE)
+  expect_false(grepl("Completed", messages, fixed = TRUE))
+})
+
 test_that("parallel progress bar uses supplied width", {
   bar <- parallel_progress_bar(6, 10, 12L)
   expect_equal(nchar(cli::ansi_strip(bar)), 12)
@@ -944,7 +967,7 @@ test_that("worker depth is scoped to each task", {
   expect_null(getOption("thisutils.parallel.depth"))
 })
 
-test_that("an interrupted fork call cleans workers and can be followed by another call", {
+test_that("an interrupted PSOCK call cleans workers and can be followed by another call", {
   skip_on_os("windows")
   skip_on_covr()
   local_parallel_test_workers()
@@ -967,6 +990,7 @@ test_that("an interrupted fork call cleans workers and can be followed by anothe
         i
       },
       cores = 2,
+      backend = "psock",
       verbose = FALSE
     )
     NULL
@@ -975,9 +999,102 @@ test_that("an interrupted fork call cleans workers and can be followed by anothe
   expect_s3_class(interrupted, "interrupt")
   expect_length(getFromNamespace("children", "parallel")(), 0L)
   expect_identical(
-    unname(unlist(parallelize_fun(1:3, identity, cores = 2, verbose = FALSE))),
+    unname(unlist(parallelize_fun(
+      1:3,
+      identity,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    ))),
     1:3
   )
+})
+
+test_that("an externally interrupted fork call reaps workers", {
+  skip_on_os("windows")
+  skip_on_covr()
+
+  marker <- tempfile("thisutils-fork-worker-")
+  worker <- callr::r_bg(
+    function(libpaths, marker) {
+      .libPaths(libpaths)
+      library(thisutils)
+
+      testthat::local_mocked_bindings(
+        cores_detect = function(cores, num_session) {
+          min(2L, as.integer(cores), as.integer(num_session))
+        },
+        .package = "thisutils"
+      )
+
+      interrupted <- tryCatch(
+        parallelize_fun(
+          1:4,
+          function(i) {
+            file.create(marker)
+            Sys.sleep(30)
+            i
+          },
+          cores = 2,
+          backend = "fork",
+          verbose = FALSE
+        ),
+        interrupt = identity
+      )
+
+      Sys.sleep(0.2)
+      child_handles <- ps::ps_children(
+        ps::ps_handle(Sys.getpid()),
+        recursive = FALSE
+      )
+      child_statuses <- vapply(
+        child_handles,
+        function(handle) {
+          tryCatch(ps::ps_status(handle), error = function(e) "gone")
+        },
+        character(1)
+      )
+      follow_up <- unname(unlist(parallelize_fun(
+        1:3,
+        identity,
+        cores = 2,
+        backend = "fork",
+        verbose = FALSE
+      )))
+
+      list(
+        interrupted = inherits(interrupted, "interrupt"),
+        child_statuses = unname(child_statuses),
+        follow_up = follow_up
+      )
+    },
+    args = list(libpaths = .libPaths(), marker = marker),
+    stdout = "|",
+    stderr = "|"
+  )
+  on.exit({
+    if (worker$is_alive()) {
+      worker$kill()
+    }
+    unlink(marker)
+  }, add = TRUE)
+
+  deadline <- Sys.time() + 20
+  while (!file.exists(marker) && worker$is_alive() && Sys.time() < deadline) {
+    Sys.sleep(0.05)
+  }
+  expect_true(file.exists(marker))
+  expect_true(worker$is_alive())
+
+  worker$interrupt()
+  worker$wait(timeout = 20000)
+  expect_false(worker$is_alive())
+  expect_identical(worker$get_exit_status(), 0L)
+
+  result <- worker$get_result()
+  expect_true(result$interrupted)
+  expect_false(any(result$child_statuses == "zombie"))
+  expect_identical(result$follow_up, 1:3)
 })
 
 test_that("verbose error reporting groups repeated failures", {
@@ -1005,6 +1122,36 @@ test_that("verbose error reporting groups repeated failures", {
   expect_true(grepl("even failure", combined, fixed = TRUE))
   expect_true(grepl("odd failure", combined, fixed = TRUE))
   expect_true(grepl("and 1 more", combined, fixed = TRUE))
+  expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
+})
+
+test_that("verbose error reporting summarizes structured named inputs", {
+  messages <- character()
+  tasks <- list(
+    first_matrix = matrix(seq_len(12), nrow = 3),
+    second_matrix = matrix(seq_len(20), nrow = 4)
+  )
+
+  result <- withCallingHandlers(
+    parallelize_fun(
+      tasks,
+      function(x) stop("expected matrix failure"),
+      cores = 1,
+      verbose = TRUE,
+      progress = FALSE,
+      timestamp_format = ""
+    ),
+    message = function(m) {
+      messages <<- c(messages, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    },
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  combined <- cli::ansi_strip(paste(messages, collapse = "\n"))
+  expect_match(combined, "expected matrix failure", fixed = TRUE)
+  expect_match(combined, "first_matrix", fixed = TRUE)
+  expect_match(combined, "second_matrix", fixed = TRUE)
   expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
 })
 
@@ -1041,7 +1188,7 @@ test_that("multi-core verbose progress handles named and list inputs", {
   expect_identical(listed, list(1, 2, 3))
 })
 
-test_that("export_fun supports functions without an environment", {
+test_that("export_fun exports objects referenced from a function environment", {
   local_parallel_test_workers()
 
   offset <- 4L
@@ -1049,7 +1196,7 @@ test_that("export_fun supports functions without an environment", {
   result <- suppressMessages(
     parallelize_fun(
       1:4,
-      as.integer,
+      function(x) x + offset,
       cores = 2,
       backend = "psock",
       export_fun = "offset",
@@ -1057,7 +1204,7 @@ test_that("export_fun supports functions without an environment", {
     )
   )
 
-  expect_identical(unname(unlist(result)), 1:4)
+  expect_identical(unname(unlist(result)), 5:8)
 })
 
 test_that("a worker returning an invalid batch raises a worker error", {

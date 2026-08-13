@@ -22,13 +22,23 @@ matrix_to_table(
 \item{threshold}{The threshold for filtering values based on absolute values.
 Defaults to \code{0}.}
 
-\item{keep_zero}{Whether to keep zero values in the table. Defaults to \code{false}.}
+\item{keep_zero}{Whether to keep zero values in the table. Defaults to \code{true}
+for backward compatibility.}
 }
 \value{
 A table with three columns: \code{row}, \code{col}, and \code{value}.
 }
 \description{
 Switch matrix to table
+}
+\details{
+With \code{keep_zero = FALSE}, sparse input is traversed through its stored entries
+and implicit zeros are not materialized. The backward-compatible default,
+\code{keep_zero = TRUE}, emits every selected matrix position, including implicit
+sparse zeros, and therefore requires time and output memory proportional to
+the selected \code{nrow * ncol}. When zeros are omitted, an all-zero row or column
+is absent from the table and cannot be reconstructed by \code{\link[=table_to_matrix]{table_to_matrix()}}
+without separate dimension metadata.
 }
 \examples{
 test_matrix <- simulate_sparse_matrix(10, 10)

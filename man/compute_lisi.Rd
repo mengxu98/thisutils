@@ -10,7 +10,10 @@ compute_lisi(
   label_colnames,
   perplexity = 30,
   tol = 1e-05,
-  max_iter = 50
+  max_iter = 50,
+  knn_algorithm = c("auto", "brute_force", "clustered"),
+  n_threads = NULL,
+  max_dense_bytes = Inf
 )
 }
 \arguments{
@@ -27,6 +30,20 @@ Defaults to \code{1e-5}.}
 
 \item{max_iter}{Maximum number of binary-search iterations.
 Defaults to \code{50}.}
+
+\item{knn_algorithm}{Exact nearest-neighbor search strategy. \code{"auto"}
+uses clustered exact search when there are at least 4096 observations and
+the requested neighborhood is less than one quarter of the data; otherwise
+it uses brute force. \code{"brute_force"} and \code{"clustered"} force either exact
+strategy.}
+
+\item{n_threads}{Number of C++ worker threads. \code{NULL} (the default) preserves
+the earlier automatic hardware-thread selection. Supply a positive integer
+to control CPU use explicitly.}
+
+\item{max_dense_bytes}{Maximum estimated bytes allowed for the dense input
+and its C++ row-major copy. The default, \code{Inf}, preserves earlier behavior;
+supply a finite value to enable the guard.}
 }
 \value{
 A data frame with one row per cell and one column per label.
@@ -34,6 +51,11 @@ A data frame with one row per cell and one column per label.
 \description{
 Compute per-cell Local Inverse Simpson's Index (LISI) scores for one or more categorical variables.
 This is a clean-room reimplementation of the \code{immunogenomics/LISI}.
+}
+\details{
+Both nearest-neighbor strategies are exact. Sparse \code{X} is converted to a
+dense matrix before neighbor search; this conversion is included in the
+\code{max_dense_bytes} check.
 }
 \examples{
 set.seed(1)

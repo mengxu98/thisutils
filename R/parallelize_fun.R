@@ -6,7 +6,10 @@
 #' @param fun The function to be applied to each element.
 #' @param cores The number of worker processes to use for parallelization.
 #' Default is `1`.
-#' @param export_fun The functions to export the function to workers.
+#' @param export_fun Character vector naming functions or other objects from
+#'   the environment of `fun` that PSOCK workers need. Objects referenced from
+#'   a global environment are not discovered automatically; list them here or
+#'   include them in each element of `x`.
 #' @param clean_result Whether to remove failed results from output.
 #' If `FALSE`, failed results are kept as error objects.
 #' Default is `FALSE`.
@@ -29,6 +32,10 @@
 #' deterministic independent L'Ecuyer-CMRG random-number stream, making results
 #' reproducible across worker counts and scheduling order. The caller's random
 #' number state is restored when the call finishes.
+#' @param progress Whether to draw a dynamic terminal progress bar. The default
+#' follows `verbose`. Set this to `FALSE` while keeping `verbose = TRUE` to emit
+#' concise lifecycle messages through [log_message()] without terminal timing
+#' output, for example in reports and persistent logs.
 #'
 #' @return
 #' A list of computed results.
@@ -87,7 +94,8 @@ parallelize_fun <- function(
   backend = c("auto", "fork", "psock"),
   timeout = Inf,
   total_timeout = Inf,
-  seed = NULL
+  seed = NULL,
+  progress = verbose
 ) {
   call_started <- parallel_elapsed()
   fun <- match.fun(fun)
@@ -113,8 +121,9 @@ parallelize_fun <- function(
   has_names <- !is.null(names(x)) && any(names(x) != "")
   is_vector <- is.vector(x) && !is.list(x)
   show_values <- !has_names && is_vector
+  show_progress <- isTRUE(verbose) && isTRUE(progress)
 
-  if (verbose) {
+  if (show_progress) {
     progress_env <- environment()
     old_cli_opts <- options(
       cli.progress_show_after = 0,
@@ -157,7 +166,7 @@ parallelize_fun <- function(
       verbose = verbose
     )
 
-    if (verbose) {
+    if (show_progress) {
       output_list <- vector("list", total)
 
       for (i in seq_along(x)) {
@@ -233,12 +242,12 @@ parallelize_fun <- function(
       rng_streams = rng_streams,
       export_fun = export_fun,
       safe_call = safe_call,
-      progress_id = if (verbose) pb else NULL,
-      progress_env = if (verbose) progress_env else NULL,
+      progress_id = if (show_progress) pb else NULL,
+      progress_env = if (show_progress) progress_env else NULL,
       has_names = has_names,
       show_values = show_values
     )
-    if (verbose) {
+    if (show_progress) {
       cli::cli_progress_done(id = pb)
     }
   }
@@ -283,12 +292,12 @@ parallelize_fun <- function(
           inputs <- error_inputs[idx]
           n <- length(idx)
           max_show <- 3
-          shown <- vapply(
-            utils::head(inputs, max_show),
-            function(v) {
-              parse_inline_expressions("{.val {v}}")
-            },
-            character(1)
+          shown_inputs <- utils::head(inputs, max_show)
+          shown <- mapply(
+            parallel_task_label,
+            input = unname(shown_inputs),
+            name = names(shown_inputs) %ss% rep("", length(shown_inputs)),
+            USE.NAMES = FALSE
           )
           task_str <- paste(shown, collapse = ", ")
           if (n > max_show) {
@@ -334,6 +343,28 @@ parallelize_fun <- function(
   }
 
   return(output_list)
+}
+
+parallel_task_label <- function(input, name = "") {
+  if (length(name) == 1L && !is.na(name) && nzchar(name)) {
+    label <- name
+  } else if (is.atomic(input) && length(input) == 1L) {
+    label <- as.character(input)
+  } else if (!is.null(dim(input))) {
+    label <- sprintf(
+      "<%s %s>",
+      class(input)[[1L]],
+      paste(dim(input), collapse = " x ")
+    )
+  } else {
+    label <- sprintf(
+      "<%s length %d>",
+      class(input)[[1L]],
+      length(input)
+    )
+  }
+
+  parse_inline_expressions("{.val {label}}", env = environment())
 }
 
 parallel_collect_results <- function(

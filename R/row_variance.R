@@ -38,23 +38,51 @@ fast_row_vars <- function(x, unbiased = TRUE) {
   }
 
   if (inherits(x, "sparseMatrix")) {
-    if (!inherits(x, "dgCMatrix")) {
-      x <- methods::as(x, "dgCMatrix")
-    }
-    row_sum <- Matrix::rowSums(x)
-    x_sq <- x
-    x_sq@x <- x_sq@x * x_sq@x
-    row_sum_sq <- Matrix::rowSums(x_sq)
+    x <- .as_dgC_matrix(x)
+    row_sum <- as.numeric(Matrix::rowSums(x))
+    squared <- x
+    squared@x <- squared@x * squared@x
+    row_sum_squares <- as.numeric(Matrix::rowSums(squared))
   } else {
     x <- as.matrix(x)
     storage.mode(x) <- "double"
     row_sum <- rowSums(x)
-    row_sum_sq <- rowSums(x * x)
+    row_sum_squares <- rowSums(x * x)
   }
 
+  correction <- row_sum * row_sum / n
+  centered_sum_squares <- row_sum_squares - correction
+  cancellation_risk <- which(
+    is.finite(row_sum_squares) & row_sum_squares > 0 &
+      centered_sum_squares <=
+        sqrt(.Machine$double.eps) * row_sum_squares
+  )
+
   denominator <- if (isTRUE(unbiased)) n - 1L else n
-  out <- (row_sum_sq - (row_sum * row_sum) / n) / denominator
-  out <- pmax(as.numeric(out), 0)
+  out <- pmax(centered_sum_squares / denominator, 0)
+  if (length(cancellation_risk)) {
+    stable_input <- x[cancellation_risk, , drop = FALSE]
+    out[cancellation_risk] <- if (inherits(x, "sparseMatrix")) {
+      row_mean <- as.numeric(Matrix::rowMeans(stable_input))
+      stored_per_row <- tabulate(
+        stable_input@i + 1L,
+        nbins = nrow(stable_input)
+      )
+      centered <- stable_input
+      centered@x <- (
+        centered@x - row_mean[centered@i + 1L]
+      )^2
+      (
+        as.numeric(Matrix::rowSums(centered)) +
+          (n - stored_per_row) * row_mean^2
+      ) / denominator
+    } else {
+      row_mean <- rowMeans(stable_input)
+      centered <- sweep(stable_input, 1L, row_mean, FUN = "-")
+      rowSums(centered * centered) / denominator
+    }
+  }
+
   names(out) <- rownames(x)
   out
 }

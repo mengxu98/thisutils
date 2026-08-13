@@ -44,3 +44,16 @@ as_matrix <- function(
     Matrix::as.matrix(x)
   )
 }
+
+.as_dgC_matrix <- function(x) {
+  if (!inherits(x, "sparseMatrix")) {
+    x <- Matrix::Matrix(x, sparse = TRUE)
+  }
+  if (inherits(x, "dgCMatrix")) {
+    return(x)
+  }
+
+  x <- methods::as(x, "generalMatrix")
+  x <- methods::as(x, "dMatrix")
+  methods::as(x, "CsparseMatrix")
+}

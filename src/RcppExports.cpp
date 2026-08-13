@@ -25,15 +25,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // sparse_topk_by_column
-List sparse_topk_by_column(S4 mat, int k, bool decreasing);
-RcppExport SEXP _thisutils_sparse_topk_by_column(SEXP matSEXP, SEXP kSEXP, SEXP decreasingSEXP) {
+List sparse_topk_by_column(S4 mat, int k, bool decreasing, bool include_implicit_zeros);
+RcppExport SEXP _thisutils_sparse_topk_by_column(SEXP matSEXP, SEXP kSEXP, SEXP decreasingSEXP, SEXP include_implicit_zerosSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< S4 >::type mat(matSEXP);
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     Rcpp::traits::input_parameter< bool >::type decreasing(decreasingSEXP);
-    rcpp_result_gen = Rcpp::wrap(sparse_topk_by_column(mat, k, decreasing));
+    Rcpp::traits::input_parameter< bool >::type include_implicit_zeros(include_implicit_zerosSEXP);
+    rcpp_result_gen = Rcpp::wrap(sparse_topk_by_column(mat, k, decreasing, include_implicit_zeros));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -51,8 +52,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_lisi_matrix
-NumericMatrix compute_lisi_matrix(const NumericMatrix& X, const IntegerMatrix& batch_labels, int n_neighbors, double perplexity, double tol, int max_iter);
-RcppExport SEXP _thisutils_compute_lisi_matrix(SEXP XSEXP, SEXP batch_labelsSEXP, SEXP n_neighborsSEXP, SEXP perplexitySEXP, SEXP tolSEXP, SEXP max_iterSEXP) {
+NumericMatrix compute_lisi_matrix(const NumericMatrix& X, const IntegerMatrix& batch_labels, int n_neighbors, double perplexity, double tol, int max_iter, std::string knn_algorithm, int n_threads);
+RcppExport SEXP _thisutils_compute_lisi_matrix(SEXP XSEXP, SEXP batch_labelsSEXP, SEXP n_neighborsSEXP, SEXP perplexitySEXP, SEXP tolSEXP, SEXP max_iterSEXP, SEXP knn_algorithmSEXP, SEXP n_threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,20 +63,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type perplexity(perplexitySEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_lisi_matrix(X, batch_labels, n_neighbors, perplexity, tol, max_iter));
+    Rcpp::traits::input_parameter< std::string >::type knn_algorithm(knn_algorithmSEXP);
+    Rcpp::traits::input_parameter< int >::type n_threads(n_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_lisi_matrix(X, batch_labels, n_neighbors, perplexity, tol, max_iter, knn_algorithm, n_threads));
     return rcpp_result_gen;
 END_RCPP
 }
 // lisi_exact_knn_cpp
-List lisi_exact_knn_cpp(const NumericMatrix& X, int k, bool exclude_self);
-RcppExport SEXP _thisutils_lisi_exact_knn_cpp(SEXP XSEXP, SEXP kSEXP, SEXP exclude_selfSEXP) {
+List lisi_exact_knn_cpp(const NumericMatrix& X, int k, bool exclude_self, int n_threads);
+RcppExport SEXP _thisutils_lisi_exact_knn_cpp(SEXP XSEXP, SEXP kSEXP, SEXP exclude_selfSEXP, SEXP n_threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericMatrix& >::type X(XSEXP);
     Rcpp::traits::input_parameter< int >::type k(kSEXP);
     Rcpp::traits::input_parameter< bool >::type exclude_self(exclude_selfSEXP);
-    rcpp_result_gen = Rcpp::wrap(lisi_exact_knn_cpp(X, k, exclude_self));
+    Rcpp::traits::input_parameter< int >::type n_threads(n_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(lisi_exact_knn_cpp(X, k, exclude_self, n_threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -103,6 +107,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
     Rcpp::traits::input_parameter< bool >::type keep_zero(keep_zeroSEXP);
     rcpp_result_gen = Rcpp::wrap(matrix_to_table(matrix, row_names, col_names, threshold, keep_zero));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sparse_pearson_block_cpp
+List sparse_pearson_block_cpp(const S4& cross_products, const NumericVector& x_means, const NumericVector& y_means, const NumericVector& x_sds, const NumericVector& y_sds, double n_observations, bool allow_neg, bool remove_na, bool remove_inf, double threshold);
+RcppExport SEXP _thisutils_sparse_pearson_block_cpp(SEXP cross_productsSEXP, SEXP x_meansSEXP, SEXP y_meansSEXP, SEXP x_sdsSEXP, SEXP y_sdsSEXP, SEXP n_observationsSEXP, SEXP allow_negSEXP, SEXP remove_naSEXP, SEXP remove_infSEXP, SEXP thresholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const S4& >::type cross_products(cross_productsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type x_means(x_meansSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type y_means(y_meansSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type x_sds(x_sdsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type y_sds(y_sdsSEXP);
+    Rcpp::traits::input_parameter< double >::type n_observations(n_observationsSEXP);
+    Rcpp::traits::input_parameter< bool >::type allow_neg(allow_negSEXP);
+    Rcpp::traits::input_parameter< bool >::type remove_na(remove_naSEXP);
+    Rcpp::traits::input_parameter< bool >::type remove_inf(remove_infSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(sparse_pearson_block_cpp(cross_products, x_means, y_means, x_sds, y_sds, n_observations, allow_neg, remove_na, remove_inf, threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -136,12 +160,13 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_thisutils_classification_metrics", (DL_FUNC) &_thisutils_classification_metrics, 4},
-    {"_thisutils_sparse_topk_by_column", (DL_FUNC) &_thisutils_sparse_topk_by_column, 3},
+    {"_thisutils_sparse_topk_by_column", (DL_FUNC) &_thisutils_sparse_topk_by_column, 4},
     {"_thisutils_dense_topk_by_column", (DL_FUNC) &_thisutils_dense_topk_by_column, 3},
-    {"_thisutils_compute_lisi_matrix", (DL_FUNC) &_thisutils_compute_lisi_matrix, 6},
-    {"_thisutils_lisi_exact_knn_cpp", (DL_FUNC) &_thisutils_lisi_exact_knn_cpp, 3},
+    {"_thisutils_compute_lisi_matrix", (DL_FUNC) &_thisutils_compute_lisi_matrix, 8},
+    {"_thisutils_lisi_exact_knn_cpp", (DL_FUNC) &_thisutils_lisi_exact_knn_cpp, 4},
     {"_thisutils_drop_self_from_knn_cpp", (DL_FUNC) &_thisutils_drop_self_from_knn_cpp, 2},
     {"_thisutils_matrix_to_table", (DL_FUNC) &_thisutils_matrix_to_table, 5},
+    {"_thisutils_sparse_pearson_block_cpp", (DL_FUNC) &_thisutils_sparse_pearson_block_cpp, 10},
     {"_thisutils_split_indices", (DL_FUNC) &_thisutils_split_indices, 2},
     {"_thisutils_table_to_matrix", (DL_FUNC) &_thisutils_table_to_matrix, 5},
     {NULL, NULL, 0}

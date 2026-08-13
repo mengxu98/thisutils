@@ -2,38 +2,75 @@
 % Please edit documentation in R/sparse_cor.R
 \name{sparse_cor}
 \alias{sparse_cor}
-\title{Sparse correlation function}
+\title{Resource-controlled sparse correlation}
 \usage{
 sparse_cor(
   x,
   y = NULL,
-  method = "pearson",
+  method = c("pearson", "spearman", "kendall"),
   allow_neg = TRUE,
   remove_na = TRUE,
   remove_inf = TRUE,
+  threshold = 0,
+  block_size = 256L,
+  max_dense_bytes = Inf,
+  max_output_entries = Inf,
   ...
 )
 }
 \arguments{
-\item{x}{Sparse matrix or character vector.}
+\item{x}{A numeric matrix or sparse \code{Matrix} with observations in rows.}
 
-\item{y}{Sparse matrix or character vector.}
+\item{y}{An optional numeric matrix or sparse \code{Matrix} with the same number
+of rows as \code{x}.}
 
-\item{method}{Method to use for calculating the correlation coefficient.}
+\item{method}{Correlation coefficient: \code{"pearson"}, \code{"spearman"}, or
+\code{"kendall"}.}
 
 \item{allow_neg}{Logical. Whether to allow negative values or set them to 0.}
 
 \item{remove_na}{Logical. Whether to replace NA values with 0.}
 
-\item{remove_inf}{Logical. Whether to replace infinite values with 1.}
+\item{remove_inf}{Logical. Whether to replace infinite values with 0.}
 
-\item{...}{Other arguments passed to \link[stats:cor]{stats::cor} function.}
+\item{threshold}{Non-negative absolute correlation threshold. Values with
+absolute magnitude below this threshold are omitted from the sparse output.}
+
+\item{block_size}{Maximum number of target columns in each Pearson working
+block. The effective size may be reduced to honor \code{max_dense_bytes}.}
+
+\item{max_dense_bytes}{Maximum estimated bytes allowed for block-local
+Pearson working arrays or dense rank-correlation arrays. The default is
+\code{Inf} for backward compatibility. Supply a finite value to enable this
+guard.}
+
+\item{max_output_entries}{Maximum number of stored values allowed in the
+sparse result. The default, \code{Inf}, preserves the historical unbounded
+output behavior; set a finite value to fail before returning an output
+that exceeds the workflow's storage budget.}
+
+\item{...}{Other arguments passed to \code{\link[stats:cor]{stats::cor()}} for Spearman and Kendall
+correlations.}
 }
 \value{
-A correlation matrix.
+A sparse correlation matrix.
 }
 \description{
-Safe correlation function which returns a sparse matrix.
+Compute correlations from matrix-like input and return a sparse matrix.
+Pearson cross-products remain sparse and correlations are evaluated in
+column blocks so block-local working memory is bounded independently of the
+full output dimensions.
+}
+\details{
+Pearson input and cross-products remain sparse. Centering, scaling, and
+thresholding are fused in a column-block scan rather than materializing a
+dense correlation block. The final sparse result can nevertheless contain
+up to \code{ncol(x) * ncol(y)} stored values when \code{threshold = 0}; use \code{threshold}
+and \code{max_output_entries} to make this boundary explicit.
+
+Spearman and Kendall correlation require ranking and currently densify the
+input and full correlation result. Their estimated peak working size is
+checked against \code{max_dense_bytes} before conversion.
 }
 \examples{
 m1 <- simulate_sparse_matrix(
