@@ -1,6 +1,6 @@
-test_that("run_dense_topk_by_column orders ties and missing values", {
+test_that("run_dense_topk orders ties and missing values", {
   mat <- matrix(c(2, NA, 2, 1, 4, 4), nrow = 3)
-  result <- run_dense_topk_by_column(mat, k = 3, decreasing = TRUE)
+  result <- run_dense_topk(mat, k = 3, by = "col")
 
   expect_identical(result$idx[1, ], c(1L, 3L, 2L))
   expect_equal(result$value[1, ], c(2, 2, NA_real_))
@@ -8,11 +8,21 @@ test_that("run_dense_topk_by_column orders ties and missing values", {
   expect_equal(result$value[2, ], c(4, 4, 1))
 })
 
-test_that("run_dense_topk_by_column pads results beyond available rows", {
-  result <- run_dense_topk_by_column(matrix(c(2, 1), nrow = 2), k = 3)
+test_that("run_dense_topk pads results beyond the selected dimension", {
+  result <- run_dense_topk(matrix(c(2, 1), nrow = 2), k = 3)
 
-  expect_identical(result$idx[1, ], c(2L, 1L, NA_integer_))
-  expect_equal(result$value[1, ], c(1, 2, NA_real_))
+  expect_identical(result$idx[1, ], c(1L, 2L, NA_integer_))
+  expect_equal(result$value[1, ], c(2, 1, NA_real_))
+})
+
+test_that("run_dense_topk supports row-wise selection", {
+  mat <- matrix(c(3, 1, 2, 4, 6, 5), nrow = 2, byrow = TRUE)
+  result <- run_dense_topk(mat, k = 2, by = "row")
+
+  expect_identical(result$idx[1, ], c(1L, 3L))
+  expect_equal(result$value[1, ], c(3, 2))
+  expect_identical(result$idx[2, ], c(2L, 3L))
+  expect_equal(result$value[2, ], c(6, 5))
 })
 
 test_that("run_sparse_topk includes implicit zeros by column", {
@@ -79,9 +89,10 @@ test_that("sparse and dense top-k have matching matrix semantics", {
       by = "col",
       decreasing = decreasing
     )
-    dense_result <- run_dense_topk_by_column(
+    dense_result <- run_dense_topk(
       dense,
       k = 4,
+      by = "col",
       decreasing = decreasing
     )
     expect_identical(sparse_result$idx, dense_result$idx)
@@ -109,7 +120,7 @@ test_that("legacy sparse top-k preserves stored-entry behavior", {
 })
 
 test_that("top-k helpers reject non-positive k", {
-  expect_error(run_dense_topk_by_column(matrix(1), k = 0), "positive")
+  expect_error(run_dense_topk(matrix(1), k = 0), "positive")
   expect_error(
     run_sparse_topk(
       Matrix::sparseMatrix(i = 1, j = 1, x = 1, dims = c(1, 1)),
@@ -119,8 +130,10 @@ test_that("top-k helpers reject non-positive k", {
   )
 })
 
-test_that("sparse top-k validates the selection direction", {
+test_that("top-k helpers validate the selection direction", {
   mat <- Matrix::sparseMatrix(i = 1, j = 1, x = 1, dims = c(1, 1))
+  expect_error(run_dense_topk(matrix(1), k = 1, by = "column"), "arg")
+  expect_error(run_dense_topk(matrix(1), k = 1, by = "layer"), "arg")
   expect_error(run_sparse_topk(mat, k = 1, by = "column"), "arg")
   expect_error(run_sparse_topk(mat, k = 1, by = "layer"), "arg")
   expect_error(run_sparse_topk_stored(mat, k = 1, by = "layer"), "arg")
