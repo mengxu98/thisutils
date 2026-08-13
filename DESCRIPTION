@@ -2,13 +2,13 @@ Type: Package
 Package: thisutils
 Title: Reliable Utilities for Reusable Research Workflows
 Version: 0.5.0
-Date: 2026-08-10
+Date: 2026-08-13
 Authors@R:
     c(
-    person(given = "Xu", family = "Meng", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054")),
+    person(given = "Meng", family = "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054")),
     person(given = "Haoliang", family = "Zhu", email = "hurry060215@gmail.com", role = c("aut"), comment = c(ORCID = "0009-0004-9766-5179"))
     )
-Maintainer: Xu Meng <mengxu98@qq.com>
+Maintainer: Meng Xu <mengxu98@qq.com>
 Description: Provides reusable building blocks for research packages across
     matrix representation, numerical computation, neighborhood evaluation,
     controlled execution, and runtime interoperability. Core tools preserve

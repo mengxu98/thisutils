@@ -2,9 +2,9 @@
 
 0 errors | 0 warnings | 0 notes
 
-* This is a new release.
+* This is an update to version 0.4.9.
 
-* Resubmission: 0.4.8 only failed the incoming pretest because of a
-  win-builder infrastructure issue (new R-devel API check could not find
-  `cc` on `PATH`), now fixed at the CRAN end and confirmed on the
-  R-package-devel mailing list.
+## Reverse dependencies
+
+The two CRAN reverse imports, inferCSN 1.2.0 and thisplot 0.4.3, were checked
+against thisutils 0.5.0. Both completed with status OK, with no new problems.
