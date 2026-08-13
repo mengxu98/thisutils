@@ -60,4 +60,6 @@ GitHub packages are normally installed with \code{pak}. If \code{pak} cannot
 parse a GitHub package's \code{DESCRIPTION} file, \code{check_r()} retries that package
 with the optional \code{remotes} package. This preserves the fast dependency
 resolution path while supporting legacy repositories with malformed metadata.
+When \code{PKG_SUBPROCESS_TIMEOUT} is unset, the pak subprocess startup window is
+temporarily increased to 30 seconds and restored before returning.
 }
