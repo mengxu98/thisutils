@@ -1,14 +1,15 @@
 # thisutils 0.5.0
 
 * **compatibility**:
-  * Preserve the historical `matrix_to_table(keep_zero = TRUE)` and
-    `run_dense_topk_by_column(decreasing = FALSE)` defaults. Compact table
-    output and decreasing dense top-k remain explicit choices.
+  * Preserve the historical `matrix_to_table(keep_zero = TRUE)` default.
+    Compact table output remains an explicit choice.
   * Preserve the stored-entry semantics and zero-value padding of
     `run_sparse_topk_by_column()`. The new `run_sparse_topk()` includes implicit
     sparse zeros by default so it matches ordinary dense-matrix semantics.
 
 * **feat**:
+  * Add `run_dense_topk()` with an explicit `by = "col"` or `by = "row"`
+    direction and a decreasing top-k default.
   * Add `run_sparse_topk()` and `run_sparse_topk_stored()` with an explicit
     `by = "col"` or `by = "row"` direction. The earlier column-wise names
     remain available as compatibility wrappers.

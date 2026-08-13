@@ -4,7 +4,7 @@
 #' For each column or row of a sparse `dgCMatrix`, extract the top `k` matrix
 #' elements and their indices. By default, unstored positions participate with
 #' their matrix value of zero. For column-wise selection, this gives the same
-#' semantics as [run_dense_topk_by_column()].
+#' semantics as [run_dense_topk()].
 #'
 #' @md
 #' @param x A `dgCMatrix` (or something coercible to one).
@@ -148,35 +148,53 @@ run_sparse_stored_topk_by_column <- function(x, k, decreasing = TRUE) {
   )
 }
 
-#' @title Dense matrix top-k by column
+#' @title Dense matrix top-k selection
 #'
 #' @description
-#' For each column of a dense numeric matrix, extract the top `k` entries
-#' (rows and values) sorted by value.
+#' For each column or row of a dense numeric matrix, extract the top `k`
+#' elements and their indices. The default returns the largest values; set
+#' `decreasing = FALSE` to retain the smallest values, as in nearest-neighbor
+#' selection from a distance matrix.
 #'
 #' @md
 #' @param x A numeric matrix (or something coercible to one).
-#' @param k Number of top entries to retain per column. Must be a positive
+#' @param k Number of entries to retain per column or row. Must be a positive
 #'   integer.
+#' @param by Direction of selection: `"col"` ranks row entries independently
+#'   within each column, while `"row"` ranks column entries independently within
+#'   each row.
 #' @param decreasing Whether to sort in decreasing order (largest values
-#'   first). Default is `FALSE` for backward compatibility.
+#'   first). Default is `TRUE`.
 #'
 #' @return A list with two components:
 #' \describe{
-#'   \item{idx}{Integer matrix (`ncol × k`) of 1-based row indices.}
-#'   \item{value}{Numeric matrix (`ncol × k`) of corresponding values.}
+#'   \item{idx}{Integer matrix of 1-based indices into the opposite dimension.}
+#'   \item{value}{Numeric matrix of corresponding values.}
 #' }
+#' Both matrices have `ncol(x)` rows when `by = "col"` and `nrow(x)` rows
+#' when `by = "row"`.
 #'
 #' @export
 #'
 #' @examples
 #' m <- matrix(rnorm(100), nrow = 10)
-#' run_dense_topk_by_column(m, k = 3)
-run_dense_topk_by_column <- function(x, k, decreasing = FALSE) {
+#' run_dense_topk(m, k = 3, by = "col")
+#' run_dense_topk(m, k = 3, by = "row")
+#' run_dense_topk(m, k = 3, by = "col", decreasing = FALSE)
+run_dense_topk <- function(
+  x,
+  k,
+  by = c("col", "row"),
+  decreasing = TRUE
+) {
   if (!is.matrix(x)) {
     x <- as.matrix(x)
   }
   storage.mode(x) <- "double"
+  by <- match.arg(by)
+  if (identical(by, "row")) {
+    x <- t(x)
+  }
   dense_topk_by_column(
     mat = x,
     k = as.integer(k),

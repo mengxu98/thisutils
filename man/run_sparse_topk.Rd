@@ -43,7 +43,7 @@ when \code{by = "row"}.
 For each column or row of a sparse \code{dgCMatrix}, extract the top \code{k} matrix
 elements and their indices. By default, unstored positions participate with
 their matrix value of zero. For column-wise selection, this gives the same
-semantics as \code{\link[=run_dense_topk_by_column]{run_dense_topk_by_column()}}.
+semantics as \code{\link[=run_dense_topk]{run_dense_topk()}}.
 }
 \examples{
 m <- Matrix::rsparsematrix(10, 20, density = 0.3)

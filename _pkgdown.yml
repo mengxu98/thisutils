@@ -56,7 +56,7 @@ reference:
   - filter_nonzero_variance_features
   - matrix_to_table
   - pearson_correlation
-  - run_dense_topk_by_column
+  - run_dense_topk
   - run_sparse_topk
   - run_sparse_topk_stored
   - sparse_cor
