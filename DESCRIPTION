@@ -1,8 +1,8 @@
 Type: Package
 Package: thisutils
 Title: Reliable Utilities for Reusable Research Workflows
-Version: 0.5.0
-Date: 2026-08-13
+Version: 0.5.1
+Date: 2026-08-28
 Authors@R:
     c(
     person(given = "Meng", family = "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054")),

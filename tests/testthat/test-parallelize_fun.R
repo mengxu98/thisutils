@@ -451,6 +451,37 @@ test_that("seed restores the caller random-number state", {
   )
 })
 
+test_that("seed restores caller state after a PSOCK timeout", {
+  local_parallel_test_workers()
+  set.seed(654)
+  state_before <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
+
+  condition <- tryCatch(
+    suppressMessages(
+      parallelize_fun(
+        1:2,
+        function(i) {
+          runif(1)
+          Sys.sleep(5)
+          i
+        },
+        cores = 2,
+        backend = "psock",
+        timeout = 0.2,
+        seed = 42,
+        verbose = FALSE
+      )
+    ),
+    error = identity
+  )
+
+  expect_s3_class(condition, "parallelize_timeout")
+  expect_identical(
+    get(".Random.seed", envir = globalenv(), inherits = FALSE),
+    state_before
+  )
+})
+
 test_that("seeded results remain stable when some inputs fail", {
   local_parallel_test_workers(workers = 4L)
   worker <- function(i) {
@@ -567,10 +598,47 @@ test_that("parallelize_fun resolves a supplied closure before PSOCK serializatio
     function(x) x + offset
   })
   result <- suppressMessages(
-    parallelize_fun(1:6, add_offset, cores = 2, verbose = FALSE)
+    parallelize_fun(
+      1:6,
+      add_offset,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
   )
 
   expect_identical(unname(unlist(result)), 12:17)
+})
+
+test_that("repeated PSOCK calls use the latest closure state", {
+  local_parallel_test_workers()
+  worker_env <- new.env(parent = baseenv())
+  worker_env$offset <- 10L
+  worker <- function(x) x + offset
+  environment(worker) <- worker_env
+
+  first <- suppressMessages(
+    parallelize_fun(
+      1:4,
+      worker,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+  worker_env$offset <- 100L
+  second <- suppressMessages(
+    parallelize_fun(
+      1:4,
+      worker,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(unname(unlist(first)), 11:14)
+  expect_identical(unname(unlist(second)), 101:104)
 })
 
 test_that("parallelize_fun reuses PSOCK workers", {
@@ -586,6 +654,155 @@ test_that("parallelize_fun reuses PSOCK workers", {
   )
 
   expect_lte(length(unique(unlist(worker_pids))), 2L)
+})
+
+test_that("completed PSOCK calls leave no worker processes", {
+  local_parallel_test_workers()
+  pid_base <- tempfile("thisutils-completed-worker-")
+  on.exit(unlink(Sys.glob(paste0(pid_base, ".*"))), add = TRUE)
+  worker <- local({
+    path <- pid_base
+    function(i) {
+      file.create(paste0(path, ".", Sys.getpid()))
+      i
+    }
+  })
+
+  result <- suppressMessages(
+    parallelize_fun(
+      1:8,
+      worker,
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  worker_files <- Sys.glob(paste0(pid_base, ".*"))
+  worker_pids <- as.integer(substring(worker_files, nchar(pid_base) + 2L))
+  expect_identical(unname(unlist(result)), 1:8)
+  expect_length(worker_pids, 2L)
+  expect_length(
+    parallel_wait_for_workers(worker_pids, timeout = 1),
+    0L
+  )
+})
+
+test_that("PSOCK worker closures do not capture task inputs", {
+  inputs <- lapply(seq_len(4L), function(i) {
+    rep.int(as.raw(i), 256L * 1024L)
+  })
+  worker_fun <- function(x) length(x)
+  environment(worker_fun) <- list2env(
+    list(),
+    parent = baseenv()
+  )
+  worker_task <- parallel_make_psock_worker_task(worker_fun)
+
+  expect_identical(
+    ls(environment(worker_task), all.names = TRUE),
+    "fun"
+  )
+  expect_identical(
+    unname(unlist(worker_task(2:3, inputs[2:3], NULL))),
+    rep(256L * 1024L, 2L)
+  )
+  expect_lt(length(serialize(worker_task, NULL)), 100 * 1024)
+})
+
+test_that("nested PSOCK support uses a compact self-contained function", {
+  nested_parallelize <- parallel_make_nested_parallelize_fun()
+  nested_env <- environment(nested_parallelize)
+
+  expect_true(is.function(nested_parallelize))
+  expect_true(all(c(
+    "parallelize_fun",
+    "parallel_worker_depth",
+    "parallel_validate_timeout",
+    "parallel_elapsed",
+    "cores_detect"
+  ) %in% ls(nested_env, all.names = TRUE)))
+  expect_lt(length(serialize(nested_parallelize, NULL)), 100 * 1024)
+
+  old_options <- options(thisutils.parallel.depth = 1L)
+  on.exit(options(old_options), add = TRUE)
+  result <- nested_parallelize(
+    1:3,
+    identity,
+    cores = 2L,
+    backend = "psock",
+    verbose = FALSE,
+    progress = FALSE
+  )
+
+  expect_identical(unname(unlist(result)), 1:3)
+})
+
+test_that("task batches suppress worker messages and warnings", {
+  worker_task <- parallel_make_psock_worker_task(
+    function(x) {
+      message("worker message")
+      warning("worker warning")
+      x
+    }
+  )
+  messages <- capture.output(
+    result <- suppressWarnings(worker_task(1:3, 1:3, NULL)),
+    type = "message"
+  )
+
+  expect_length(messages, 0L)
+  expect_identical(unname(unlist(result)), 1:3)
+})
+
+test_that("PSOCK suppresses worker conditions across multi-input batches", {
+  local_parallel_test_workers()
+  messages <- character()
+  warnings <- character()
+
+  result <- withCallingHandlers(
+    parallelize_fun(
+      seq_len(40L),
+      function(i) {
+        message("worker message ", i)
+        warning("worker warning ", i)
+        i
+      },
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    ),
+    message = function(condition) {
+      messages <<- c(messages, conditionMessage(condition))
+      invokeRestart("muffleMessage")
+    },
+    warning = function(condition) {
+      warnings <<- c(warnings, conditionMessage(condition))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_identical(unname(unlist(result)), seq_len(40L))
+  expect_length(messages, 0L)
+  expect_length(warnings, 0L)
+})
+
+test_that("local PSOCK workers use native serialization", {
+  observed <- NULL
+  fake_cluster <- structure(list(), class = c("SOCKcluster", "cluster"))
+  testthat::local_mocked_bindings(
+    makePSOCKcluster = function(...) {
+      observed <<- list(...)
+      fake_cluster
+    },
+    .package = "parallel"
+  )
+
+  cl <- make_parallel_psock_cluster(2L)
+  on.exit(remove_parallel_cluster_tempdir(cl), add = TRUE)
+
+  expect_identical(observed[[1L]], 2L)
+  expect_false(observed[["useXDR"]])
 })
 
 test_that("parallelize_fun supports explicit fork and PSOCK backends", {
@@ -944,6 +1161,51 @@ test_that("nested PSOCK calls resolve parallelize_fun in global closures", {
   expect_identical(unname(result), list(2:4, 3:5, 4:6, 5:7))
 })
 
+test_that("nested PSOCK calls work from source-only global environments", {
+  skip_on_covr()
+  source_files <- sort(list.files(
+    testthat::test_path("..", "..", "R"),
+    pattern = "[.]R$",
+    full.names = TRUE
+  ))
+  skip_if_not(
+    length(source_files) > 0L,
+    "package source files are unavailable in the installed test tree"
+  )
+
+  result <- callr::r(
+    function(source_files) {
+      for (path in source_files) {
+        sys.source(path, envir = globalenv())
+      }
+      worker <- function(i) {
+        unname(unlist(get("parallelize_fun", envir = globalenv())(
+          1:3,
+          function(j) i + j,
+          cores = 2,
+          backend = "psock",
+          verbose = FALSE,
+          progress = FALSE
+        )))
+      }
+      environment(worker) <- globalenv()
+
+      get("parallelize_fun", envir = globalenv())(
+        1:4,
+        worker,
+        cores = 2,
+        backend = "psock",
+        verbose = FALSE,
+        progress = FALSE
+      )
+    },
+    args = list(source_files = source_files),
+    libpath = .libPaths()
+  )
+
+  expect_identical(unname(result), list(2:4, 3:5, 4:6, 5:7))
+})
+
 test_that("worker depth is scoped to each task", {
   local_parallel_test_workers()
   old_options <- options(thisutils.parallel.depth = NULL)
@@ -965,6 +1227,57 @@ test_that("worker depth is scoped to each task", {
 
   expect_identical(unname(unlist(depths)), rep(1L, 8L))
   expect_null(getOption("thisutils.parallel.depth"))
+})
+
+test_that("worker depth is isolated between tasks in the same batch", {
+  local_parallel_test_workers()
+
+  depths <- suppressMessages(
+    parallelize_fun(
+      seq_len(40L),
+      function(i) {
+        depth <- getOption("thisutils.parallel.depth", 0L)
+        options(thisutils.parallel.depth = 99L)
+        depth
+      },
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(unname(unlist(depths)), rep(1L, 40L))
+})
+
+test_that("failed tasks do not leak worker state within a batch", {
+  local_parallel_test_workers()
+  failed_indices <- c(7L, 14L, 21L, 28L, 35L)
+
+  result <- suppressMessages(
+    parallelize_fun(
+      seq_len(40L),
+      function(i) {
+        depth <- getOption("thisutils.parallel.depth", 0L)
+        options(thisutils.parallel.depth = 99L)
+        if (i %% 7L == 0L) stop("expected batch failure")
+        depth
+      },
+      cores = 2,
+      backend = "psock",
+      verbose = FALSE
+    )
+  )
+
+  expect_identical(
+    unname(unlist(result[-failed_indices])),
+    rep(1L, 35L)
+  )
+  for (i in failed_indices) {
+    expect_s3_class(result[[i]], "parallelize_error")
+    expect_identical(result[[i]]$index, i)
+    expect_identical(result[[i]]$input, i)
+    expect_identical(result[[i]]$error, "expected batch failure")
+  }
 })
 
 test_that("an interrupted PSOCK call cleans workers and can be followed by another call", {
@@ -1125,6 +1438,29 @@ test_that("verbose error reporting groups repeated failures", {
   expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
 })
 
+test_that("verbose error reporting caps distinct error details", {
+  messages <- character()
+  result <- withCallingHandlers(
+    parallelize_fun(
+      seq_len(30L),
+      function(x) stop(sprintf("unique failure %02d", x)),
+      cores = 1,
+      verbose = TRUE,
+      progress = FALSE,
+      timestamp_format = ""
+    ),
+    message = function(m) {
+      messages <<- c(messages, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    },
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  combined <- cli::ansi_strip(paste(messages, collapse = "\n"))
+  expect_match(combined, "10 additional distinct error types omitted", fixed = TRUE)
+  expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
+})
+
 test_that("verbose error reporting summarizes structured named inputs", {
   messages <- character()
   tasks <- list(
@@ -1211,7 +1547,7 @@ test_that("a worker returning an invalid batch raises a worker error", {
   local_parallel_test_workers()
 
   testthat::local_mocked_bindings(
-    parallel_psock_worker_task = function(indices) 42L,
+    parallel_psock_worker_task = function(indices, values, rng_streams) 42L,
     .package = "thisutils"
   )
 
@@ -1388,4 +1724,43 @@ test_that("cores_detect handles missing sessions and degenerate hardware", {
   )
 
   expect_identical(cores_detect(cores = 2, num_session = 4), 1L)
+})
+
+test_that("verbose error reporting survives multi-element list inputs", {
+  # Regression: the task label used to evaluate the raw input list inline, so
+  # a five-element list grew the message text to length five and crashed the
+  # grepl-based replacement loop before error details were reported.
+  modules <- lapply(
+    paste0("TF", seq_len(4)),
+    function(tf) {
+      list(
+        tf = tf,
+        genes = paste0("G", seq_len(40)),
+        context = "weight>75%",
+        regulation = 1L,
+        suffix = "(+)"
+      )
+    }
+  )
+
+  messages <- character()
+  result <- withCallingHandlers(
+    parallelize_fun(
+      modules,
+      function(x) stop("worker failure"),
+      cores = 1,
+      verbose = TRUE,
+      progress = FALSE,
+      timestamp_format = ""
+    ),
+    message = function(m) {
+      messages <<- c(messages, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    },
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  combined <- paste(messages, collapse = "\n")
+  expect_true(grepl("worker failure", combined, fixed = TRUE))
+  expect_true(all(vapply(result, inherits, logical(1), "parallelize_error")))
 })
