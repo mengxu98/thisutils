@@ -1659,6 +1659,9 @@ replace_expressions <- function(text, env) {
 
       match <- substr(text, start_pos, start_pos + match_length - 1)
       replacement <- process_match(match, env)
+      if (length(replacement) != 1) {
+        replacement <- paste(replacement, collapse = " ")
+      }
 
       text <- paste0(
         substr(text, 1, start_pos - 1),
