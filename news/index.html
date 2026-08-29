@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,24 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.5.0" id="thisutils-050">thisutils 0.5.0<a class="anchor" aria-label="anchor" href="#thisutils-050"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.5.1" id="thisutils-051">thisutils 0.5.1<a class="anchor" aria-label="anchor" href="#thisutils-051"></a></h2>
+<ul><li>
+<strong>performance</strong>:
+<ul><li>Evaluate each scheduled task batch behind one message sink instead of opening and closing a connection for every input.</li>
+<li>Set nested-worker state once per scheduled batch, resetting it only after inputs that mutate the internal option, instead of updating options around every input.</li>
+<li>Minimize PSOCK worker closures, remove source references from worker-only function copies, and use native serialization for same-host workers.</li>
+<li>Bundle nested-call helpers into one compact PSOCK export instead of sending each internal function separately.</li>
+<li>Send each PSOCK batch only its assigned input values and random-number streams instead of copying the complete task list to every worker.</li>
+<li>Skip lifecycle logging entirely for <code>verbose = FALSE</code> calls.</li>
+<li>Limit verbose formatting to the first 20 distinct error types while retaining every error object in the returned results.</li>
+</ul></li>
+<li>
+<strong>fix</strong>:
+<ul><li>Collapse multi-element inline expression evaluations to a single string in <code><a href="../reference/parse_inline_expressions.html">parse_inline_expressions()</a></code>. Vector-valued evaluations previously grew the message text beyond length one and crashed the <code>grepl</code>-based replacement loop with <code>'length = N' in coercion to 'logical(1)'</code> before the real error details could be reported.</li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="thisutils-050">thisutils 0.5.0<a class="anchor" aria-label="anchor" href="#thisutils-050"></a></h2><p class="text-muted">CRAN release: 2026-08-21</p>
 <ul><li>
 <strong>compatibility</strong>:
 <ul><li>Preserve the historical <code>matrix_to_table(keep_zero = TRUE)</code> default. Compact table output remains an explicit choice.</li>

@@ -1,6 +1,36 @@
 # Changelog
 
+## thisutils 0.5.1
+
+- **performance**:
+  - Evaluate each scheduled task batch behind one message sink instead
+    of opening and closing a connection for every input.
+  - Set nested-worker state once per scheduled batch, resetting it only
+    after inputs that mutate the internal option, instead of updating
+    options around every input.
+  - Minimize PSOCK worker closures, remove source references from
+    worker-only function copies, and use native serialization for
+    same-host workers.
+  - Bundle nested-call helpers into one compact PSOCK export instead of
+    sending each internal function separately.
+  - Send each PSOCK batch only its assigned input values and
+    random-number streams instead of copying the complete task list to
+    every worker.
+  - Skip lifecycle logging entirely for `verbose = FALSE` calls.
+  - Limit verbose formatting to the first 20 distinct error types while
+    retaining every error object in the returned results.
+- **fix**:
+  - Collapse multi-element inline expression evaluations to a single
+    string in
+    [`parse_inline_expressions()`](https://mengxu98.github.io/thisutils/reference/parse_inline_expressions.md).
+    Vector-valued evaluations previously grew the message text beyond
+    length one and crashed the `grepl`-based replacement loop with
+    `'length = N' in coercion to 'logical(1)'` before the real error
+    details could be reported.
+
 ## thisutils 0.5.0
+
+CRAN release: 2026-08-21
 
 - **compatibility**:
   - Preserve the historical `matrix_to_table(keep_zero = TRUE)` default.

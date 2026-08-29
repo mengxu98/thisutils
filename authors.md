@@ -13,13 +13,13 @@ Source:
 [`DESCRIPTION`](https://github.com/mengxu98/thisutils/blob/main/DESCRIPTION)
 
 Xu M, Zhu H (2026). *thisutils: Reliable Utilities for Reusable Research
-Workflows*. R package version 0.5.0,
+Workflows*. R package version 0.5.1,
 <https://mengxu98.github.io/thisutils/>.
 
     @Manual{,
       title = {thisutils: Reliable Utilities for Reusable Research Workflows},
       author = {Meng Xu and Haoliang Zhu},
       year = {2026},
-      note = {R package version 0.5.0},
+      note = {R package version 0.5.1},
       url = {https://mengxu98.github.io/thisutils/},
     }
