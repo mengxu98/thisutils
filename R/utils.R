@@ -37,6 +37,8 @@
 #' @return `a` if it is not `NULL` and has length greater than zero,
 #' otherwise `b`.
 #'
+#' @name grapes-or-or-or-grapes
+#'
 #' @export
 #'
 #' @examples
