@@ -11,6 +11,14 @@ test_that("%ss% returns right side when left is NULL", {
   expect_equal(NULL %ss% NULL, NULL)
 })
 
+test_that("%|||% treats NULL and empty values as missing", {
+  expect_equal(NULL %|||% 10, 10)
+  expect_equal(character(0) %|||% "fallback", "fallback")
+  expect_equal(list() %|||% 1, 1)
+  expect_equal(5 %|||% 10, 5)
+  expect_equal("a" %|||% "b", "a")
+})
+
 test_that("get_namespace_fun returns function from namespace", {
   fn <- get_namespace_fun("base", "mean")
   expect_true(is.function(fn))

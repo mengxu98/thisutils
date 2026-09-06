@@ -52,6 +52,9 @@ reference:
   - as_matrix
   - check_sparsity
   - collapse_sparse_rows
+  - col_maxs
+  - row_maxs
+  - fast_aggregate
   - fast_row_vars
   - filter_nonzero_variance_features
   - matrix_to_table
@@ -85,6 +88,8 @@ reference:
 - subtitle: "Additional statistical and utility helpers"
 - contents:
   - '%ss%'
+  - '%|||%'
+  - aggregate_matrix
   - capitalize
   - check_ci_env
   - download

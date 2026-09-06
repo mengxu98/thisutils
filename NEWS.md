@@ -1,4 +1,11 @@
-# thisutils 0.5.1
+# thisutils 0.5.2
+
+* **feat**:
+  * Add `%|||%` for `NULL` or zero-length fallbacks. `%ss%` remains
+    `NULL`-only so it does not mask rlang `%||%`.
+  * Add `col_maxs()`, `row_maxs()`, `fast_aggregate()`, and
+    `aggregate_matrix()` for dense and sparse matrices. Sparse maxima treat
+    implicit zeros as zero.
 
 * **performance**:
   * Evaluate each scheduled task batch behind one message sink instead of
