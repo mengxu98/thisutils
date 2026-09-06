@@ -29,6 +29,12 @@
   : Check sparsity of matrix
 - [`collapse_sparse_rows()`](https://mengxu98.github.io/thisutils/reference/collapse_sparse_rows.md)
   : Collapse sparse matrix rows by group
+- [`col_maxs()`](https://mengxu98.github.io/thisutils/reference/col_maxs.md)
+  : Column maxima
+- [`row_maxs()`](https://mengxu98.github.io/thisutils/reference/row_maxs.md)
+  : Row maxima
+- [`fast_aggregate()`](https://mengxu98.github.io/thisutils/reference/fast_aggregate.md)
+  : Fast sparse aggregation
 - [`fast_row_vars()`](https://mengxu98.github.io/thisutils/reference/fast_row_vars.md)
   : Compute row variances
 - [`filter_nonzero_variance_features()`](https://mengxu98.github.io/thisutils/reference/filter_nonzero_variance_features.md)
@@ -83,6 +89,10 @@
 
 - [`` `%ss%` ``](https://mengxu98.github.io/thisutils/reference/grapes-ss-grapes.md)
   : Value selection operator
+- [`` `%|||%` ``](https://mengxu98.github.io/thisutils/reference/grapes-or-or-or-grapes.md)
+  : Empty-value selection operator
+- [`aggregate_matrix()`](https://mengxu98.github.io/thisutils/reference/aggregate_matrix.md)
+  : Aggregate matrix over groups
 - [`capitalize()`](https://mengxu98.github.io/thisutils/reference/capitalize.md)
   : Capitalize the first letter of each word
 - [`check_ci_env()`](https://mengxu98.github.io/thisutils/reference/check_ci_env.md)

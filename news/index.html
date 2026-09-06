@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,8 +40,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.5.1" id="thisutils-051">thisutils 0.5.1<a class="anchor" aria-label="anchor" href="#thisutils-051"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.5.2" id="thisutils-052">thisutils 0.5.2<a class="anchor" aria-label="anchor" href="#thisutils-052"></a></h2>
 <ul><li>
+<strong>feat</strong>:
+<ul><li>Add <code>%|||%</code> for <code>NULL</code> or zero-length fallbacks. <code>%ss%</code> remains <code>NULL</code>-only so it does not mask rlang <code>%||%</code>.</li>
+<li>Add <code><a href="../reference/col_maxs.html">col_maxs()</a></code>, <code><a href="../reference/row_maxs.html">row_maxs()</a></code>, <code><a href="../reference/fast_aggregate.html">fast_aggregate()</a></code>, and <code><a href="../reference/aggregate_matrix.html">aggregate_matrix()</a></code> for dense and sparse matrices. Sparse maxima treat implicit zeros as zero.</li>
+</ul></li>
+<li>
 <strong>performance</strong>:
 <ul><li>Evaluate each scheduled task batch behind one message sink instead of opening and closing a connection for every input.</li>
 <li>Set nested-worker state once per scheduled batch, resetting it only after inputs that mutate the internal option, instead of updating options around every input.</li>

@@ -1,7 +1,18 @@
 # Changelog
 
-## thisutils 0.5.1
+## thisutils 0.5.2
 
+- **feat**:
+  - Add `%|||%` for `NULL` or zero-length fallbacks. `%ss%` remains
+    `NULL`-only so it does not mask rlang `%||%`.
+  - Add
+    [`col_maxs()`](https://mengxu98.github.io/thisutils/reference/col_maxs.md),
+    [`row_maxs()`](https://mengxu98.github.io/thisutils/reference/row_maxs.md),
+    [`fast_aggregate()`](https://mengxu98.github.io/thisutils/reference/fast_aggregate.md),
+    and
+    [`aggregate_matrix()`](https://mengxu98.github.io/thisutils/reference/aggregate_matrix.md)
+    for dense and sparse matrices. Sparse maxima treat implicit zeros as
+    zero.
 - **performance**:
   - Evaluate each scheduled task batch behind one message sink instead
     of opening and closing a connection for every input.

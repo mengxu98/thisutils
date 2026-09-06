@@ -53,7 +53,7 @@ f <- function() {
   }
 }
 f_evaluated <- try_get(expr = f())
-#> ℹ [2026-08-29 08:59:26] Value is larger than 0.5
+#> ℹ [2026-09-06 10:21:05] Value is larger than 0.5
 print(f_evaluated)
 #> [1] 0.6870228
 ```
