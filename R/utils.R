@@ -23,6 +23,34 @@
   }
 }
 
+#' @title Empty-value selection operator
+#'
+#' @description
+#' Return the left side unless it is `NULL` or has length zero, otherwise
+#' return the right side. Use `%ss%` when only `NULL` should fall through;
+#' that matches the rlang `%||%` operator without masking it.
+#'
+#' @md
+#' @param a The left side value to check.
+#' @param b The right side value to use if `a` is `NULL` or length zero.
+#'
+#' @return `a` if it is not `NULL` and has length greater than zero,
+#' otherwise `b`.
+#'
+#' @export
+#'
+#' @examples
+#' NULL %|||% 10
+#' character(0) %|||% "fallback"
+#' 5 %|||% 10
+`%|||%` <- function(a, b) {
+  if (is.null(a) || !length(a)) {
+    b
+  } else {
+    a
+  }
+}
+
 #' @title Get a function from a namespace
 #'
 #' @md
