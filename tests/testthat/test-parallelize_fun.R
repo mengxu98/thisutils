@@ -1079,7 +1079,9 @@ test_that("single-core and parallel modes keep the same mixed-result contract", 
         1:8,
         function(x) {
           if (x %in% c(3L, 7L)) stop("expected failure")
-          if (x == 5L) return(NULL)
+          if (x == 5L) {
+            return(NULL)
+          }
           x * 2L
         },
         cores = cores,
@@ -1295,19 +1297,22 @@ test_that("an interrupted PSOCK call cleans workers and can be followed by anoth
   )
   on.exit(interrupter$kill(), add = TRUE)
 
-  interrupted <- tryCatch({
-    parallelize_fun(
-      1:4,
-      function(i) {
-        Sys.sleep(2)
-        i
-      },
-      cores = 2,
-      backend = "psock",
-      verbose = FALSE
-    )
-    NULL
-  }, interrupt = identity)
+  interrupted <- tryCatch(
+    {
+      parallelize_fun(
+        1:4,
+        function(i) {
+          Sys.sleep(2)
+          i
+        },
+        cores = 2,
+        backend = "psock",
+        verbose = FALSE
+      )
+      NULL
+    },
+    interrupt = identity
+  )
 
   expect_s3_class(interrupted, "interrupt")
   expect_length(getFromNamespace("children", "parallel")(), 0L)
@@ -1385,12 +1390,15 @@ test_that("an externally interrupted fork call reaps workers", {
     stdout = "|",
     stderr = "|"
   )
-  on.exit({
-    if (worker$is_alive()) {
-      worker$kill()
-    }
-    unlink(marker)
-  }, add = TRUE)
+  on.exit(
+    {
+      if (worker$is_alive()) {
+        worker$kill()
+      }
+      unlink(marker)
+    },
+    add = TRUE
+  )
 
   deadline <- Sys.time() + 20
   while (!file.exists(marker) && worker$is_alive() && Sys.time() < deadline) {
@@ -1681,12 +1689,15 @@ test_that("seed restores a clean random-number state", {
     rm(".Random.seed", envir = globalenv())
   }
   saved_kind <- RNGkind()
-  on.exit({
-    do.call(RNGkind, as.list(saved_kind))
-    if (has_seed) {
-      assign(".Random.seed", saved_seed, envir = globalenv())
-    }
-  }, add = TRUE)
+  on.exit(
+    {
+      do.call(RNGkind, as.list(saved_kind))
+      if (has_seed) {
+        assign(".Random.seed", saved_seed, envir = globalenv())
+      }
+    },
+    add = TRUE
+  )
 
   suppressMessages(
     parallelize_fun(

@@ -28,12 +28,13 @@
 #' simulate_sparse_matrix(10, 10, decimal = 1)
 #' simulate_sparse_matrix(10, 10, decimal = 5)
 simulate_sparse_matrix <- function(
-    nrow,
-    ncol,
-    sparsity = 0.95,
-    distribution_fun = function(n) stats::rpois(n, lambda = 0.5) + 1,
-    decimal = 0,
-    seed = 1) {
+  nrow,
+  ncol,
+  sparsity = 0.95,
+  distribution_fun = function(n) stats::rpois(n, lambda = 0.5) + 1,
+  decimal = 0,
+  seed = 1
+) {
   set.seed(seed)
 
   nnz <- round(nrow * ncol * (1 - sparsity))
@@ -79,7 +80,7 @@ simulate_sparse_matrix <- function(
 #' @export
 check_sparsity <- function(x) {
   total_counts <- prod(dim(x))
-  
+
   if (inherits(x, "sparseMatrix")) {
     non_zero_count <- Matrix::nnzero(x)
   } else {
@@ -148,10 +149,11 @@ r_square <- function(y_true, y_pred) {
 #' normalization(x, method = "unit_vector")
 #' normalization(x, method = "unit_vector", na_rm = FALSE)
 normalization <- function(
-    x,
-    method = "max_min",
-    na_rm = TRUE,
-    ...) {
+  x,
+  method = "max_min",
+  na_rm = TRUE,
+  ...
+) {
   method <- match.arg(
     method,
     c(
@@ -305,9 +307,10 @@ log2fc_matrix <- function(matrix) {
 #' m <- as_matrix(m)
 #' matrix_process(m, method = function(x) x / rowMeans(x))
 matrix_process <- function(
-    matrix,
-    method = c("raw", "zscore", "fc", "log2fc", "log1p"),
-    ...) {
+  matrix,
+  method = c("raw", "zscore", "fc", "log2fc", "log1p"),
+  ...
+) {
   if (is.function(method)) {
     matrix_processed <- method(matrix, ...)
   } else {

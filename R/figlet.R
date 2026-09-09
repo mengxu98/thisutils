@@ -24,12 +24,13 @@
 #' @examples
 #' figlet("thisutils")
 figlet <- function(
-    text,
-    font = "Slant",
-    width = getOption("width", 80),
-    justify = "left",
-    absolute = FALSE,
-    strip = TRUE) {
+  text,
+  font = "Slant",
+  width = getOption("width", 80),
+  justify = "left",
+  absolute = FALSE,
+  strip = TRUE
+) {
   font <- figlet_font(font)
   str <- .figlet_render(
     text,
@@ -47,12 +48,13 @@ figlet <- function(
 }
 
 .figlet_render <- function(
-    text,
-    font,
-    width = getOption("width", 80),
-    justify = "left",
-    absolute = FALSE,
-    strip = TRUE) {
+  text,
+  font,
+  width = getOption("width", 80),
+  justify = "left",
+  absolute = FALSE,
+  strip = TRUE
+) {
   if (any(grepl("\n", text, fixed = TRUE))) {
     text <- unlist(strsplit(text, "\n", fixed = TRUE))
   }
@@ -189,11 +191,12 @@ figlet <- function(
 }
 
 .figlet_render_layout <- function(
-    buffer,
-    hard_blank,
-    width,
-    justify,
-    absolute) {
+  buffer,
+  hard_blank,
+  width,
+  justify,
+  absolute
+) {
   if (is.list(buffer)) {
     template <- list(
       template = character(),
@@ -246,9 +249,10 @@ figlet <- function(
 }
 
 .figlet_render_layout_template <- function(
-    text, hard_blank,
-    offset_char = 0,
-    offset_text = 0) {
+  text, hard_blank,
+  offset_char = 0,
+  offset_text = 0
+) {
   pos <- apply(array(text %in% c(" ", hard_blank), dim(text)), 2, all)
   map <- c(1:9, letters, LETTERS)
   n <- cumsum(pos) + 1L + offset_char

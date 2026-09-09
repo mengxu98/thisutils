@@ -91,17 +91,18 @@
 #'   cor(as_matrix(m1), as_matrix(m2))
 #' )
 sparse_cor <- function(
-    x,
-    y = NULL,
-    method = c("pearson", "spearman", "kendall"),
-    allow_neg = TRUE,
-    remove_na = TRUE,
-    remove_inf = TRUE,
-    threshold = 0,
-    block_size = 256L,
-    max_dense_bytes = Inf,
-    max_output_entries = Inf,
-    ...) {
+  x,
+  y = NULL,
+  method = c("pearson", "spearman", "kendall"),
+  allow_neg = TRUE,
+  remove_na = TRUE,
+  remove_inf = TRUE,
+  threshold = 0,
+  block_size = 256L,
+  max_dense_bytes = Inf,
+  max_output_entries = Inf,
+  ...
+) {
   method <- match.arg(method)
   .validate_sparse_cor_controls(
     allow_neg = allow_neg,

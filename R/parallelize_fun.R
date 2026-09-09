@@ -152,17 +152,20 @@ parallelize_fun <- function(
   quiet_eval <- function(code) {
     message_sink <- file(nullfile(), open = "w")
     initial_sink <- sink.number(type = "message")
-    on.exit({
-      attempts <- 0L
-      while (
-        !identical(sink.number(type = "message"), initial_sink) &&
-          attempts < 100L
-      ) {
-        sink(type = "message")
-        attempts <- attempts + 1L
-      }
-      try(close(message_sink), silent = TRUE)
-    }, add = TRUE)
+    on.exit(
+      {
+        attempts <- 0L
+        while (
+          !identical(sink.number(type = "message"), initial_sink) &&
+            attempts < 100L
+        ) {
+          sink(type = "message")
+          attempts <- attempts + 1L
+        }
+        try(close(message_sink), silent = TRUE)
+      },
+      add = TRUE
+    )
     sink(message_sink, type = "message")
     suppressWarnings(force(code))
   }
@@ -404,17 +407,20 @@ parallel_psock_worker_task_template <- function(
   fun <- get("fun", envir = environment(), inherits = TRUE)
   message_sink <- file(nullfile(), open = "w")
   initial_sink <- sink.number(type = "message")
-  on.exit({
-    attempts <- 0L
-    while (
-      !identical(sink.number(type = "message"), initial_sink) &&
-        attempts < 100L
-    ) {
-      sink(type = "message")
-      attempts <- attempts + 1L
-    }
-    try(close(message_sink), silent = TRUE)
-  }, add = TRUE)
+  on.exit(
+    {
+      attempts <- 0L
+      while (
+        !identical(sink.number(type = "message"), initial_sink) &&
+          attempts < 100L
+      ) {
+        sink(type = "message")
+        attempts <- attempts + 1L
+      }
+      try(close(message_sink), silent = TRUE)
+    },
+    add = TRUE
+  )
   sink(message_sink, type = "message")
 
   depth <- suppressWarnings(
@@ -563,11 +569,14 @@ parallel_collect_results_cluster <- function(
     context$rng_streams <- rng_streams
     context$worker_task <- parallel_make_psock_worker_task(fun)
     .parallel_fork_contexts[[context_id]] <- context
-    on.exit({
-      if (exists(context_id, envir = .parallel_fork_contexts, inherits = FALSE)) {
-        rm(list = context_id, envir = .parallel_fork_contexts)
-      }
-    }, add = TRUE)
+    on.exit(
+      {
+        if (exists(context_id, envir = .parallel_fork_contexts, inherits = FALSE)) {
+          rm(list = context_id, envir = .parallel_fork_contexts)
+        }
+      },
+      add = TRUE
+    )
   }
 
   cl <- make_parallel_cluster(cores, backend)
@@ -933,10 +942,13 @@ parallel_worker_error <- function(pids = integer(), cause = NULL) {
 }
 
 terminate_parallel_cluster <- function(cl, worker_pids, force = FALSE) {
-  on.exit({
-    close_parallel_cluster_connections(cl)
-    remove_parallel_cluster_tempdir(cl)
-  }, add = TRUE)
+  on.exit(
+    {
+      close_parallel_cluster_connections(cl)
+      remove_parallel_cluster_tempdir(cl)
+    },
+    add = TRUE
+  )
 
   if (isTRUE(force)) {
     parallel_signal_workers(worker_pids, tools::SIGTERM)
@@ -1064,21 +1076,27 @@ make_parallel_psock_cluster <- function(cores) {
     stop("Unable to create a temporary directory for PSOCK workers.", call. = FALSE)
   }
   complete <- FALSE
-  on.exit({
-    if (!complete) {
-      unlink(launch_dir, recursive = TRUE, force = TRUE)
-    }
-  }, add = TRUE)
+  on.exit(
+    {
+      if (!complete) {
+        unlink(launch_dir, recursive = TRUE, force = TRUE)
+      }
+    },
+    add = TRUE
+  )
 
   old_tmpdir <- Sys.getenv("TMPDIR", unset = NA_character_)
   Sys.setenv(TMPDIR = launch_dir)
-  on.exit({
-    if (is.na(old_tmpdir)) {
-      Sys.unsetenv("TMPDIR")
-    } else {
-      Sys.setenv(TMPDIR = old_tmpdir)
-    }
-  }, add = TRUE)
+  on.exit(
+    {
+      if (is.na(old_tmpdir)) {
+        Sys.unsetenv("TMPDIR")
+      } else {
+        Sys.setenv(TMPDIR = old_tmpdir)
+      }
+    },
+    add = TRUE
+  )
 
   cl <- parallel::makePSOCKcluster(
     cores,
