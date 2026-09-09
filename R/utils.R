@@ -95,10 +95,11 @@ get_namespace_fun <- function(pkg, fun) {
 #' invoke_fun("f", list(x = 1, y = 2))
 #' invoke_fun("f", x = 1, y = 2)
 invoke_fun <- function(
-    .fn,
-    .args = list(),
-    ...,
-    .env = rlang::caller_env()) {
+  .fn,
+  .args = list(),
+  ...,
+  .env = rlang::caller_env()
+) {
   args <- c(.args, list(...))
   if (!length(args)) {
     if (rlang::is_scalar_character(.fn)) {
@@ -205,9 +206,10 @@ capitalize <- function(x, force_tolower = FALSE) {
 #' unnest_fun(data2, cols = "data")
 #' unnest_fun(data2, cols = "data", keep_empty = TRUE)
 unnest_fun <- function(
-    data,
-    cols,
-    keep_empty = FALSE) {
+  data,
+  cols,
+  keep_empty = FALSE
+) {
   if (nrow(data) == 0 || length(cols) == 0) {
     return(data)
   }
@@ -268,11 +270,12 @@ unnest_fun <- function(
 #' remove_space(multiline)
 #' remove_space(multiline, preserve_newlines = FALSE)
 remove_space <- function(
-    x,
-    trim_start = TRUE,
-    trim_end = FALSE,
-    collapse_multiple = TRUE,
-    preserve_newlines = TRUE) {
+  x,
+  trim_start = TRUE,
+  trim_end = FALSE,
+  collapse_multiple = TRUE,
+  preserve_newlines = TRUE
+) {
   if (is.null(x)) {
     return(NULL)
   }
@@ -367,10 +370,11 @@ remove_space <- function(
 #' f_evaluated <- try_get(expr = f())
 #' print(f_evaluated)
 try_get <- function(
-    expr,
-    max_tries = 5,
-    error_message = "",
-    retry_message = "Retrying...") {
+  expr,
+  max_tries = 5,
+  error_message = "",
+  retry_message = "Retrying..."
+) {
   out <- simpleError("start")
   ntry <- 0
   while (inherits(out, "error")) {
@@ -413,14 +417,15 @@ try_get <- function(
 #'
 #' @export
 download <- function(
-    url,
-    destfile,
-    methods = c(
-      "auto", "wget", "libcurl", "curl", "wininet", "internal"
-    ),
-    quiet = FALSE,
-    ...,
-    max_tries = 2) {
+  url,
+  destfile,
+  methods = c(
+    "auto", "wget", "libcurl", "curl", "wininet", "internal"
+  ),
+  quiet = FALSE,
+  ...,
+  max_tries = 2
+) {
   if (missing(url) || missing(destfile)) {
     log_message(
       "{.arg url} and {.arg destfile} must be both provided",
@@ -776,10 +781,11 @@ max_depth <- function(x, depth = 0) {
 #' x <- c(10, 20, NA, 15, 35)
 #' is_outlier(x, nmads = 2, type = "higher") # returns 3, 5
 is_outlier <- function(
-    x,
-    nmads = 2.5,
-    constant = 1.4826,
-    type = c("both", "lower", "higher")) {
+  x,
+  nmads = 2.5,
+  constant = 1.4826,
+  type = c("both", "lower", "higher")
+) {
   type <- match.arg(type, c("both", "lower", "higher"))
   mad <- stats::mad(x, constant = constant, na.rm = TRUE)
   upper <- stats::median(x, na.rm = TRUE) + nmads * mad

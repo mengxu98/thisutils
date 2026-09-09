@@ -13,13 +13,14 @@
 #'
 #' @export
 add_pkg_file <- function(
-    use_figlet = TRUE,
-    figlet_font = "Slant",
-    colors = c(
-      "red", "yellow", "green", "magenta", "cyan",
-      "yellow", "green", "white", "magenta", "cyan"
-    ),
-    verbose = TRUE) {
+  use_figlet = TRUE,
+  figlet_font = "Slant",
+  colors = c(
+    "red", "yellow", "green", "magenta", "cyan",
+    "yellow", "green", "white", "magenta", "cyan"
+  ),
+  verbose = TRUE
+) {
   desc_file <- "DESCRIPTION"
   pkgdown_file <- "_pkgdown.yml"
 
@@ -139,15 +140,16 @@ add_pkg_file <- function(
 }
 
 generate_content <- function(
-    pkg_name,
-    title,
-    pkg_description,
-    author_name,
-    author_email,
-    github_url,
-    ascii_lines,
-    colors,
-    src_exist = FALSE) {
+  pkg_name,
+  title,
+  pkg_description,
+  author_name,
+  author_email,
+  github_url,
+  ascii_lines,
+  colors,
+  src_exist = FALSE
+) {
   ascii_with_numbers <- add_ascii_numbers(
     ascii_lines,
     length(colors)
@@ -300,8 +302,9 @@ generate_content <- function(
 }
 
 add_ascii_numbers <- function(
-    ascii_lines,
-    num_colors) {
+  ascii_lines,
+  num_colors
+) {
   if (length(ascii_lines) == 0) {
     return("")
   }
@@ -316,8 +319,9 @@ add_ascii_numbers <- function(
 }
 
 generate_hexa <- function(
-    num_colors,
-    colors) {
+  num_colors,
+  colors
+) {
   symbols <- rep(c("*", ".", "o"), length.out = num_colors)
 
   code <- c(
@@ -350,8 +354,9 @@ generate_hexa <- function(
 }
 
 read_description <- function(
-    desc_file,
-    verbose) {
+  desc_file,
+  verbose
+) {
   if (!file.exists(desc_file)) {
     log_message(
       "DESCRIPTION file not found",

@@ -100,7 +100,8 @@ print.thisutils_logo <- function(x, ...) {
     version <- utils::packageVersion(pkgname)
     date <- utils::packageDate(pkgname)
     url <- utils::packageDescription(
-      pkgname, fields = "URL"
+      pkgname,
+      fields = "URL"
     )
 
     msg <- paste0(
