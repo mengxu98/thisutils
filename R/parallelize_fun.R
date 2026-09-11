@@ -117,7 +117,7 @@ parallelize_fun <- function(
   if (parallel_worker_depth() > 0L) {
     cores <- 1L
   }
-  cores <- cores_detect(cores, total)
+  cores <- detect_cores(cores = cores, num_session = total)
   has_names <- !is.null(names(x)) && any(names(x) != "")
   is_vector <- is.vector(x) && !is.list(x)
   show_values <- !has_names && is_vector
@@ -492,7 +492,7 @@ parallel_make_nested_parallelize_fun <- function() {
     "parallel_assert_total_time",
     "parallel_total_timeout_error",
     "parallel_elapsed",
-    "cores_detect"
+    "detect_cores"
   )
   nested_env <- new.env(parent = source_env)
 
@@ -1168,30 +1168,67 @@ parallel_progress_bar <- function(
   )
 }
 
-cores_detect <- function(
-  cores = 1,
-  num_session = NULL
+#' @title Detect the number of CPU cores
+#'
+#' @md
+#' @inheritParams log_message
+#' @param cores Requested number of workers. Only used when `num_session` is
+#' supplied; invalid values fall back to `1`.
+#' @param num_session Number of tasks that can be scheduled concurrently. When
+#' supplied, the result is the usable worker count: the detected cores minus one
+#' reserved for the parent, capped by `cores` and `num_session`.
+#' @param max_threads Optional upper bound for the detected core count, e.g. the
+#' largest worker count a kernel can use. `NULL` leaves the detected value as is.
+#' @param logical Whether to report logical (hyper-threaded) cores, as
+#' [parallel::detectCores()] does.
+#'
+#' @return A single integer, at least `1`. A failed or unusable probe falls back
+#' to `1` instead of propagating `NA`.
+#'
+#' @export
+#'
+#' @examples
+#' detect_cores()
+#' detect_cores(max_threads = 2)
+#' detect_cores(cores = 4, num_session = 8)
+detect_cores <- function(
+  cores = NULL,
+  num_session = NULL,
+  max_threads = NULL,
+  logical = FALSE
 ) {
-  if (is.null(num_session)) {
-    return(1)
-  }
-  detected_cores <- suppressWarnings(
-    parallel::detectCores(logical = FALSE)
+  detected_cores <- tryCatch(
+    suppressWarnings(parallel::detectCores(logical = logical)),
+    error = function(...) NA_integer_
   )
-  if (!is.finite(detected_cores) || detected_cores < 2) {
-    detected_cores <- 2L
+  if (length(detected_cores) == 0L || !is.finite(detected_cores) || detected_cores < 1L) {
+    detected_cores <- 1L
+  }
+  detected_cores <- as.integer(detected_cores)
+
+  if (is.null(num_session)) {
+    if (is.null(max_threads)) {
+      return(detected_cores)
+    }
+    max_threads <- suppressWarnings(as.integer(max_threads)[1L])
+    if (is.na(max_threads) || max_threads < 1L) {
+      max_threads <- 1L
+    }
+    return(max(1L, min(max_threads, detected_cores)))
   }
 
-  max_cores <- max(1L, as.integer(detected_cores) - 1L)
+  if (detected_cores < 2L) {
+    detected_cores <- 2L
+  }
+  max_cores <- max(1L, detected_cores - 1L)
   requested_cores <- suppressWarnings(as.integer(cores)[1L])
   if (!length(requested_cores) || is.na(requested_cores) || requested_cores < 1L) {
     requested_cores <- 1L
   }
-
   num_session <- suppressWarnings(as.integer(num_session)[1L])
   if (!length(num_session) || is.na(num_session) || num_session < 1L) {
     num_session <- 1L
   }
-
   min(max_cores, requested_cores, num_session)
 }
+
