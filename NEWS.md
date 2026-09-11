@@ -3,6 +3,10 @@
 * **feat**:
   * Add `%|||%` for `NULL` or zero-length fallbacks. `%ss%` remains
     `NULL`-only so it does not mask rlang `%||%`.
+  * Add `detect_cores()`, which reports the number of CPU cores and clamps it
+    to an optional `max_threads` bound, falling back to `1` when the probe
+    fails. Supplying `num_session` gives the worker-count heuristic that
+    `parallelize_fun()` uses, so core detection lives in one place.
   * Add `col_maxs()`, `row_maxs()`, `fast_aggregate()`, and
     `aggregate_matrix()` for dense and sparse matrices. Sparse maxima treat
     implicit zeros as zero.
