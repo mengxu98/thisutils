@@ -12,6 +12,8 @@
 
 ### Controlled execution
 
+- [`detect_cores()`](https://mengxu98.github.io/thisutils/reference/detect_cores.md)
+  : Detect the number of CPU cores
 - [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
   : Parallelize a function
 - [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)

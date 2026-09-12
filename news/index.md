@@ -6,6 +6,13 @@
   - Add `%|||%` for `NULL` or zero-length fallbacks. `%ss%` remains
     `NULL`-only so it does not mask rlang `%||%`.
   - Add
+    [`detect_cores()`](https://mengxu98.github.io/thisutils/reference/detect_cores.md),
+    which reports the number of CPU cores and clamps it to an optional
+    `max_threads` bound, falling back to `1` when the probe fails.
+    Supplying `num_session` gives the worker-count heuristic that
+    [`parallelize_fun()`](https://mengxu98.github.io/thisutils/reference/parallelize_fun.md)
+    uses, so core detection lives in one place.
+  - Add
     [`col_maxs()`](https://mengxu98.github.io/thisutils/reference/col_maxs.md),
     [`row_maxs()`](https://mengxu98.github.io/thisutils/reference/row_maxs.md),
     [`fast_aggregate()`](https://mengxu98.github.io/thisutils/reference/fast_aggregate.md),

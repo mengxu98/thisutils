@@ -44,6 +44,7 @@
 <ul><li>
 <strong>feat</strong>:
 <ul><li>Add <code>%|||%</code> for <code>NULL</code> or zero-length fallbacks. <code>%ss%</code> remains <code>NULL</code>-only so it does not mask rlang <code>%||%</code>.</li>
+<li>Add <code><a href="../reference/detect_cores.html">detect_cores()</a></code>, which reports the number of CPU cores and clamps it to an optional <code>max_threads</code> bound, falling back to <code>1</code> when the probe fails. Supplying <code>num_session</code> gives the worker-count heuristic that <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> uses, so core detection lives in one place.</li>
 <li>Add <code><a href="../reference/col_maxs.html">col_maxs()</a></code>, <code><a href="../reference/row_maxs.html">row_maxs()</a></code>, <code><a href="../reference/fast_aggregate.html">fast_aggregate()</a></code>, and <code><a href="../reference/aggregate_matrix.html">aggregate_matrix()</a></code> for dense and sparse matrices. Sparse maxima treat implicit zeros as zero.</li>
 </ul></li>
 <li>
