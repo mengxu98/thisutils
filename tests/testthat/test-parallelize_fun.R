@@ -1,7 +1,7 @@
 local_parallel_test_workers <- function(workers = 2L, .env = parent.frame()) {
   workers <- min(2L, as.integer(workers))
   testthat::local_mocked_bindings(
-    cores_detect = function(cores, num_session) {
+    detect_cores = function(cores = NULL, num_session = NULL, ...) {
       min(as.integer(workers), as.integer(cores), as.integer(num_session))
     },
     .package = "thisutils",
@@ -316,8 +316,24 @@ test_that("parallelize_fun exports requested dependencies in multi-core mode", {
   expect_equal(names(result), as.character(1:4))
 })
 
-test_that("cores_detect falls back to at least one core", {
-  expect_gte(cores_detect(cores = 2, num_session = 4), 1)
+test_that("detect_cores reports a usable core count and honours max_threads", {
+  detected <- detect_cores()
+  expect_type(detected, "integer")
+  expect_length(detected, 1L)
+  expect_gte(detected, 1L)
+
+  expect_identical(detect_cores(max_threads = 1), 1L)
+  expect_lte(detect_cores(max_threads = 2), 2L)
+  expect_gte(detect_cores(max_threads = 2), 1L)
+
+  expect_identical(detect_cores(max_threads = NA_integer_), 1L)
+  expect_identical(detect_cores(max_threads = 0), 1L)
+  expect_identical(detect_cores(max_threads = -3), 1L)
+  expect_identical(detect_cores(logical = FALSE) >= 1L, TRUE)
+})
+
+test_that("detect_cores falls back to at least one usable worker", {
+  expect_gte(detect_cores(cores = 2, num_session = 4), 1)
 })
 
 test_that("parallelize_fun normalizes invalid and oversized core requests", {
@@ -720,7 +736,7 @@ test_that("nested PSOCK support uses a compact self-contained function", {
     "parallel_worker_depth",
     "parallel_validate_timeout",
     "parallel_elapsed",
-    "cores_detect"
+    "detect_cores"
   ) %in% ls(nested_env, all.names = TRUE)))
   expect_lt(length(serialize(nested_parallelize, NULL)), 100 * 1024)
 
@@ -1339,7 +1355,7 @@ test_that("an externally interrupted fork call reaps workers", {
       library(thisutils)
 
       testthat::local_mocked_bindings(
-        cores_detect = function(cores, num_session) {
+        detect_cores = function(cores = NULL, num_session = NULL, ...) {
           min(2L, as.integer(cores), as.integer(num_session))
         },
         .package = "thisutils"
@@ -1726,15 +1742,19 @@ test_that("parallel progress bar handles degenerate inputs", {
   expect_equal(nchar(cli::ansi_strip(parallel_progress_bar(NaN, 10))), 10)
 })
 
-test_that("cores_detect handles missing sessions and degenerate hardware", {
-  expect_identical(cores_detect(cores = 2, num_session = NULL), 1)
+test_that("detect_cores handles missing sessions and degenerate hardware", {
+  # Without a scheduling context it reports the probe itself, clamped by max_threads.
+  expect_gte(detect_cores(), 1L)
+  expect_identical(detect_cores(max_threads = 2), min(2L, detect_cores()))
 
   testthat::local_mocked_bindings(
     detectCores = function(...) 1L,
     .package = "parallel"
   )
 
-  expect_identical(cores_detect(cores = 2, num_session = 4), 1L)
+  expect_identical(detect_cores(), 1L)
+  expect_identical(detect_cores(max_threads = 8), 1L)
+  expect_identical(detect_cores(cores = 2, num_session = 4), 1L)
 })
 
 test_that("verbose error reporting survives multi-element list inputs", {

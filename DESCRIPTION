@@ -46,5 +46,5 @@ Config/Needs/website: mengxu98/thistemplate
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Language: en-US
+Config/roxygen2/version: 8.1.0
