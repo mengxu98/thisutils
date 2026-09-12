@@ -42,6 +42,7 @@ reference:
 
 - subtitle: "Controlled execution"
 - contents:
+  - detect_cores
   - parallelize_fun
   - get_verbose
   - log_message
