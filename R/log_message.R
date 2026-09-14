@@ -381,6 +381,11 @@ log_message <- function(
   expr_quo <- if (expr_supplied) substitute(expr) else NULL
   verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
+
+  if (!expr_supplied && !verbose && message_type != "error") {
+    return(invisible(NULL))
+  }
+
   msg <- build_message(...)
   emit_message <- function(msg_text, msg_type = message_type, multiline = multiline_indent) {
     output_message(
