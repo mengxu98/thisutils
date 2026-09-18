@@ -111,6 +111,8 @@ def style_formatting(
     back_color: Optional[str],
     text_style: Optional[Sequence[str]],
 ) -> str:
+    if os.environ.get("NO_COLOR"):
+        return msg
     if text_color is None and back_color is None and not text_style:
         return msg
 
@@ -368,11 +370,8 @@ def parse_bool(value: object) -> Optional[bool]:
 
 
 def get_verbose(verbose: Optional[bool] = None) -> bool:
-    env_raw = os.getenv("LOG_MESSAGE_VERBOSE")
-
-    if env_raw is None:
-        if verbose is None:
-            return True
+    # Consistent with R: call argument > global switch (env LOG_MESSAGE_VERBOSE) > TRUE
+    if verbose is not None:
         parsed_local = parse_bool(verbose)
         if parsed_local is None:
             print(
@@ -380,6 +379,10 @@ def get_verbose(verbose: Optional[bool] = None) -> bool:
             )
             return True
         return parsed_local
+
+    env_raw = os.getenv("LOG_MESSAGE_VERBOSE")
+    if env_raw is None:
+        return True
 
     parsed_env = parse_bool(env_raw)
     if parsed_env is None:
@@ -596,7 +599,7 @@ def ask_yes_no_cancel() -> Optional[bool]:
 
 def log_message(
     *args: object,
-    verbose: Optional[bool] = True,
+    verbose: Optional[bool] = None,
     message_type: str = "info",
     cli_model: bool = True,
     level: int = 1,
@@ -625,7 +628,8 @@ def log_message(
         raise LogMessageError(msg)
 
     verbose_value = get_verbose(verbose)
-    if not verbose_value:
+    if not verbose_value and message_type != "ask":
+        # 'ask' is not silenced, matching 'error' and the R implementation
         return None
 
     validate_params(level, symbol, text_color, back_color, text_style, timestamp_style)
