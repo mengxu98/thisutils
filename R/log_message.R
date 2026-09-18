@@ -382,7 +382,7 @@ log_message <- function(
   verbose <- get_verbose(verbose)
   message_type <- match.arg(message_type)
 
-  if (!expr_supplied && !verbose && message_type != "error") {
+  if (!expr_supplied && !verbose && !(message_type %in% c("error", "ask"))) {
     return(invisible(NULL))
   }
 
@@ -438,7 +438,9 @@ log_message <- function(
   )
 
   if (!expr_supplied) {
-    if (!verbose) {
+    # 'ask' is not silenced by verbose = FALSE, matching error and the Python/Shell versions:
+    # Prompt text is emitted by emit_message; askYesNo uses an empty prompt to avoid duplicate printing.
+    if (!verbose && message_type != "ask") {
       return(invisible(NULL))
     }
 
@@ -535,6 +537,23 @@ get_verbose <- function(verbose = NULL) {
     }
 
     return(verbose)
+  }
+
+  # Shared global switch with Python/Shell: call argument > LOG_MESSAGE_VERBOSE > option > TRUE
+  verbose_env <- Sys.getenv("LOG_MESSAGE_VERBOSE", unset = NA_character_)
+  if (!is.na(verbose_env)) {
+    parsed_env <- switch(tolower(trimws(verbose_env)),
+      "true" = TRUE, "t" = TRUE, "1" = TRUE,
+      "false" = FALSE, "f" = FALSE, "0" = FALSE,
+      NULL
+    )
+    if (is.null(parsed_env)) {
+      cli::cli_alert_warning(
+        "{.envvar LOG_MESSAGE_VERBOSE} is not a logical value, ignored"
+      )
+    } else {
+      return(parsed_env)
+    }
   }
 
   if (is.null(verbose_global)) {

@@ -100,6 +100,11 @@ style_formatting() {
   local text_color="$2"
   local back_color="$3"
   local text_style="$4"
+  if [[ -n "${NO_COLOR-}" ]]; then
+    printf '%s' "$msg"
+    return 0
+  fi
+
 
   local codes=()
 
@@ -260,14 +265,16 @@ parse_bool() {
 }
 
 get_verbose() {
+  # Consistent with R: call argument > global switch (LOG_MESSAGE_VERBOSE) > TRUE
   local local_verbose="$1"
   local global_verbose="${LOG_MESSAGE_VERBOSE:-}"
 
-  if [[ -z "$global_verbose" ]]; then
-    if [[ -z "$local_verbose" ]]; then
-      echo "true"
-      return 0
-    fi
+  if [[ -z "$global_verbose" && -z "$local_verbose" ]]; then
+    echo "true"
+    return 0
+  fi
+
+  if [[ -n "$local_verbose" ]]; then
 
     local parsed_local
     parsed_local=$(parse_bool "$local_verbose")
@@ -579,7 +586,7 @@ ask_yes_no_cancel() {
 }
 
 log_message() {
-  local verbose="true"
+  local verbose=""
   local message_type="info"
   local cli_model="true"
   local level=1
@@ -689,7 +696,7 @@ log_message() {
 
   local verbose_value
   verbose_value=$(get_verbose "$verbose")
-  if [[ "$verbose_value" != "true" ]]; then
+  if [[ "$verbose_value" != "true" && "$message_type" != "ask" ]]; then
     return 0
   fi
 

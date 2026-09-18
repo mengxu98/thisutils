@@ -1,3 +1,11 @@
+# thisutils (development)
+
+## Align log_message across R, Python, and Shell (2026-09-18)
+
+- Moved `inst/python/{log_message.py,log_message.sh,example_log_message.*}` to `inst/scripts/` (legacy path removed).
+- Python / Shell: `verbose` now defaults to `None` / empty (inherits global state); precedence unified to **call argument > `LOG_MESSAGE_VERBOSE` > TRUE**; `ask` is no longer silenced when `verbose = FALSE`, matching `error`; added `NO_COLOR` support to bypass terminal styling.
+- R: `get_verbose()` now reads `LOG_MESSAGE_VERBOSE` (call argument > env > `options(log_message.verbose)` > TRUE); `ask` is no longer silenced when `verbose = FALSE`.
+
 # thisutils 0.5.2
 
 * **feat**:
