@@ -41,6 +41,8 @@
   : Compute row variances
 - [`filter_nonzero_variance_features()`](https://mengxu98.github.io/thisutils/reference/filter_nonzero_variance_features.md)
   : Keep matrix rows with nonzero variance
+- [`fit_trends()`](https://mengxu98.github.io/thisutils/reference/fit_trends.md)
+  : Fit feature trends
 - [`matrix_to_table()`](https://mengxu98.github.io/thisutils/reference/matrix_to_table.md)
   : Switch matrix to table
 - [`pearson_correlation()`](https://mengxu98.github.io/thisutils/reference/pearson_correlation.md)
