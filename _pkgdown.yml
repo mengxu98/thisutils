@@ -58,6 +58,7 @@ reference:
   - fast_aggregate
   - fast_row_vars
   - filter_nonzero_variance_features
+  - fit_trends
   - matrix_to_table
   - pearson_correlation
   - run_dense_topk
