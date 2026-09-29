@@ -26,12 +26,14 @@ Imports:
     cli,
     methods,
     Matrix,
+    mgcv,
     pak,
     parallel,
     ps,
     Rcpp,
     rlang,
     stats,
+    splines,
     utils
 Suggests:
     BiocNeighbors,
