@@ -13,6 +13,14 @@ dense_topk_by_column <- function(mat, k, decreasing = FALSE) {
     .Call(`_thisutils_dense_topk_by_column`, mat, k, decreasing)
 }
 
+row_ranges <- function(values) {
+    .Call(`_thisutils_row_ranges`, values)
+}
+
+summarize_curves <- function(fitted, values, time, inclusive) {
+    .Call(`_thisutils_summarize_curves`, fitted, values, time, inclusive)
+}
+
 compute_lisi_matrix <- function(X, batch_labels, n_neighbors, perplexity = 30, tol = 1e-5, max_iter = 50L, knn_algorithm = "auto", n_threads = 0L) {
     .Call(`_thisutils_compute_lisi_matrix`, X, batch_labels, n_neighbors, perplexity, tol, max_iter, knn_algorithm, n_threads)
 }
