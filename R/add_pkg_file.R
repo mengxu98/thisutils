@@ -150,10 +150,18 @@ generate_content <- function(
   colors,
   src_exist = FALSE
 ) {
-  ascii_with_numbers <- add_ascii_numbers(
-    ascii_lines,
-    length(colors)
-  )
+  ascii_with_numbers <- if (length(ascii_lines) == 0) {
+    ""
+  } else {
+    paste(
+      c(
+        "          0          1        2             3     4",
+        ascii_lines,
+        "      5               6      7        8          9"
+      ),
+      collapse = "\n"
+    )
+  }
 
   use_dynlib_line <- if (src_exist) {
     c(
@@ -299,23 +307,6 @@ generate_content <- function(
   )
 
   content
-}
-
-add_ascii_numbers <- function(
-  ascii_lines,
-  num_colors
-) {
-  if (length(ascii_lines) == 0) {
-    return("")
-  }
-
-  top_numbers <- "          0          1        2             3     4"
-  bottom_numbers <- "      5               6      7        8          9"
-
-  all_lines <- c(top_numbers, ascii_lines, bottom_numbers)
-  result <- paste(all_lines, collapse = "\n")
-
-  result
 }
 
 generate_hexa <- function(

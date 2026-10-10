@@ -108,18 +108,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// drop_self_from_knn_cpp
-List drop_self_from_knn_cpp(const IntegerMatrix& nn_idx, const NumericMatrix& nn_dists);
-RcppExport SEXP _thisutils_drop_self_from_knn_cpp(SEXP nn_idxSEXP, SEXP nn_distsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const IntegerMatrix& >::type nn_idx(nn_idxSEXP);
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type nn_dists(nn_distsSEXP);
-    rcpp_result_gen = Rcpp::wrap(drop_self_from_knn_cpp(nn_idx, nn_dists));
-    return rcpp_result_gen;
-END_RCPP
-}
 // matrix_to_table
 DataFrame matrix_to_table(SEXP matrix, SEXP row_names, SEXP col_names, double threshold, bool keep_zero);
 RcppExport SEXP _thisutils_matrix_to_table(SEXP matrixSEXP, SEXP row_namesSEXP, SEXP col_namesSEXP, SEXP thresholdSEXP, SEXP keep_zeroSEXP) {
@@ -191,7 +179,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_thisutils_summarize_curves", (DL_FUNC) &_thisutils_summarize_curves, 4},
     {"_thisutils_compute_lisi_matrix", (DL_FUNC) &_thisutils_compute_lisi_matrix, 8},
     {"_thisutils_lisi_exact_knn_cpp", (DL_FUNC) &_thisutils_lisi_exact_knn_cpp, 4},
-    {"_thisutils_drop_self_from_knn_cpp", (DL_FUNC) &_thisutils_drop_self_from_knn_cpp, 2},
     {"_thisutils_matrix_to_table", (DL_FUNC) &_thisutils_matrix_to_table, 5},
     {"_thisutils_sparse_pearson_block_cpp", (DL_FUNC) &_thisutils_sparse_pearson_block_cpp, 10},
     {"_thisutils_split_indices", (DL_FUNC) &_thisutils_split_indices, 2},

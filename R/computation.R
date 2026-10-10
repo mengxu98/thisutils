@@ -92,16 +92,8 @@ check_sparsity <- function(x) {
   1 - sparsity_ratio
 }
 
-.rmse <- function(true, pred) {
-  sqrt(mean((true - pred)^2))
-}
-
 .sse <- function(y_true, y_pred) {
   sum((y_true - y_pred)**2)
-}
-
-.rse <- function(y_true, y_pred) {
-  .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
 }
 
 #' @title Coefficient of determination (\eqn{R^2})
@@ -119,7 +111,7 @@ check_sparsity <- function(x) {
 #' y_pred <- y + rnorm(100, sd = 0.5)
 #' r_square(y, y_pred)
 r_square <- function(y_true, y_pred) {
-  1 - .rse(y_true, y_pred)
+  1 - .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
 }
 
 #' @title Normalize numeric vector
@@ -265,28 +257,6 @@ normalization <- function(
   x
 }
 
-fc_matrix <- function(matrix) {
-  row_means <- if (inherits(matrix, "sparseMatrix")) {
-    Matrix::rowMeans(matrix)
-  } else {
-    rowMeans(matrix)
-  }
-  matrix / row_means
-}
-
-zscore_matrix <- function(matrix, ...) {
-  Matrix::t(scale(Matrix::t(matrix), ...))
-}
-
-log2fc_matrix <- function(matrix) {
-  row_means <- if (inherits(matrix, "sparseMatrix")) {
-    Matrix::rowMeans(matrix)
-  } else {
-    rowMeans(matrix)
-  }
-  log2(matrix / row_means)
-}
-
 #' @title Process matrix
 #'
 #' @param matrix A matrix.
@@ -315,19 +285,30 @@ matrix_process <- function(
     matrix_processed <- method(matrix, ...)
   } else {
     method <- match.arg(method)
+    if (method == "fc" && ...length() > 0L) {
+      # Preserve argument matching errors without evaluating unused dots.
+      (function(matrix) NULL)(matrix, ...)
+    }
+    if (method %in% c("fc", "log2fc")) {
+      row_means <- if (inherits(matrix, "sparseMatrix")) {
+        Matrix::rowMeans(matrix)
+      } else {
+        rowMeans(matrix)
+      }
+    }
     matrix_processed <- switch(
       EXPR = method,
       "raw" = {
         matrix
       },
       "fc" = {
-        fc_matrix(matrix, ...)
+        matrix / row_means
       },
       "zscore" = {
-        zscore_matrix(matrix, ...)
+        Matrix::t(scale(Matrix::t(matrix), ...))
       },
       "log2fc" = {
-        log2fc_matrix(matrix)
+        log2(matrix / row_means)
       },
       "log1p" = {
         log1p(matrix)
