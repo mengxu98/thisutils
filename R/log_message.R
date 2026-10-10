@@ -1260,20 +1260,7 @@ output_message <- function(
     }
     indent_part <- get_indent_part(symbol, level)
 
-    if (symbol != "  ") {
-      final_msg <- paste0(
-        timestamp_part,
-        paste(rep(symbol, level), collapse = ""),
-        " ",
-        msg
-      )
-    } else {
-      final_msg <- paste0(
-        timestamp_part,
-        indent_part,
-        msg
-      )
-    }
+    final_msg <- paste0(timestamp_part, indent_part, msg)
 
     if (!is.null(text_color) || !is.null(back_color) || !is.null(text_style)) {
       if (timestamp_style) {

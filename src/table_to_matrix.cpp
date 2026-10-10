@@ -94,9 +94,9 @@ SEXP table_to_matrix(DataFrame table,
     stop("Input table must have exactly 3 columns");
   }
 
-  CharacterVector table_rows = table[0]; // First column as row names
-  CharacterVector table_cols = table[1]; // Second column as column names
-  NumericVector values = table[2];       // Third column as values
+  CharacterVector table_rows = table[0];
+  CharacterVector table_cols = table[1];
+  NumericVector values = table[2];
 
   if (!Rf_isNumeric(table[2]))
   {

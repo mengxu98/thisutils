@@ -215,6 +215,8 @@ test_that("check_r batches missing packages and forwards cores to pak", {
 })
 
 test_that("check_r falls back to remotes for malformed GitHub DESCRIPTION files", {
+  skip_if_not_installed("remotes")
+
   status <- c(yaGST = FALSE, SCEVAN = FALSE)
   installed_repo <- NULL
   installed_ref <- NULL

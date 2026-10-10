@@ -1,7 +1,6 @@
 #include <Rcpp.h>
 #include <algorithm>
 #include <unordered_set>
-#include <unordered_map>
 #include <vector>
 
 using namespace Rcpp;
@@ -246,7 +245,6 @@ DataFrame matrix_to_table(SEXP matrix,
     }
     else
     {
-      // Original logic for keep_zero = FALSE or with filtering
       out_rows.reserve(x.size());
       out_cols.reserve(x.size());
       out_vals.reserve(x.size());
@@ -297,7 +295,6 @@ DataFrame matrix_to_table(SEXP matrix,
     return empty_result;
   }
 
-  // Indices for sorting by |value| desc
   IntegerVector order_idx(out_vals.size());
   for (R_xlen_t k = 0; k < order_idx.size(); ++k)
     order_idx[k] = k;
