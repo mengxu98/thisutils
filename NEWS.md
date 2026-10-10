@@ -1,5 +1,7 @@
 # thisutils (development)
 
+- Folded examples into `log_message.* --demo` and removed the standalone example files.
+
 ## Align log_message across R, Python, and Shell (2026-09-18)
 
 - Moved `inst/python/{log_message.py,log_message.sh,example_log_message.*}` to `inst/scripts/` (legacy path removed).
