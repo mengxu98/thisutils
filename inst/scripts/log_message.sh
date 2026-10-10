@@ -586,7 +586,7 @@ ask_yes_no_cancel() {
 }
 
 log_message() {
-  local demo="false"
+  local _thisutils_run_demo="false"
   local verbose=""
   local message_type="info"
   local cli_model="true"
@@ -607,7 +607,7 @@ log_message() {
     case "$1" in
       --demo)
         if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-          demo="true"
+          _thisutils_run_demo="true"
         else
           message_parts+=("$1")
         fi
@@ -679,7 +679,7 @@ log_message() {
     esac
   done
 
-  if [[ "$demo" == "true" ]]; then
+  if [[ "$_thisutils_run_demo" == "true" ]]; then
     _run_log_message_demo
     return $?
   fi
