@@ -91,6 +91,8 @@ for a connected example installed with the package.
   : Parallelize a function
 - [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)
   : Get the verbose option
+- [`local_verbose()`](https://mengxu98.github.io/thisutils/reference/local_verbose.md)
+  : Temporarily set the shared verbose switch
 - [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
   : Print formatted message
 - [`parse_inline_expressions()`](https://mengxu98.github.io/thisutils/reference/parse_inline_expressions.md)

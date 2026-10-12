@@ -1,6 +1,7 @@
 # Get the verbose option
 
-Get the verbose option from the global options or the local argument.
+Resolve `options(log_message.verbose)`. An explicit `verbose` argument
+wins. Otherwise the option is used, and the default is `TRUE`.
 
 ## Usage
 
