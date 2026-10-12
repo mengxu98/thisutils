@@ -30,14 +30,8 @@ as_matrix <- function(
       return(
         Matrix::Matrix(x, sparse = TRUE, dimnames = dimnames(x))
       )
-    } else {
-      return(
-        Matrix::as.matrix(x)
-      )
     }
-  }
-
-  if (return_sparse) {
+  } else if (return_sparse) {
     return(x)
   }
 

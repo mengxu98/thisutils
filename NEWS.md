@@ -1,6 +1,7 @@
 # thisutils (development)
 
 - Folded examples into `log_message.* --demo` and removed the standalone example files.
+- Remove redundant internal helpers and demo scripts, and guard the optional `remotes` fallback.
 
 ## Align log_message across R, Python, and Shell (2026-09-18)
 

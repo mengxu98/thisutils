@@ -242,7 +242,7 @@ parallelize_fun <- function(
       )
     }
 
-    output_list <- parallel_collect_results(
+    output_list <- parallel_collect_results_cluster(
       x = x,
       fun = fun,
       total = total,
@@ -505,40 +505,6 @@ parallel_make_nested_parallelize_fun <- function() {
   }
 
   nested_env$parallelize_fun
-}
-
-parallel_collect_results <- function(
-  x,
-  fun,
-  total,
-  cores,
-  backend,
-  timeout,
-  total_timeout,
-  total_deadline,
-  rng_streams,
-  export_fun,
-  progress_id,
-  progress_env,
-  has_names,
-  show_values
-) {
-  parallel_collect_results_cluster(
-    x = x,
-    fun = fun,
-    total = total,
-    cores = cores,
-    backend = backend,
-    timeout = timeout,
-    total_timeout = total_timeout,
-    total_deadline = total_deadline,
-    rng_streams = rng_streams,
-    export_fun = export_fun,
-    progress_id = progress_id,
-    progress_env = progress_env,
-    has_names = has_names,
-    show_values = show_values
-  )
 }
 
 parallel_collect_results_cluster <- function(

@@ -323,6 +323,14 @@ check_r_try_remotes_fallback <- function(
   if (!needs_fallback) {
     return(error)
   }
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    log_message(
+      "Cannot retry {.pkg {pkg}} because the optional {.pkg remotes} package is not installed; the original installation failure is retained.",
+      message_type = "warning",
+      verbose = verbose
+    )
+    return(error)
+  }
   remote_parts <- strsplit(pkg, "@", fixed = TRUE)[[1]]
   repo <- remote_parts[[1]]
   ref <- if (length(remote_parts) > 1L) remote_parts[[2]] else "HEAD"
