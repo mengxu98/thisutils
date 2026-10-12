@@ -1044,8 +1044,6 @@ test_that("send failures are classified without connection message text", {
     parallel_rethrow_send_error(1L, identity, list(1L), 1L)
   )
 
-  # Force the serialization failure branch without relying on a translated
-  # connection message. Dead workers still take priority over that failure.
   suppressMessages(trace(
     serialize,
     quote(stop("cannot serialize this payload")),

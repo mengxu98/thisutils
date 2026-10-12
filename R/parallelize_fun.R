@@ -854,18 +854,21 @@ parallel_worker_depth <- function() {
   depth
 }
 
-# A closed worker socket makes serialize() fail with a translated connection
-# error. Replaying the payload into a raw vector separates that transport
-# failure from a task that cannot be serialized.
 parallel_rethrow_send_error <- function(dead_workers, fun, args, tag) {
   if (length(dead_workers)) {
     return(FALSE)
   }
 
+  sink <- tryCatch(file(nullfile(), open = "wb"), error = identity)
+  if (inherits(sink, "error")) {
+    return(TRUE)
+  }
+  on.exit(close(sink), add = TRUE)
+
   inherits(
     tryCatch(
       suppressWarnings(
-        serialize(list(fun = fun, args = args, tag = tag), NULL)
+        serialize(list(fun = fun, args = args, tag = tag), sink)
       ),
       error = identity
     ),
