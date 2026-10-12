@@ -865,11 +865,16 @@ parallel_rethrow_send_error <- function(dead_workers, fun, args, tag) {
   }
   on.exit(close(sink), add = TRUE)
 
+  payload <- list(fun = fun, args = args, tag = tag)
   inherits(
     tryCatch(
-      suppressWarnings(
-        serialize(list(fun = fun, args = args, tag = tag), sink)
-      ),
+      {
+        if (isTRUE(getOption("warn") >= 2)) {
+          serialize(payload, sink)
+        } else {
+          suppressWarnings(serialize(payload, sink))
+        }
+      },
       error = identity
     ),
     "error"
