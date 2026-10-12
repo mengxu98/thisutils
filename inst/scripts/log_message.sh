@@ -265,39 +265,21 @@ parse_bool() {
 }
 
 get_verbose() {
-  # Consistent with R: call argument > global switch (LOG_MESSAGE_VERBOSE) > TRUE
   local local_verbose="$1"
-  local global_verbose="${LOG_MESSAGE_VERBOSE:-}"
-
-  if [[ -z "$global_verbose" && -z "$local_verbose" ]]; then
+  if [[ -z "$local_verbose" ]]; then
     echo "true"
     return 0
   fi
 
-  if [[ -n "$local_verbose" ]]; then
-
-    local parsed_local
-    parsed_local=$(parse_bool "$local_verbose")
-    if [[ "$parsed_local" == "invalid" ]]; then
-      printf '%s\n' "WARNING: verbose is not a logical value, set to TRUE" >&2
-      echo "true"
-      return 0
-    fi
-
-    echo "$parsed_local"
+  local parsed_local
+  parsed_local=$(parse_bool "$local_verbose")
+  if [[ "$parsed_local" == "invalid" ]]; then
+    printf '%s\n' "WARNING: verbose is not a logical value, set to TRUE" >&2
+    echo "true"
     return 0
   fi
 
-  local parsed_global
-  parsed_global=$(parse_bool "$global_verbose")
-  if [[ "$parsed_global" == "invalid" ]]; then
-    printf '%s\n' "WARNING: LOG_MESSAGE_VERBOSE is not a logical value, treated as NULL" >&2
-    printf '%s\n' "WARNING: or use LOG_MESSAGE_VERBOSE=true/false" >&2
-    echo "false"
-    return 0
-  fi
-
-  echo "$parsed_global"
+  echo "$parsed_local"
 }
 
 get_indent_part() {
@@ -751,9 +733,6 @@ log_message() {
 
 _run_log_message_demo() (
   set -euo pipefail
-  # Show the examples even when the caller has logging switched off.
-  # Explicit --verbose false calls below still demonstrate suppression.
-  LOG_MESSAGE_VERBOSE=true
 
   # basic usage
   log_message "Hello, " "world!"
@@ -766,8 +745,6 @@ _run_log_message_demo() (
 
   # suppress messages
   log_message "Hello, world!" --verbose false
-  LOG_MESSAGE_VERBOSE=false log_message "Hello, world!"
-  LOG_MESSAGE_VERBOSE=true log_message "Hello, world!" --verbose false
 
   # cli inline markup
   log_message "{.arg abc} is an argument"

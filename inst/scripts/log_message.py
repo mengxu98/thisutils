@@ -371,30 +371,15 @@ def parse_bool(value: object) -> Optional[bool]:
 
 
 def get_verbose(verbose: Optional[bool] = None) -> bool:
-    # Consistent with R: call argument > global switch (env LOG_MESSAGE_VERBOSE) > TRUE
-    if verbose is not None:
-        parsed_local = parse_bool(verbose)
-        if parsed_local is None:
-            print(
-                "WARNING: verbose is not a logical value, set to TRUE", file=sys.stderr
-            )
-            return True
-        return parsed_local
-
-    env_raw = os.getenv("LOG_MESSAGE_VERBOSE")
-    if env_raw is None:
+    if verbose is None:
         return True
-
-    parsed_env = parse_bool(env_raw)
-    if parsed_env is None:
+    parsed_local = parse_bool(verbose)
+    if parsed_local is None:
         print(
-            "WARNING: LOG_MESSAGE_VERBOSE is not a logical value, treated as NULL",
-            file=sys.stderr,
+            "WARNING: verbose is not a logical value, set to TRUE", file=sys.stderr
         )
-        print("WARNING: or use LOG_MESSAGE_VERBOSE=true/false", file=sys.stderr)
-        return False
-
-    return parsed_env
+        return True
+    return parsed_local
 
 
 def get_indent_part(symbol: str, level: int) -> str:
@@ -675,20 +660,6 @@ def log_message(
 
 
 def _run_demo() -> None:
-    # Show the examples even when the caller has logging switched off.
-    # Explicit verbose=False calls below still demonstrate suppression.
-    previous_verbose = os.environ.get("LOG_MESSAGE_VERBOSE")
-    os.environ["LOG_MESSAGE_VERBOSE"] = "true"
-    try:
-        _run_demo_examples()
-    finally:
-        if previous_verbose is None:
-            os.environ.pop("LOG_MESSAGE_VERBOSE", None)
-        else:
-            os.environ["LOG_MESSAGE_VERBOSE"] = previous_verbose
-
-
-def _run_demo_examples() -> None:
     # basic usage
     log_message("Hello, ", "world!")
     log_message("hello, world!")
@@ -700,17 +671,6 @@ def _run_demo_examples() -> None:
 
     # suppress messages
     log_message("Hello, world!", verbose=False)
-    previous_verbose = os.environ.get("LOG_MESSAGE_VERBOSE")
-    try:
-        os.environ["LOG_MESSAGE_VERBOSE"] = "false"
-        log_message("Hello, world!")
-        os.environ["LOG_MESSAGE_VERBOSE"] = "true"
-        log_message("Hello, world!", verbose=False)
-    finally:
-        if previous_verbose is None:
-            os.environ.pop("LOG_MESSAGE_VERBOSE", None)
-        else:
-            os.environ["LOG_MESSAGE_VERBOSE"] = previous_verbose
 
     # cli inline markup
     log_message("{.arg abc} is an argument")

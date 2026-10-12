@@ -1,13 +1,14 @@
 # thisutils (development)
 
 - Folded examples into `log_message.* --demo` and removed the standalone example files.
+- Verbose control uses only `options(log_message.verbose)`. `local_verbose()` sets that option for the calling frame, and compiled `log_message()` resolves it through `get_verbose()`.
 - Remove redundant internal helpers and demo scripts, and guard the optional `remotes` fallback.
 
 ## Align log_message across R, Python, and Shell (2026-09-18)
 
 - Moved `inst/python/{log_message.py,log_message.sh,example_log_message.*}` to `inst/scripts/` (legacy path removed).
-- Python / Shell: `verbose` now defaults to `None` / empty (inherits global state); precedence unified to **call argument > `LOG_MESSAGE_VERBOSE` > TRUE**; `ask` is no longer silenced when `verbose = FALSE`, matching `error`; added `NO_COLOR` support to bypass terminal styling.
-- R: `get_verbose()` now reads `LOG_MESSAGE_VERBOSE` (call argument > env > `options(log_message.verbose)` > TRUE); `ask` is no longer silenced when `verbose = FALSE`.
+- Python / Shell: `verbose` now defaults to visible unless the call passes `verbose = FALSE`; `ask` is no longer silenced when `verbose = FALSE`, matching `error`; added `NO_COLOR` support to bypass terminal styling.
+- R: `get_verbose()` reads `options(log_message.verbose)` (call argument > option > TRUE); `ask` is no longer silenced when `verbose = FALSE`.
 
 # thisutils 0.5.2
 
