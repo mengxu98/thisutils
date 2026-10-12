@@ -29,10 +29,6 @@ lisi_exact_knn_cpp <- function(X, k, exclude_self = FALSE, n_threads = 0L) {
     .Call(`_thisutils_lisi_exact_knn_cpp`, X, k, exclude_self, n_threads)
 }
 
-drop_self_from_knn_cpp <- function(nn_idx, nn_dists) {
-    .Call(`_thisutils_drop_self_from_knn_cpp`, nn_idx, nn_dists)
-}
-
 #' @title Switch matrix to table
 #'
 #' @md

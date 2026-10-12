@@ -13,10 +13,6 @@ using namespace Rcpp;
 
 namespace {
 
-inline bool is_valid_distance(double x) {
-  return !NumericVector::is_na(x) && std::isfinite(x);
-}
-
 struct KnnEntry {
   double dist_sq;
   int index;
@@ -847,51 +843,5 @@ List lisi_exact_knn_cpp(
   return List::create(
     Named("nn.idx") = nn_idx,
     Named("nn.dists") = nn_dists
-  );
-}
-
-// [[Rcpp::export]]
-List drop_self_from_knn_cpp(
-    const IntegerMatrix& nn_idx,
-    const NumericMatrix& nn_dists) {
-  const int n = nn_idx.nrow();
-  const int k = nn_idx.ncol();
-
-  if (nn_dists.nrow() != n || nn_dists.ncol() != k) {
-    stop("nn_idx and nn_dists must have the same dimensions.");
-  }
-  if (k < 2) {
-    stop("Need at least two neighbors to remove self from the KNN graph.");
-  }
-
-  IntegerMatrix idx_out(n, k - 1);
-  NumericMatrix dist_out(n, k - 1);
-
-  for (int i = 0; i < n; ++i) {
-    int drop_pos = -1;
-    for (int neighbor = 0; neighbor < k; ++neighbor) {
-      if (nn_idx(i, neighbor) == (i + 1)) {
-        drop_pos = neighbor;
-        break;
-      }
-    }
-    if (drop_pos < 0) {
-      drop_pos = 0;
-    }
-
-    int out_col = 0;
-    for (int neighbor = 0; neighbor < k; ++neighbor) {
-      if (neighbor == drop_pos) {
-        continue;
-      }
-      idx_out(i, out_col) = nn_idx(i, neighbor);
-      dist_out(i, out_col) = nn_dists(i, neighbor);
-      ++out_col;
-    }
-  }
-
-  return List::create(
-    Named("nn.idx") = idx_out,
-    Named("nn.dists") = dist_out
   );
 }

@@ -80,7 +80,7 @@ figlet <- function(
   height <- font$options$height
   buffer <- matrix(character(), height, 0)
 
-  char_index <- .asc(text)
+  char_index <- strtoi(charToRaw(text), 16L)
   for (char in seq_along(char_index)) {
     cur_char <- font$chars[[char_index[[char]]]]
     if (is.null(cur_char)) {
@@ -309,8 +309,7 @@ figlet_font <- function(font) {
 
   is_comment <- seq_len(options$comment_lines) + 1L
   chars <- .figlet_font_characters(
-    data[-c(1L, is_comment)], options,
-    filename, name
+    data[-c(1L, is_comment)], options
   )
   ret <- list(
     name = name,
@@ -378,19 +377,17 @@ figlet_font <- function(font) {
   options
 }
 
-.figlet_font_characters <- function(data, options, filename, name) {
+.figlet_font_characters <- function(data, options) {
   code_standard <- 32:126
   code_extra <- c(196, 214, 220, 228, 246, 252, 223)
   code_req <- c(code_standard, code_extra)
 
-  get_character <- function(i, d) {
-    .figlet_font_character(d[, i], options)
-  }
-
   i_req <- seq_len(length(code_req) * options$height)
   dat_req <- matrix(data[i_req], options$height)
   chars <- vector("list", max(code_req))
-  chars[code_req] <- lapply(seq_along(code_req), get_character, dat_req)
+  chars[code_req] <- lapply(seq_along(code_req), function(i) {
+    .figlet_font_character(dat_req[, i], options)
+  })
   chars
 }
 
@@ -419,10 +416,6 @@ figlet_font <- function(font) {
     width = as.integer(char_width),
     data = matrix(unlist(m), length(txt), byrow = TRUE)
   )
-}
-
-.asc <- function(x) {
-  strtoi(charToRaw(x), 16L)
 }
 
 .vcapply <- function(X, FUN, ...) {

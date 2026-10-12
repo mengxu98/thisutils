@@ -11,27 +11,11 @@ static double metric_choose2(double x) {
   return x * (x - 1.0) / 2.0;
 }
 
-static double metric_mean_na_rm(const NumericVector& x) {
+template <typename Container>
+static double metric_mean_na_rm(const Container& x) {
   double total = 0.0;
   int n = 0;
-  for (int i = 0; i < x.size(); ++i) {
-    const double value = x[i];
-    if (!NumericVector::is_na(value) && !R_IsNaN(value)) {
-      total += value;
-      ++n;
-    }
-  }
-  if (n == 0) {
-    return R_NaN;
-  }
-  return total / static_cast<double>(n);
-}
-
-static double metric_mean_na_rm_std(const std::vector<double>& x) {
-  double total = 0.0;
-  int n = 0;
-  for (std::size_t i = 0; i < x.size(); ++i) {
-    const double value = x[i];
+  for (const double value : x) {
     if (!R_IsNA(value) && !R_IsNaN(value)) {
       total += value;
       ++n;
@@ -204,7 +188,7 @@ List classification_metrics(
       rare_recalls.push_back(recall[cls]);
     }
   }
-  const double rare_recall = rare_recalls.size() == 0 ? NA_REAL : metric_mean_na_rm_std(rare_recalls);
+  const double rare_recall = rare_recalls.size() == 0 ? NA_REAL : metric_mean_na_rm(rare_recalls);
 
   DataFrame class_table = DataFrame::create(
     _["class"] = classes,

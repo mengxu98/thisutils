@@ -1,5 +1,7 @@
 # thisutils (development)
 
+- Remove redundant internal helpers and demo scripts, and guard the optional `remotes` fallback.
+
 ## Align log_message across R, Python, and Shell (2026-09-18)
 
 - Moved `inst/python/{log_message.py,log_message.sh,example_log_message.*}` to `inst/scripts/` (legacy path removed).
