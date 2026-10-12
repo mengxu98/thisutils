@@ -45,6 +45,7 @@ reference:
   - detect_cores
   - parallelize_fun
   - get_verbose
+  - local_verbose
   - log_message
   - parse_inline_expressions
 
