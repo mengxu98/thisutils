@@ -1,6 +1,6 @@
 # thisutils (development)
 
-- Report a PSOCK worker that exits while the next task is being sent as `parallelize_worker_error` instead of a raw connection error.
+- Report a PSOCK worker that exits while the next task is being sent as `parallelize_worker_error` instead of a raw connection error, without depending on the language of R's connection messages.
 - Folded examples into `log_message.* --demo` and removed the standalone example files.
 - Verbose control uses only `options(log_message.verbose)`. `local_verbose()` sets that option for the calling frame, and compiled `log_message()` resolves it through `get_verbose()`.
 - Remove redundant internal helpers and demo scripts, and guard the optional `remotes` fallback.

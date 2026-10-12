@@ -604,11 +604,12 @@ parallel_collect_results_cluster <- function(
   send_call <- parallel_scheduler_fun("sendCall")
   receive_result <- parallel_scheduler_fun("recvOneResult")
   send_cluster_call <- function(con, job) {
+    task_args <- worker_args(task_chunks[[job]])
     tryCatch(
       send_call(
         con = con,
         fun = dispatch_task,
-        args = worker_args(task_chunks[[job]]),
+        args = task_args,
         tag = job
       ),
       error = function(e) {
@@ -617,7 +618,14 @@ parallel_collect_results_cluster <- function(
           parallel_process_alive,
           logical(1)
         )]
-        if (!length(dead_workers) && !parallel_socket_write_error(e)) {
+        if (
+          parallel_rethrow_send_error(
+            dead_workers,
+            dispatch_task,
+            task_args,
+            job
+          )
+        ) {
           stop(e)
         }
         stop(parallel_worker_error(dead_workers, conditionMessage(e)))
@@ -846,11 +854,22 @@ parallel_worker_depth <- function() {
   depth
 }
 
-parallel_socket_write_error <- function(error) {
-  grepl(
-    "error writing to connection|connection is not open|invalid connection|SIGPIPE",
-    conditionMessage(error),
-    ignore.case = TRUE
+# A closed worker socket makes serialize() fail with a translated connection
+# error. Replaying the payload into a raw vector separates that transport
+# failure from a task that cannot be serialized.
+parallel_rethrow_send_error <- function(dead_workers, fun, args, tag) {
+  if (length(dead_workers)) {
+    return(FALSE)
+  }
+
+  inherits(
+    tryCatch(
+      suppressWarnings(
+        serialize(list(fun = fun, args = args, tag = tag), NULL)
+      ),
+      error = identity
+    ),
+    "error"
   )
 }
 
