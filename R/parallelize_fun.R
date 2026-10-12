@@ -603,14 +603,30 @@ parallel_collect_results_cluster <- function(
 
   send_call <- parallel_scheduler_fun("sendCall")
   receive_result <- parallel_scheduler_fun("recvOneResult")
+  send_cluster_call <- function(con, job) {
+    tryCatch(
+      send_call(
+        con = con,
+        fun = dispatch_task,
+        args = worker_args(task_chunks[[job]]),
+        tag = job
+      ),
+      error = function(e) {
+        dead_workers <- worker_pids[!vapply(
+          worker_pids,
+          parallel_process_alive,
+          logical(1)
+        )]
+        if (!length(dead_workers) && !parallel_socket_write_error(e)) {
+          stop(e)
+        }
+        stop(parallel_worker_error(dead_workers, conditionMessage(e)))
+      }
+    )
+  }
   parallel_assert_total_time(total_deadline, total_timeout)
   for (worker_idx in seq_len(active_workers)) {
-    send_call(
-      con = cl[[worker_idx]],
-      fun = dispatch_task,
-      args = worker_args(task_chunks[[next_job]]),
-      tag = next_job
-    )
+    send_cluster_call(cl[[worker_idx]], next_job)
     job_started[[next_job]] <- parallel_elapsed()
     next_job <- next_job + 1L
   }
@@ -653,12 +669,7 @@ parallel_collect_results_cluster <- function(
     }
 
     if (next_job <= total_jobs) {
-      send_call(
-        con = cl[[result$node]],
-        fun = dispatch_task,
-        args = worker_args(task_chunks[[next_job]]),
-        tag = next_job
-      )
+      send_cluster_call(cl[[result$node]], next_job)
       job_started[[next_job]] <- parallel_elapsed()
       next_job <- next_job + 1L
     }
@@ -833,6 +844,14 @@ parallel_worker_depth <- function() {
     return(0L)
   }
   depth
+}
+
+parallel_socket_write_error <- function(error) {
+  grepl(
+    "error writing to connection|connection is not open|invalid connection|SIGPIPE",
+    conditionMessage(error),
+    ignore.case = TRUE
+  )
 }
 
 parallel_process_alive <- function(pid) {
