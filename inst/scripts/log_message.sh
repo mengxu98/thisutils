@@ -606,11 +606,7 @@ log_message() {
   while (($# > 0)); do
     case "$1" in
       --demo)
-        if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-          _thisutils_run_demo="true"
-        else
-          message_parts+=("$1")
-        fi
+        _thisutils_run_demo="true"
         shift
         ;;
       --verbose)
