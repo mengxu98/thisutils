@@ -243,6 +243,18 @@ test_that("get_verbose respects global option", {
   expect_false(get_verbose())
 })
 
+test_that("local_verbose sets log_message.verbose and restores it", {
+  old <- options(log_message.verbose = TRUE)
+  on.exit(options(old))
+  local({
+    local_verbose(FALSE)
+    expect_false(get_verbose())
+    expect_false(isTRUE(getOption("log_message.verbose")))
+  })
+  expect_true(isTRUE(getOption("log_message.verbose")))
+  expect_true(get_verbose())
+})
+
 test_that("get_verbose gives explicit argument precedence over global option", {
   old <- options(log_message.verbose = FALSE)
   on.exit(options(old))

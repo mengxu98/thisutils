@@ -504,7 +504,9 @@ log_message <- function(
 #' @title Get the verbose option
 #'
 #' @description
-#' Get the verbose option from the global options or the local argument.
+#' Resolve `options(log_message.verbose)`.
+#' An explicit `verbose` argument wins. Otherwise the option is used, and the
+#' default is `TRUE`.
 #'
 #' @param verbose The verbose option.
 #' Default is `NULL`, which means to get the verbose option from the global options.
@@ -539,23 +541,6 @@ get_verbose <- function(verbose = NULL) {
     return(verbose)
   }
 
-  # Shared global switch with Python/Shell: call argument > LOG_MESSAGE_VERBOSE > option > TRUE
-  verbose_env <- Sys.getenv("LOG_MESSAGE_VERBOSE", unset = NA_character_)
-  if (!is.na(verbose_env)) {
-    parsed_env <- switch(tolower(trimws(verbose_env)),
-      "true" = TRUE, "t" = TRUE, "1" = TRUE,
-      "false" = FALSE, "f" = FALSE, "0" = FALSE,
-      NULL
-    )
-    if (is.null(parsed_env)) {
-      cli::cli_alert_warning(
-        "{.envvar LOG_MESSAGE_VERBOSE} is not a logical value, ignored"
-      )
-    } else {
-      return(parsed_env)
-    }
-  }
-
   if (is.null(verbose_global)) {
     return(TRUE)
   }
@@ -572,6 +557,37 @@ get_verbose <- function(verbose = NULL) {
   }
 
   verbose_global
+}
+
+#' @title Temporarily set the shared verbose switch
+#'
+#' @description
+#' Set `options(log_message.verbose)` for the calling frame, then restore the
+#' previous value. Nested `get_verbose()` calls, including compiled
+#' `log_message()` code, see the temporary value.
+#'
+#' @param verbose Single logical value.
+#'
+#' @return `verbose`, invisibly.
+#' @export
+#'
+#' @examples
+#' local({
+#'   local_verbose(FALSE)
+#'   get_verbose()
+#' })
+local_verbose <- function(verbose) {
+  if (!is.logical(verbose) || length(verbose) != 1L || is.na(verbose)) {
+    cli::cli_abort("{.arg verbose} must be a single logical value.")
+  }
+
+  old_options <- options(log_message.verbose = verbose)
+  exit_expr <- substitute(
+    options(old_options),
+    list(old_options = old_options)
+  )
+  do.call(on.exit, list(exit_expr, add = TRUE), envir = parent.frame())
+  invisible(verbose)
 }
 
 build_message <- function(...) {

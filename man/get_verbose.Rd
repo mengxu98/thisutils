@@ -14,7 +14,9 @@ Default is `NULL`, which means to get the verbose option from the global options
 The verbose option.
 }
 \description{
-Get the verbose option from the global options or the local argument.
+Resolve \code{options(log_message.verbose)}.
+An explicit \code{verbose} argument wins. Otherwise the option is used, and the
+default is \code{TRUE}.
 }
 \examples{
 get_verbose()

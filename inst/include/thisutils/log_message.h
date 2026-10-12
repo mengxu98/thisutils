@@ -16,8 +16,8 @@
 //   - "ask" prompts the user through utils::askYesNo and returns TRUE/FALSE/NA
 //   - timestamp "[YYYY-MM-DD HH:MM:SS] " prefix
 //   - level / symbol indentation
-//   - verbose control: explicit argument wins, otherwise the R option
-//     log_message.verbose is consulted
+//   - verbose control: an explicit argument wins; otherwise
+//     thisutils::get_verbose() reads options(log_message.verbose), then TRUE
 //   - message text is capitalized like build_message() in the R version
 // Messages are printed to stderr, matching the Python implementation.
 
@@ -79,20 +79,13 @@ inline bool log_message_verbose(bool verbose_supplied, bool verbose) {
   if (verbose_supplied) {
     return verbose;
   }
-  Rcpp::Function get_option("getOption");
-  Rcpp::Nullable<Rcpp::LogicalVector> opt = Rcpp::as<
-      Rcpp::Nullable<Rcpp::LogicalVector> >(
-      get_option("log_message.verbose", R_NilValue));
-  if (opt.isNull()) {
-    return true;
-  }
-  Rcpp::LogicalVector value(opt);
+  Rcpp::Environment ns = Rcpp::Environment::namespace_env("thisutils");
+  Rcpp::Function get_verbose = ns["get_verbose"];
+  Rcpp::LogicalVector value = Rcpp::as<Rcpp::LogicalVector>(get_verbose());
   if (value.size() != 1 || Rcpp::LogicalVector::is_na(value[0])) {
-    Rcpp::Rcerr << "WARNING: log_message.verbose is not a logical value, "
-                   "treated as NULL\n";
     return true;
   }
-  return Rcpp::as<bool>(value);
+  return value[0] == TRUE;
 }
 
 inline std::string log_message_symbol(const std::string& message_type) {
