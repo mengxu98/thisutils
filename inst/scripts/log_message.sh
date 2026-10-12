@@ -751,6 +751,9 @@ log_message() {
 
 _run_log_message_demo() (
   set -euo pipefail
+  # Show the examples even when the caller has logging switched off.
+  # Explicit --verbose false calls below still demonstrate suppression.
+  LOG_MESSAGE_VERBOSE=true
 
   # basic usage
   log_message "Hello, " "world!"

@@ -675,6 +675,20 @@ def log_message(
 
 
 def _run_demo() -> None:
+    # Show the examples even when the caller has logging switched off.
+    # Explicit verbose=False calls below still demonstrate suppression.
+    previous_verbose = os.environ.get("LOG_MESSAGE_VERBOSE")
+    os.environ["LOG_MESSAGE_VERBOSE"] = "true"
+    try:
+        _run_demo_examples()
+    finally:
+        if previous_verbose is None:
+            os.environ.pop("LOG_MESSAGE_VERBOSE", None)
+        else:
+            os.environ["LOG_MESSAGE_VERBOSE"] = previous_verbose
+
+
+def _run_demo_examples() -> None:
     # basic usage
     log_message("Hello, ", "world!")
     log_message("hello, world!")
