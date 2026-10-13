@@ -1,15 +1,40 @@
-# thisutils (development)
+# thisutils 0.5.3
 
-- Report a PSOCK worker that exits while the next task is being sent as `parallelize_worker_error` instead of a raw connection error, without depending on the language of R's connection messages.
-- Folded examples into `log_message.* --demo` and removed the standalone example files.
-- Verbose control uses only `options(log_message.verbose)`. `local_verbose()` sets that option for the calling frame, and compiled `log_message()` resolves it through `get_verbose()`.
-- Remove redundant internal helpers and demo scripts, and guard the optional `remotes` fallback.
+* **feat**:
+  * Add `fit_trends()` for GAM and PreTSA feature trends. Results include
+    per-feature fit scores, peak and valley times, and adjusted P-values,
+    with optional fitted curves and bounds.
+  * Add `local_verbose()` to set `options(log_message.verbose)` for the
+    calling frame. Compiled `log_message()` resolves that option through
+    `get_verbose()`.
+  * Add `--demo` to the Python and Shell `log_message` scripts and remove
+    the standalone example files.
+  * Move the Python and Shell helpers from `inst/python/` to
+    `inst/scripts/`. The old path is removed.
 
-## Align log_message across R, Python, and Shell (2026-09-18)
+* **compatibility**:
+  * Verbose control uses only `options(log_message.verbose)`. An explicit
+    call argument still wins, and the default remains visible.
+  * `ask` is no longer silenced when `verbose = FALSE` in R, Python, and
+    Shell, matching `error`.
+  * Python and Shell `verbose` now defaults to visible unless the call
+    passes `verbose = FALSE`.
+  * Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
+    can be bypassed.
 
-- Moved `inst/python/{log_message.py,log_message.sh,example_log_message.*}` to `inst/scripts/` (legacy path removed).
-- Python / Shell: `verbose` now defaults to visible unless the call passes `verbose = FALSE`; `ask` is no longer silenced when `verbose = FALSE`, matching `error`; added `NO_COLOR` support to bypass terminal styling.
-- R: `get_verbose()` reads `options(log_message.verbose)` (call argument > option > TRUE); `ask` is no longer silenced when `verbose = FALSE`.
+* **fix**:
+  * Keep the original `check_r()` installation error when the optional
+    `remotes` package is not installed.
+  * Report a PSOCK worker that exits while the next task is being sent as
+    `parallelize_worker_error` instead of a raw connection error, without
+    depending on the language of R's connection messages.
+
+* **performance**:
+  * Drop unused internal helpers, inline thin matrix and parallel wrappers,
+    and share one C++ mean across classification metrics.
+
+* **docs**:
+  * List `local_verbose` in the pkgdown reference index.
 
 # thisutils 0.5.2
 
