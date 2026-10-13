@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">thisutils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,33 @@
       <small>Source: <a href="https://github.com/mengxu98/thisutils/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.3" id="thisutils-053">thisutils 0.5.3<a class="anchor" aria-label="anchor" href="#thisutils-053"></a></h2>
+<ul><li>
+<strong>feat</strong>:
+<ul><li>Add <code><a href="../reference/fit_trends.html">fit_trends()</a></code> for GAM and PreTSA feature trends. Statistics include fit scores, peak and valley times, P-values, and adjusted P-values. <code>fitted</code>, <code>lower</code>, and <code>upper</code> are optional and stay in input order. GAM bounds are +/- 2 standard errors on the link scale. PreTSA bounds equal the fitted values.</li>
+<li>Add <code><a href="../reference/local_verbose.html">local_verbose()</a></code> to set <code>options(log_message.verbose)</code> for the calling frame and restore it on exit. Compiled <code><a href="../reference/log_message.html">log_message()</a></code> reads that option through <code><a href="../reference/get_verbose.html">get_verbose()</a></code>.</li>
+<li>Add <code>--demo</code> to the Python and Shell <code>log_message</code> scripts and remove the standalone example files.</li>
+<li>Move the Python and Shell helpers from <code>inst/python/</code> to <code>inst/scripts/</code>. The old path is removed.</li>
+</ul></li>
+<li>
+<strong>compatibility</strong>:
+<ul><li>R verbosity is unchanged: an explicit call argument wins, then <code>options(log_message.verbose)</code>, otherwise the message stays visible.</li>
+<li>Python and Shell no longer read <code>LOG_MESSAGE_VERBOSE</code>. An omitted <code>verbose</code> stays visible.</li>
+<li>
+<code>ask</code> is no longer silenced when <code>verbose = FALSE</code> in R, Python, and Shell. <code>error</code> still signals.</li>
+<li>Honor <code>NO_COLOR</code> in the Python and Shell scripts so terminal styling can be bypassed.</li>
+</ul></li>
+<li>
+<strong>fix</strong>:
+<ul><li>Keep the original <code><a href="../reference/check_r.html">check_r()</a></code> installation error when the optional <code>remotes</code> package is not installed.</li>
+<li>Report a PSOCK worker that exits during send, or while the scheduler is waiting for a result, as <code>parallelize_worker_error</code>. Classification does not depend on the language of R’s connection messages. A serialization failure, including a warning promoted to an error, is still raised unchanged when the worker is alive.</li>
+</ul></li>
+<li>
+<strong>docs</strong>:
+<ul><li>List <code>local_verbose</code> in the pkgdown reference index.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.2" id="thisutils-052">thisutils 0.5.2<a class="anchor" aria-label="anchor" href="#thisutils-052"></a></h2>
 <ul><li>

@@ -1,5 +1,48 @@
 # Changelog
 
+## thisutils 0.5.3
+
+- **feat**:
+  - Add
+    [`fit_trends()`](https://mengxu98.github.io/thisutils/reference/fit_trends.md)
+    for GAM and PreTSA feature trends. Statistics include fit scores,
+    peak and valley times, P-values, and adjusted P-values. `fitted`,
+    `lower`, and `upper` are optional and stay in input order. GAM
+    bounds are +/- 2 standard errors on the link scale. PreTSA bounds
+    equal the fitted values.
+  - Add
+    [`local_verbose()`](https://mengxu98.github.io/thisutils/reference/local_verbose.md)
+    to set `options(log_message.verbose)` for the calling frame and
+    restore it on exit. Compiled
+    [`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
+    reads that option through
+    [`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md).
+  - Add `--demo` to the Python and Shell `log_message` scripts and
+    remove the standalone example files.
+  - Move the Python and Shell helpers from `inst/python/` to
+    `inst/scripts/`. The old path is removed.
+- **compatibility**:
+  - R verbosity is unchanged: an explicit call argument wins, then
+    `options(log_message.verbose)`, otherwise the message stays visible.
+  - Python and Shell no longer read `LOG_MESSAGE_VERBOSE`. An omitted
+    `verbose` stays visible.
+  - `ask` is no longer silenced when `verbose = FALSE` in R, Python, and
+    Shell. `error` still signals.
+  - Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
+    can be bypassed.
+- **fix**:
+  - Keep the original
+    [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+    installation error when the optional `remotes` package is not
+    installed.
+  - Report a PSOCK worker that exits during send, or while the scheduler
+    is waiting for a result, as `parallelize_worker_error`.
+    Classification does not depend on the language of R’s connection
+    messages. A serialization failure, including a warning promoted to
+    an error, is still raised unchanged when the worker is alive.
+- **docs**:
+  - List `local_verbose` in the pkgdown reference index.
+
 ## thisutils 0.5.2
 
 - **feat**:
