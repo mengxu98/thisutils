@@ -1,37 +1,37 @@
 # thisutils 0.5.3
 
 * **feat**:
-  * Add `fit_trends()` for GAM and PreTSA feature trends. Results include
-    per-feature fit scores, peak and valley times, and adjusted P-values,
-    with optional fitted curves and bounds.
+  * Add `fit_trends()` for GAM and PreTSA feature trends. Statistics include
+    fit scores, peak and valley times, P-values, and adjusted P-values.
+    `fitted`, `lower`, and `upper` are optional and stay in input order.
+    GAM bounds are +/- 2 standard errors on the link scale. PreTSA bounds
+    equal the fitted values.
   * Add `local_verbose()` to set `options(log_message.verbose)` for the
-    calling frame. Compiled `log_message()` resolves that option through
-    `get_verbose()`.
+    calling frame and restore it on exit. Compiled `log_message()` reads
+    that option through `get_verbose()`.
   * Add `--demo` to the Python and Shell `log_message` scripts and remove
     the standalone example files.
   * Move the Python and Shell helpers from `inst/python/` to
     `inst/scripts/`. The old path is removed.
 
 * **compatibility**:
-  * Verbose control uses only `options(log_message.verbose)`. An explicit
-    call argument still wins, and the default remains visible.
+  * R verbosity is unchanged: an explicit call argument wins, then
+    `options(log_message.verbose)`, otherwise the message stays visible.
+  * Python and Shell no longer read `LOG_MESSAGE_VERBOSE`. An omitted
+    `verbose` stays visible.
   * `ask` is no longer silenced when `verbose = FALSE` in R, Python, and
-    Shell, matching `error`.
-  * Python and Shell `verbose` now defaults to visible unless the call
-    passes `verbose = FALSE`.
+    Shell. `error` still signals.
   * Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
     can be bypassed.
 
 * **fix**:
   * Keep the original `check_r()` installation error when the optional
     `remotes` package is not installed.
-  * Report a PSOCK worker that exits while the next task is being sent as
-    `parallelize_worker_error` instead of a raw connection error, without
-    depending on the language of R's connection messages.
-
-* **performance**:
-  * Drop unused internal helpers, inline thin matrix and parallel wrappers,
-    and share one C++ mean across classification metrics.
+  * Report a PSOCK worker that exits during send, or while the scheduler is
+    waiting for a result, as `parallelize_worker_error`. Classification does
+    not depend on the language of R's connection messages. A serialization
+    failure, including a warning promoted to an error, is still raised
+    unchanged when the worker is alive.
 
 * **docs**:
   * List `local_verbose` in the pkgdown reference index.
