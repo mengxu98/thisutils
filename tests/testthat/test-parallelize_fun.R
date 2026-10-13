@@ -1036,6 +1036,43 @@ test_that("timed-out PSOCK tasks leave no worker processes", {
   expect_false(any(vapply(worker_pids, parallel_process_alive, logical(1))))
 })
 
+test_that("send failures are classified without connection message text", {
+  expect_false(
+    parallel_rethrow_send_error(integer(), identity, list(1L), 1L)
+  )
+  expect_false(
+    parallel_rethrow_send_error(1L, identity, list(1L), 1L)
+  )
+
+  suppressMessages(trace(
+    serialize,
+    quote(stop("cannot serialize this payload")),
+    print = FALSE
+  ))
+  on.exit(suppressMessages(untrace(serialize)), add = TRUE)
+
+  expect_true(
+    parallel_rethrow_send_error(integer(), identity, list(1L), 1L)
+  )
+  expect_false(
+    parallel_rethrow_send_error(1L, identity, list(1L), 1L)
+  )
+})
+
+test_that("warning-to-error send failures stay send failures", {
+  old <- options(warn = 2)
+  on.exit(options(old), add = TRUE)
+
+  fun <- function() 1
+  environment(fun) <- as.environment("package:stats")
+  expect_true(
+    parallel_rethrow_send_error(integer(), fun, list(1L), 1L)
+  )
+  expect_false(
+    parallel_rethrow_send_error(1L, fun, list(1L), 1L)
+  )
+})
+
 test_that("fatal workers fail promptly with a worker error", {
   local_parallel_test_workers()
 
