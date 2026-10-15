@@ -1,3 +1,7 @@
+# thisutils (development version)
+
+* **fix**: `check_r()` recognizes pak's `github::` prefix in installed repository metadata, avoiding false source mismatches and unnecessary reinstallation while retaining repository and requested-ref checks.
+
 # thisutils 0.5.3
 
 * **feat**:
