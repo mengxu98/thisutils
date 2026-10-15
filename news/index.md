@@ -1,5 +1,13 @@
 # Changelog
 
+## thisutils (development version)
+
+- **fix**:
+  [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
+  recognizes pak’s `github::` prefix in installed repository metadata,
+  avoiding false source mismatches and unnecessary reinstallation while
+  retaining repository and requested-ref checks.
+
 ## thisutils 0.5.3
 
 - **feat**:
