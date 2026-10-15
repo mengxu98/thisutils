@@ -287,6 +287,7 @@ check_r_remote_status <- function(info, lib = .libPaths()) {
     installed_remote <- paste(username, repository, sep = "/")
   }
   normalize_remote <- function(x) {
+    x <- sub("^github::", "", x, ignore.case = TRUE)
     tolower(sub("\\.git$", "", sub("@.*$", "", x)))
   }
   if (!identical(normalize_remote(installed_remote), normalize_remote(info$remote))) {
