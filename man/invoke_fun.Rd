@@ -9,13 +9,13 @@ invoke_fun(.fn, .args = list(), ..., .env = rlang::caller_env())
 \arguments{
 \item{.fn}{A function, or function name as a string.}
 
-\item{.args}{A list of arguments.}
+\item{.args}{A list or pairlist of argument values, or NULL.}
 
 \item{...}{Other arguments passed to the function.}
 
-\item{.env}{Environment in which to evaluate the call.
-This will be most useful if \code{.fn} is a string,
-or the function has side-effects.}
+\item{.env}{Evaluation environment for calls without arguments, or the parent
+of the temporary argument environment for calls with arguments. Captured
+expressions and caller-frame side effects use that temporary environment.}
 }
 \description{
 Invoke a function with a list of arguments
