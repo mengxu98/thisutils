@@ -79,11 +79,11 @@ get_namespace_fun <- function(pkg, fun) {
 #'
 #' @md
 #' @param .fn A function, or function name as a string.
-#' @param .args A list of arguments.
+#' @param .args A list or pairlist of argument values, or NULL.
 #' @param ... Other arguments passed to the function.
-#' @param .env Environment in which to evaluate the call.
-#' This will be most useful if `.fn` is a string,
-#' or the function has side-effects.
+#' @param .env Evaluation environment for calls without arguments, or the parent
+#' of the temporary argument environment for calls with arguments. Captured
+#' expressions and caller-frame side effects use that temporary environment.
 #'
 #' @export
 #'
@@ -100,26 +100,35 @@ invoke_fun <- function(
   ...,
   .env = rlang::caller_env()
 ) {
+  if (!is.null(.args) && !is.list(.args)) {
+    rlang::abort("`.args` must be a list or NULL.")
+  }
+  if (!is.function(.fn) && !(
+    rlang::is_scalar_character(.fn) && !is.na(.fn) && nzchar(.fn)
+  )) {
+    rlang::abort("`.fn` must be a function or a non-empty function name.")
+  }
   args <- c(.args, list(...))
   if (!length(args)) {
-    if (rlang::is_scalar_character(.fn)) {
-      .fn <- rlang::env_get(.env, .fn, inherit = TRUE)
-    }
-    call <- rlang::call2(.fn, !!!args)
+    call <- rlang::call2(.fn)
     return(rlang::eval_bare(call, .env))
   }
-  fn_nm <- ".fn"
-  buried_nms <- paste0("", seq_along(args))
-  buried_args <- rlang::set_names(args, buried_nms)
-  .env <- rlang::env(.env, !!!buried_args)
-  args <- rlang::set_names(buried_nms, names(args))
-  args <- rlang::syms(args)
-  if (rlang::is_function(.fn)) {
-    `:=` <- rlang::`:=`
-    rlang::env_bind(.env, `:=`(!!fn_nm, .fn))
-    .fn <- fn_nm
+  buried_nms <- as.character(seq_len(length(args) + is.character(.fn)))
+  if (is.character(.fn)) {
+    buried_nms <- buried_nms[buried_nms != .fn][seq_along(args)]
   }
-  call <- rlang::call2(.fn, !!!args)
+  missing_args <- vapply(args, rlang::is_missing, logical(1))
+  buried_args <- args[!missing_args]
+  names(buried_args) <- buried_nms[!missing_args]
+  .env <- list2env(buried_args, parent = .env)
+  call_args <- lapply(buried_nms, as.name)
+  call_args[missing_args] <- args[missing_args]
+  names(call_args) <- names(args)
+  if (is.function(.fn)) {
+    .env$.fn <- .fn
+    .fn <- ".fn"
+  }
+  call <- as.call(c(list(as.name(.fn)), call_args))
   rlang::eval_bare(call, .env)
 }
 
