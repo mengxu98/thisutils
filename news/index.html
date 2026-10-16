@@ -55,7 +55,9 @@
 </ul></li>
 <li>
 <strong>compatibility</strong>:
-<ul><li>R verbosity is unchanged: an explicit call argument wins, then <code>options(log_message.verbose)</code>, otherwise the message stays visible.</li>
+<ul><li>
+<code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> requires a list or pairlist of argument values, or <code>NULL</code>. Calls with arguments still use a temporary child environment: captured expressions use temporary symbols, caller-frame side effects stay in that environment, and captured model calls are not generally replayable.</li>
+<li>R verbosity is unchanged: an explicit call argument wins, then <code>options(log_message.verbose)</code>, otherwise the message stays visible.</li>
 <li>Python and Shell no longer read <code>LOG_MESSAGE_VERBOSE</code>. An omitted <code>verbose</code> stays visible.</li>
 <li>
 <code>ask</code> is no longer silenced when <code>verbose = FALSE</code> in R, Python, and Shell. <code>error</code> still signals.</li>
@@ -63,7 +65,8 @@
 </ul></li>
 <li>
 <strong>fix</strong>:
-<ul><li>Keep the original <code><a href="../reference/check_r.html">check_r()</a></code> installation error when the optional <code>remotes</code> package is not installed.</li>
+<ul><li>Reduce <code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> call-construction overhead while keeping large objects outside captured calls. Preserve string function names, use the same function lookup for empty and nonempty calls, avoid temporary-name collisions, and preserve explicit missing arguments and their defaults.</li>
+<li>Keep the original <code><a href="../reference/check_r.html">check_r()</a></code> installation error when the optional <code>remotes</code> package is not installed.</li>
 <li>Report a PSOCK worker that exits during send, or while the scheduler is waiting for a result, as <code>parallelize_worker_error</code>. Classification does not depend on the language of R’s connection messages. A serialization failure, including a warning promoted to an error, is still raised unchanged when the worker is alive.</li>
 </ul></li>
 <li>

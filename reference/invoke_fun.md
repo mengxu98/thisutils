@@ -16,7 +16,7 @@ invoke_fun(.fn, .args = list(), ..., .env = rlang::caller_env())
 
 - .args:
 
-  A list of arguments.
+  A list or pairlist of argument values, or NULL.
 
 - ...:
 
@@ -24,8 +24,10 @@ invoke_fun(.fn, .args = list(), ..., .env = rlang::caller_env())
 
 - .env:
 
-  Environment in which to evaluate the call. This will be most useful if
-  `.fn` is a string, or the function has side-effects.
+  Evaluation environment for calls without arguments, or the parent of
+  the temporary argument environment for calls with arguments. Captured
+  expressions and caller-frame side effects use that temporary
+  environment.
 
 ## Examples
 

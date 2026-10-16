@@ -30,6 +30,12 @@
   - Move the Python and Shell helpers from `inst/python/` to
     `inst/scripts/`. The old path is removed.
 - **compatibility**:
+  - [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
+    requires a list or pairlist of argument values, or `NULL`. Calls
+    with arguments still use a temporary child environment: captured
+    expressions use temporary symbols, caller-frame side effects stay in
+    that environment, and captured model calls are not generally
+    replayable.
   - R verbosity is unchanged: an explicit call argument wins, then
     `options(log_message.verbose)`, otherwise the message stays visible.
   - Python and Shell no longer read `LOG_MESSAGE_VERBOSE`. An omitted
@@ -39,6 +45,13 @@
   - Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
     can be bypassed.
 - **fix**:
+  - Reduce
+    [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
+    call-construction overhead while keeping large objects outside
+    captured calls. Preserve string function names, use the same
+    function lookup for empty and nonempty calls, avoid temporary-name
+    collisions, and preserve explicit missing arguments and their
+    defaults.
   - Keep the original
     [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
     installation error when the optional `remotes` package is not
