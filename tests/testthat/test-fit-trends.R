@@ -56,6 +56,27 @@ test_that("fixed spline statistics agree with the explicit regression", {
   expect_equal(out$statistics$pvalue, unname(p), tolerance = 1e-12)
 })
 
+test_that("PreTSA retains nonconstant zero-sum trends", {
+  time <- 1:20
+  values <- seq(-19, 19, 2) + rep(c(1, -1), 10)
+  x <- rbind(centered = values, shifted = values + 7, zero = 0, constant = 3)
+  out <- fit_trends(x, time, method = "pretsa", verbose = FALSE)
+  B <- cbind(1, splines::bs(time, df = 3, intercept = FALSE))
+  reference <- stats::lm.fit(B, values)
+  sse <- sum(reference$residuals^2)
+  sst <- sum((values - mean(values))^2)
+  expected <- stats::pf(((sst - sse) / 3) / (sse / 16), 3, 16, lower.tail = FALSE)
+
+  expect_lt(out$statistics["centered", "pvalue"], 1e-6)
+  expect_equal(log(out$statistics["centered", "pvalue"]), log(expected), tolerance = 1e-10)
+  expect_equal(
+    log(out$statistics["centered", "pvalue"]),
+    log(out$statistics["shifted", "pvalue"]),
+    tolerance = 1e-10
+  )
+  expect_equal(out$statistics[c("zero", "constant"), "pvalue"], c(1, 1))
+})
+
 test_that("curve quantiles preserve ties and missing-value behavior", {
   set.seed(29)
   for (n in c(1, 2, 3, 99, 100, 101, 1000)) {

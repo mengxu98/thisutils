@@ -1183,7 +1183,6 @@ parallel_progress_bar <- function(
 #' @title Detect the number of CPU cores
 #'
 #' @md
-#' @inheritParams log_message
 #' @param cores Requested number of workers. Only used when `num_session` is
 #' supplied; invalid values fall back to `1`.
 #' @param num_session Number of tasks that can be scheduled concurrently. When
@@ -1243,4 +1242,3 @@ detect_cores <- function(
   }
   min(max_cores, requested_cores, num_session)
 }
-

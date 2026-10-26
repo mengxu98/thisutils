@@ -10,12 +10,12 @@ local_verbose(verbose)
 \item{verbose}{Single logical value.}
 }
 \value{
-\code{verbose}, invisibly.
+`verbose`, invisibly.
 }
 \description{
-Set \code{options(log_message.verbose)} for the calling frame, then restore the
-previous value. Nested \code{get_verbose()} calls, including compiled
-\code{log_message()} code, see the temporary value.
+Set `options(log_message.verbose)` for the calling frame, then restore the
+previous value. Nested `get_verbose()` calls, including compiled
+`log_message()` code, see the temporary value.
 }
 \examples{
 local({
