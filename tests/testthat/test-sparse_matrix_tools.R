@@ -118,3 +118,51 @@ test_that("aggregate_matrix and fast_aggregate collapse rows by group", {
   expect_equal(unname(averaged["a", ]), c(2, 3))
   expect_equal(unname(averaged["b", ]), c(5, 6))
 })
+
+test_that("sparse maxima preserve missing values and structured storage", {
+  dense <- matrix(c(NA, 0, -2, -3), 2)
+  sparse <- Matrix::Matrix(dense, sparse = TRUE)
+  expect_equal(col_maxs(sparse, na.rm = FALSE), apply(dense, 2, max, na.rm = FALSE))
+  expect_equal(row_maxs(sparse, na.rm = FALSE), apply(dense, 1, max, na.rm = FALSE))
+
+  dense <- matrix(c(-1, -2, -2, -3), 2)
+  symmetric <- Matrix::forceSymmetric(Matrix::Matrix(dense, sparse = TRUE))
+  triangular <- Matrix::triu(Matrix::Matrix(dense, sparse = TRUE))
+  for (x in list(symmetric, triangular)) {
+    expect_equal(col_maxs(x), apply(as.matrix(x), 2, max))
+    expect_equal(row_maxs(x), apply(as.matrix(x), 1, max))
+  }
+})
+
+test_that("fast sparse means include zero values in every group", {
+  dense <- matrix(c(0, 2, 0, 4, 0, 0), 3, byrow = TRUE,
+    dimnames = list(NULL, c("x", "y")))
+  groups <- c("a", "a", "b")
+  expected <- rbind(a = c(x = 0, y = 3), b = c(x = 0, y = 0))
+  for (x in list(dense, Matrix::Matrix(dense, sparse = TRUE))) {
+    actual <- fast_aggregate(x, groups, fun = "mean")
+    expect_equal(as.matrix(actual), expected)
+    expect_equal(as.matrix(actual), as.matrix(aggregate_matrix(x, groups, "mean")))
+  }
+})
+
+test_that("group summaries preserve columns for all group sizes", {
+  dense <- matrix(1:8, 4, byrow = TRUE, dimnames = list(NULL, c("x", "y")))
+  for (x in list(dense, Matrix::Matrix(dense, sparse = TRUE))) {
+    for (groups in list(c("a", "a", "b", "b"), c("a", "a", "b", "c"))) {
+      levels <- sort(unique(groups))
+      for (fun in list("max", "min", stats::median)) {
+        summary <- if (is.character(fun)) get(fun) else fun
+        expected <- do.call(rbind, lapply(levels, function(g) {
+          apply(dense[groups == g, , drop = FALSE], 2, summary)
+        }))
+        rownames(expected) <- levels
+        expect_equal(as.matrix(aggregate_matrix(x, groups, fun)), expected)
+      }
+    }
+    expect_equal(as.matrix(aggregate_matrix(x, "all", "max")),
+      matrix(c(7, 8), 1, dimnames = list("all", c("x", "y"))))
+    expect_equal(as.matrix(aggregate_matrix(x[, "x", drop = FALSE], c("a", "a", "b", "b"), "max")),
+      matrix(c(3, 7), 2, dimnames = list(c("a", "b"), "x")))
+  }
+})

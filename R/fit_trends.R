@@ -131,7 +131,7 @@ fit_trends <- function(
     SSE <- rowSums((x - fitted)^2)
     SST <- rowSums(sweep(x, 1L, rowMeans(x), "-")^2)
     fstat <- ((SST - SSE) / df1) / (SSE / df2)
-    fstat[rowSums(x) == 0] <- 0
+    fstat[SST == 0] <- 0
     pvalue <- stats::pf(fstat, df1, df2, lower.tail = FALSE)
     rsq <- 1 - SSE / SST
     rsq[!is.finite(rsq) | rsq < 0] <- 0

@@ -38,6 +38,7 @@ collapse_sparse_rows <- function(matrix, group) {
 }
 
 sparse_matrix_maxima <- function(x, margin = 1L, na.rm = TRUE) {
+  x <- methods::as(methods::as(x, "dMatrix"), "generalMatrix")
   x <- methods::as(x, "CsparseMatrix")
   if (identical(margin, 1L)) {
     x <- Matrix::t(x)
@@ -62,8 +63,7 @@ sparse_matrix_maxima <- function(x, margin = 1L, na.rm = TRUE) {
   idx <- as.integer(names(maxima))
   implicit_zero <- stored_n[idx] < nr
   values <- as.numeric(maxima)
-  replace_with_zero <- implicit_zero & (is.na(values) | values < 0)
-  values[replace_with_zero] <- 0
+  values[implicit_zero] <- pmax(values[implicit_zero], 0)
   out[idx] <- values
   out
 }
@@ -249,7 +249,7 @@ fast_aggregate <- function(
   colnames(mapping) <- substring(colnames(mapping), 2)
   result <- Matrix::t(mapping) %*% x
   if (identical(fun, "mean")) {
-    result@x <- result@x / (fast_aggregate(x, groupings2, fun = "count"))@x
+    result <- result / as.numeric(Matrix::colSums(mapping))
   }
   result
 }
@@ -278,13 +278,8 @@ aggregate_matrix <- function(
   fun = "mean"
 ) {
   if (length(groups) == nrow(x) && is.character(fun)) {
-    if (fun %in% c("count", "sum")) {
+    if (fun %in% c("count", "sum", "mean")) {
       return(fast_aggregate(x = x, groupings = groups, fun = fun))
-    }
-    if (identical(fun, "mean")) {
-      group_counts <- as.numeric(table(groups))
-      agg_mat <- fast_aggregate(x = x, groupings = groups, fun = "sum")
-      return(agg_mat / group_counts)
     }
   }
   if (is.character(fun)) {
@@ -297,20 +292,22 @@ aggregate_matrix <- function(
     )
   }
   if (length(groups) == nrow(x)) {
-    agg_mat <- sapply(levels(factor(groups)), function(g) {
-      chunk <- x[which(groups == g), ]
-      if (is.null(dim(chunk))) {
-        chunk
-      } else {
-        fun(chunk)
-      }
-    })
-    agg_mat <- Matrix::Matrix(agg_mat, sparse = TRUE)
+    group_levels <- levels(factor(groups))
+    agg_mat <- vapply(group_levels, function(g) {
+      chunk <- x[which(groups == g), , drop = FALSE]
+      vapply(seq_len(ncol(x)), function(j) fun(chunk[, j]), numeric(1))
+    }, numeric(ncol(x)))
+    agg_mat <- Matrix::Matrix(
+      matrix(agg_mat, nrow = ncol(x), ncol = length(group_levels),
+        dimnames = list(colnames(x), group_levels)),
+      sparse = TRUE
+    )
   } else if (length(groups) <= 1) {
-    agg_mat <- fun(x)
-    agg_mat <- Matrix::Matrix(agg_mat, sparse = TRUE)
-    colnames(agg_mat) <- groups
-    rownames(agg_mat) <- colnames(x)
+    agg_mat <- vapply(seq_len(ncol(x)), function(j) fun(x[, j]), numeric(1))
+    agg_mat <- Matrix::Matrix(
+      matrix(agg_mat, ncol = 1L, dimnames = list(colnames(x), groups)),
+      sparse = TRUE
+    )
   } else {
     log_message(
       "Length of {.arg groups} must be either nrow(x) or 1",
