@@ -1,7 +1,8 @@
 # Get the verbose option
 
-Resolve `options(log_message.verbose)`. An explicit `verbose` argument
-wins. Otherwise the option is used, and the default is `TRUE`.
+Resolve \`options(log_message.verbose)\`. An explicit \`verbose\`
+argument wins. Otherwise the option is used, and the default is
+\`TRUE\`.
 
 ## Usage
 

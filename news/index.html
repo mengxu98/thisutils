@@ -40,11 +40,6 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="thisutils-development-version">thisutils (development version)<a class="anchor" aria-label="anchor" href="#thisutils-development-version"></a></h2>
-<ul><li>
-<strong>fix</strong>: <code><a href="../reference/check_r.html">check_r()</a></code> recognizes pak’s <code>github::</code> prefix in installed repository metadata, avoiding false source mismatches and unnecessary reinstallation while retaining repository and requested-ref checks.</li>
-</ul></div>
-    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.3" id="thisutils-053">thisutils 0.5.3<a class="anchor" aria-label="anchor" href="#thisutils-053"></a></h2>
 <ul><li>
 <strong>feat</strong>:
@@ -65,7 +60,12 @@
 </ul></li>
 <li>
 <strong>fix</strong>:
-<ul><li>Reduce <code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> call-construction overhead while keeping large objects outside captured calls. Preserve string function names, use the same function lookup for empty and nonempty calls, avoid temporary-name collisions, and preserve explicit missing arguments and their defaults.</li>
+<ul><li>Keep nonconstant zero-sum features in PreTSA trend significance tests and return a P-value of one for constant features.</li>
+<li>Include zero values in <code><a href="../reference/fast_aggregate.html">fast_aggregate()</a></code> means and align them with <code><a href="../reference/aggregate_matrix.html">aggregate_matrix()</a></code> means.</li>
+<li>Apply grouped maximum, minimum, and custom summaries separately to each column, preserving dimensions and names for single-row groups.</li>
+<li>Preserve missing values when sparse maxima use <code>na.rm = FALSE</code>, and respect symmetric and triangular sparse matrix storage.</li>
+<li>Recognize pak’s <code>github::</code> prefix in installed repository metadata when checking package sources, avoiding unnecessary reinstallation.</li>
+<li>Reduce <code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> call-construction overhead while keeping large objects outside captured calls. Preserve string function names, use the same function lookup for empty and nonempty calls, avoid temporary-name collisions, and preserve explicit missing arguments and their defaults.</li>
 <li>Keep the original <code><a href="../reference/check_r.html">check_r()</a></code> installation error when the optional <code>remotes</code> package is not installed.</li>
 <li>Report a PSOCK worker that exits during send, or while the scheduler is waiting for a result, as <code>parallelize_worker_error</code>. Classification does not depend on the language of R’s connection messages. A serialization failure, including a warning promoted to an error, is still raised unchanged when the worker is alive.</li>
 </ul></li>

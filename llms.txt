@@ -71,8 +71,6 @@ for the complete API, and run
 [`vignette("research-package-workflows", package = "thisutils")`](https://mengxu98.github.io/thisutils/articles/research-package-workflows.md)
 for a connected example installed with the package.
 
-# Package index
-
 ### Package overview
 
 - [`thisutils`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)

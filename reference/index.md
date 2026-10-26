@@ -1,5 +1,3 @@
-# Package index
-
 ### Package overview
 
 - [`thisutils`](https://mengxu98.github.io/thisutils/reference/thisutils-package.md)

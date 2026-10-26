@@ -1,13 +1,5 @@
 # Changelog
 
-## thisutils (development version)
-
-- **fix**:
-  [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md)
-  recognizes pak’s `github::` prefix in installed repository metadata,
-  avoiding false source mismatches and unnecessary reinstallation while
-  retaining repository and requested-ref checks.
-
 ## thisutils 0.5.3
 
 - **feat**:
@@ -45,6 +37,19 @@
   - Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
     can be bypassed.
 - **fix**:
+  - Keep nonconstant zero-sum features in PreTSA trend significance
+    tests and return a P-value of one for constant features.
+  - Include zero values in
+    [`fast_aggregate()`](https://mengxu98.github.io/thisutils/reference/fast_aggregate.md)
+    means and align them with
+    [`aggregate_matrix()`](https://mengxu98.github.io/thisutils/reference/aggregate_matrix.md)
+    means.
+  - Apply grouped maximum, minimum, and custom summaries separately to
+    each column, preserving dimensions and names for single-row groups.
+  - Preserve missing values when sparse maxima use `na.rm = FALSE`, and
+    respect symmetric and triangular sparse matrix storage.
+  - Recognize pak’s `github::` prefix in installed repository metadata
+    when checking package sources, avoiding unnecessary reinstallation.
   - Reduce
     [`invoke_fun()`](https://mengxu98.github.io/thisutils/reference/invoke_fun.md)
     call-construction overhead while keeping large objects outside

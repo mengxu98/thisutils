@@ -1,11 +1,8 @@
 # Temporarily set the shared verbose switch
 
-Set `options(log_message.verbose)` for the calling frame, then restore
-the previous value. Nested
-[`get_verbose()`](https://mengxu98.github.io/thisutils/reference/get_verbose.md)
-calls, including compiled
-[`log_message()`](https://mengxu98.github.io/thisutils/reference/log_message.md)
-code, see the temporary value.
+Set \`options(log_message.verbose)\` for the calling frame, then restore
+the previous value. Nested \`get_verbose()\` calls, including compiled
+\`log_message()\` code, see the temporary value.
 
 ## Usage
 
@@ -21,7 +18,7 @@ local_verbose(verbose)
 
 ## Value
 
-`verbose`, invisibly.
+\`verbose\`, invisibly.
 
 ## Examples
 
