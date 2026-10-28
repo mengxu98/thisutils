@@ -126,7 +126,9 @@ dMcast <- function(
     values <- data[, value.var]
   }
   alltms <- stats::terms(formula, data = data)
-  response <- rownames(attr(alltms, "factors"))[attr(alltms, "response")]
+  response <- rownames(
+    attr(alltms, "factors")
+  )[attr(alltms, "response")]
   tm <- attr(alltms, "term.labels")
   interactions <- tm[grep(":", tm)]
   simple <- setdiff(tm, interactions)
@@ -148,7 +150,9 @@ dMcast <- function(
     data <- data.frame(lapply(data, as.factor))
   }
   characters <- unlist(lapply(data, is.character))
-  data[, characters] <- lapply(data[, characters, drop = FALSE], as.factor)
+  data[, characters] <- lapply(
+    data[, characters, drop = FALSE], as.factor
+  )
   factors <- unlist(lapply(data, is.factor))
   data[, factors] <- lapply(
     data[, factors, drop = FALSE], function(x) {
@@ -298,12 +302,17 @@ aggregate_matrix <- function(
       vapply(seq_len(ncol(x)), function(j) fun(chunk[, j]), numeric(1))
     }, numeric(ncol(x)))
     agg_mat <- Matrix::Matrix(
-      matrix(agg_mat, nrow = ncol(x), ncol = length(group_levels),
-        dimnames = list(colnames(x), group_levels)),
+      matrix(
+        agg_mat,
+        nrow = ncol(x), ncol = length(group_levels),
+        dimnames = list(colnames(x), group_levels)
+      ),
       sparse = TRUE
     )
   } else if (length(groups) <= 1) {
-    agg_mat <- vapply(seq_len(ncol(x)), function(j) fun(x[, j]), numeric(1))
+    agg_mat <- vapply(
+      seq_len(ncol(x)), function(j) fun(x[, j]), numeric(1)
+    )
     agg_mat <- Matrix::Matrix(
       matrix(agg_mat, ncol = 1L, dimnames = list(colnames(x), groups)),
       sparse = TRUE

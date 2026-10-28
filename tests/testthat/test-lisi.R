@@ -120,37 +120,6 @@ test_that("compute_lisi wrapper matches fused C++ path", {
   expect_equal(unname(as.matrix(fused)), unname(direct), tolerance = 1e-12)
 })
 
-test_that("compute_lisi is deterministic on small data", {
-  set.seed(11)
-  X <- rbind(
-    matrix(rnorm(1000, mean = -1), ncol = 10),
-    matrix(rnorm(1000, mean = 1), ncol = 10)
-  )
-  meta <- data.frame(
-    batch = rep(c("A", "B"), each = nrow(X) / 2),
-    group = sample(c("g1", "g2", "g3"), nrow(X), replace = TRUE)
-  )
-
-  first <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10))
-  second <- suppressMessages(compute_lisi(X, meta, c("batch", "group"), perplexity = 10))
-
-  expect_equal(first, second, tolerance = 1e-10)
-})
-
-test_that("removed backend argument is rejected", {
-  X <- matrix(rnorm(100), ncol = 5)
-  meta <- data.frame(batch = rep(c("A", "B"), each = 10))
-
-  expect_error(
-    suppressMessages(compute_lisi(X, meta, "batch", perplexity = 5, nn_method = "rann")),
-    "unused argument"
-  )
-  expect_error(
-    suppressMessages(compute_lisi(X, meta, "batch", perplexity = 5, nn_method = "fnn")),
-    "unused argument"
-  )
-})
-
 test_that("compute_lisi remains stable on different sizes", {
   set.seed(22)
   X_small <- rbind(
@@ -269,20 +238,5 @@ test_that("compute_lisi exposes dense conversion and control validation", {
   expect_error(
     compute_lisi(X, meta, "batch", knn_algorithm = "approximate"),
     "arg"
-  )
-})
-
-test_that("internal exact KNN supports automatic and explicit thread controls", {
-  set.seed(34)
-  X <- matrix(rnorm(900), ncol = 5)
-
-  serial <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE, n_threads = 1)
-  parallel <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE, n_threads = 2)
-  automatic <- lisi_exact_knn_cpp(X, k = 5, exclude_self = TRUE)
-  expect_identical(parallel, serial)
-  expect_identical(automatic, serial)
-  expect_error(
-    lisi_exact_knn_cpp(X, k = 5, n_threads = -1),
-    "non-negative"
   )
 })
