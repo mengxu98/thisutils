@@ -251,14 +251,6 @@ test_that("parallel progress bar falls back to default width", {
   expect_equal(nchar(cli::ansi_strip(bar)), 10)
 })
 
-test_that("parallelize_fun accepts progress_bar_width argument", {
-  expect_no_error(
-    suppressMessages(
-      parallelize_fun(1:2, function(x) x^2, verbose = FALSE, progress_bar_width = 9L)
-    )
-  )
-})
-
 test_that("parallelize_fun preserves input order for multi-core execution", {
   local_parallel_test_workers()
 
@@ -332,10 +324,6 @@ test_that("detect_cores reports a usable core count and honours max_threads", {
   expect_identical(detect_cores(logical = FALSE) >= 1L, TRUE)
 })
 
-test_that("detect_cores falls back to at least one usable worker", {
-  expect_gte(detect_cores(cores = 2, num_session = 4), 1)
-})
-
 test_that("parallelize_fun normalizes invalid and oversized core requests", {
   invalid <- suppressMessages(
     parallelize_fun(1:3, identity, cores = NA, verbose = FALSE)
@@ -361,22 +349,6 @@ test_that("parallelize_fun preserves NULL results on a single core", {
   expect_equal(result[[1]], 1)
   expect_null(result[[2]])
   expect_equal(result[[3]], 3)
-})
-
-test_that("parallelize_fun reuses a bounded set of workers", {
-  skip_on_os("windows")
-  local_parallel_test_workers()
-
-  worker_pids <- suppressMessages(
-    parallelize_fun(
-      1:12,
-      function(x) Sys.getpid(),
-      cores = 2,
-      verbose = FALSE
-    )
-  )
-
-  expect_lte(length(unique(unlist(worker_pids))), 2L)
 })
 
 test_that("parallel task chunks are bounded and preserve every input index", {

@@ -135,8 +135,10 @@ test_that("sparse maxima preserve missing values and structured storage", {
 })
 
 test_that("fast sparse means include zero values in every group", {
-  dense <- matrix(c(0, 2, 0, 4, 0, 0), 3, byrow = TRUE,
-    dimnames = list(NULL, c("x", "y")))
+  dense <- matrix(c(0, 2, 0, 4, 0, 0), 3,
+    byrow = TRUE,
+    dimnames = list(NULL, c("x", "y"))
+  )
   groups <- c("a", "a", "b")
   expected <- rbind(a = c(x = 0, y = 3), b = c(x = 0, y = 0))
   for (x in list(dense, Matrix::Matrix(dense, sparse = TRUE))) {
@@ -160,9 +162,13 @@ test_that("group summaries preserve columns for all group sizes", {
         expect_equal(as.matrix(aggregate_matrix(x, groups, fun)), expected)
       }
     }
-    expect_equal(as.matrix(aggregate_matrix(x, "all", "max")),
-      matrix(c(7, 8), 1, dimnames = list("all", c("x", "y"))))
-    expect_equal(as.matrix(aggregate_matrix(x[, "x", drop = FALSE], c("a", "a", "b", "b"), "max")),
-      matrix(c(3, 7), 2, dimnames = list(c("a", "b"), "x")))
+    expect_equal(
+      as.matrix(aggregate_matrix(x, "all", "max")),
+      matrix(c(7, 8), 1, dimnames = list("all", c("x", "y")))
+    )
+    expect_equal(
+      as.matrix(aggregate_matrix(x[, "x", drop = FALSE], c("a", "a", "b", "b"), "max")),
+      matrix(c(3, 7), 2, dimnames = list(c("a", "b"), "x"))
+    )
   }
 })

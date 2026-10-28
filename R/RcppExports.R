@@ -25,10 +25,6 @@ compute_lisi_matrix <- function(X, batch_labels, n_neighbors, perplexity = 30, t
     .Call(`_thisutils_compute_lisi_matrix`, X, batch_labels, n_neighbors, perplexity, tol, max_iter, knn_algorithm, n_threads)
 }
 
-lisi_exact_knn_cpp <- function(X, k, exclude_self = FALSE, n_threads = 0L) {
-    .Call(`_thisutils_lisi_exact_knn_cpp`, X, k, exclude_self, n_threads)
-}
-
 #' @title Switch matrix to table
 #'
 #' @md
