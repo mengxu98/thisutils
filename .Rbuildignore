@@ -13,6 +13,7 @@
 ^.*\.py[co]$
 ^LICENSE\.md$
 ^_pkgdown\.yml$
+^\.git$
 ^\.github$
 ^dev$
 ^libs

@@ -45,8 +45,8 @@ check_r <- function(
   timeout = Inf,
   load = FALSE,
   cores = NULL,
-  strict = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  strict = FALSE
 ) {
   if (!is.logical(install) || length(install) != 1L || is.na(install)) {
     stop("`install` must be TRUE or FALSE", call. = FALSE)

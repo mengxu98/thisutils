@@ -317,3 +317,27 @@ test_that("check_r strict mode reports packages that could not be installed", {
     list(absent = TRUE)
   )
 })
+
+test_that("check_r preserves positional verbose calls", {
+  package <- "thisutils_positional_missing_package"
+
+  expect_silent(
+    quiet_status <- check_r(
+      package, .libPaths()[1], NA, FALSE, FALSE, Inf, FALSE, NULL, FALSE
+    )
+  )
+  expect_identical(quiet_status, stats::setNames(list(FALSE), package))
+
+  expect_warning(
+    verbose_status <- suppressMessages(check_r(
+      package, .libPaths()[1], NA, FALSE, FALSE, Inf, FALSE, NULL, TRUE
+    )),
+    "Failed to install"
+  )
+  expect_identical(verbose_status, stats::setNames(list(FALSE), package))
+
+  expect_error(
+    check_r(package, install = FALSE, verbose = FALSE, strict = TRUE),
+    "not available"
+  )
+})

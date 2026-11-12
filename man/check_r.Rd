@@ -13,8 +13,8 @@ check_r(
   timeout = Inf,
   load = FALSE,
   cores = NULL,
-  strict = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  strict = FALSE
 )
 }
 \arguments{
@@ -47,12 +47,12 @@ Default is \code{FALSE}.}
 \item{cores}{Number of workers used by \code{\link[pak:pkg_install]{pak::pkg_install()}}. Use \code{NULL}
 (the default) to let pak select its worker count automatically.}
 
+\item{verbose}{Whether to print the message.
+Default is \code{TRUE}.}
+
 \item{strict}{Whether to stop with an error naming the packages that are
 still unavailable after the check (and installation, when \code{install = TRUE}).
 Use it before code that needs the packages. Default is \code{FALSE}.}
-
-\item{verbose}{Whether to print the message.
-Default is \code{TRUE}.}
 }
 \value{
 Package installation status.
