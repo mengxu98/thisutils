@@ -305,7 +305,7 @@ figlet_font <- function(font) {
     )
   }
   data <- readLines(filename, warn = FALSE)
-  options <- .figlet_font_options(data, filename, name)
+  options <- .figlet_font_options(data, filename)
 
   is_comment <- seq_len(options$comment_lines) + 1L
   chars <- .figlet_font_characters(
@@ -321,7 +321,7 @@ figlet_font <- function(font) {
   ret
 }
 
-.figlet_font_options <- function(data, filename, name) {
+.figlet_font_options <- function(data, filename) {
   if (length(data) == 0) {
     log_message(
       "{.file {filename}} is empty",

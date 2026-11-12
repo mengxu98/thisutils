@@ -1129,18 +1129,14 @@ format_line_with_style <- function(
       msg = full_line,
       text_color = text_color,
       back_color = back_color,
-      text_style = text_style,
-      cli_model = TRUE,
-      .envir = .envir
+      text_style = text_style
     )
   } else {
     styled_line <- style_formatting(
       msg = line,
       text_color = text_color,
       back_color = back_color,
-      text_style = text_style,
-      cli_model = TRUE,
-      .envir = .envir
+      text_style = text_style
     )
     paste0(prefix, styled_line)
   }
@@ -1284,18 +1280,14 @@ output_message <- function(
           msg = final_msg,
           text_color = text_color,
           back_color = back_color,
-          text_style = text_style,
-          cli_model = cli_model,
-          .envir = .envir
+          text_style = text_style
         )
       } else {
         styled_msg <- style_formatting(
           msg = msg,
           text_color = text_color,
           back_color = back_color,
-          text_style = text_style,
-          cli_model = cli_model,
-          .envir = .envir
+          text_style = text_style
         )
         final_msg <- paste0(
           timestamp_part,
@@ -1332,9 +1324,7 @@ output_message <- function(
         msg = formatted_msg,
         text_color = text_color,
         back_color = back_color,
-        text_style = text_style,
-        cli_model = cli_model,
-        .envir = .envir
+        text_style = text_style
       )
     }
 
@@ -1354,9 +1344,7 @@ style_formatting <- function(
   msg,
   text_color,
   back_color,
-  text_style,
-  cli_model,
-  .envir = parent.frame()
+  text_style
 ) {
   if (is.null(text_color) && is.null(back_color) && is.null(text_style)) {
     return(msg)
@@ -1406,9 +1394,7 @@ plain_text_output <- function(
         msg = text,
         text_color = text_color,
         back_color = back_color,
-        text_style = text_style,
-        cli_model = cli_model,
-        .envir = .envir
+        text_style = text_style
       )
     }
     cli::cli_verbatim(text, .envir = .envir)
@@ -1425,9 +1411,7 @@ plain_text_output <- function(
         msg = formatted_text,
         text_color = text_color,
         back_color = back_color,
-        text_style = text_style,
-        cli_model = cli_model,
-        .envir = .envir
+        text_style = text_style
       )
     }
 

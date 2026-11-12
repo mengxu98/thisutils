@@ -264,3 +264,56 @@ test_that("check_r falls back to remotes for malformed GitHub DESCRIPTION files"
   expect_identical(installed_ref, "HEAD")
   expect_identical(installed_upgrade, "never")
 })
+
+test_that("check_r strict mode stops only for unavailable packages", {
+  status <- list(present = TRUE, absent = FALSE)
+  testthat::local_mocked_bindings(
+    check_pkg_status = function(pkg, version = NULL, lib = NULL) status[[pkg]],
+    .package = "thisutils"
+  )
+  expect_identical(
+    check_r("present", install = FALSE, strict = TRUE, verbose = FALSE),
+    list(present = TRUE)
+  )
+  expect_error(
+    check_r(c("present", "absent"), install = FALSE, strict = TRUE, verbose = FALSE),
+    "absent.*not available"
+  )
+  expect_identical(
+    check_r("absent", install = FALSE, verbose = FALSE),
+    list(absent = FALSE)
+  )
+  expect_error(check_r("present", strict = NA), "`strict` must be TRUE or FALSE")
+})
+
+test_that("check_r strict mode reports packages that could not be installed", {
+  status <- list(absent = FALSE)
+  testthat::local_mocked_bindings(
+    check_pkg_status = function(pkg, version = NULL, lib = NULL) status[[pkg]],
+    .package = "thisutils"
+  )
+  testthat::local_mocked_bindings(
+    pkg_install = function(...) stop("network unavailable"),
+    .package = "pak"
+  )
+  expect_error(
+    check_r("absent", lib = tempfile("lib"), strict = TRUE, verbose = FALSE),
+    "could not be installed"
+  )
+  installed <- list(absent = FALSE)
+  testthat::local_mocked_bindings(
+    check_pkg_status = function(pkg, version = NULL, lib = NULL) installed[[pkg]],
+    .package = "thisutils"
+  )
+  testthat::local_mocked_bindings(
+    pkg_install = function(...) {
+      installed$absent <<- TRUE
+      invisible(NULL)
+    },
+    .package = "pak"
+  )
+  expect_identical(
+    check_r("absent", lib = tempfile("lib"), strict = TRUE, verbose = FALSE),
+    list(absent = TRUE)
+  )
+})

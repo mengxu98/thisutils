@@ -1,5 +1,6 @@
 ^renv$
 ^renv\.lock$
+^renv/.*$
 ^revdep$
 ^.*\.Rproj$
 ^\.Rproj\.user$
