@@ -1,3 +1,11 @@
+# thisutils (development version)
+
+* **feat**: `check_r(strict = TRUE)` stops with an install hint when a package
+  is still unavailable after the check, so callers can rely on it before code
+  that needs the package. Installation behaviour and the returned status are
+  unchanged.
+* Preserve the positional `verbose` argument when using `check_r()`.
+
 # thisutils 0.5.3
 
 * **feat**:

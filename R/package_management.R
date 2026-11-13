@@ -23,6 +23,9 @@
 #' Default is `FALSE`.
 #' @param cores Number of workers used by [pak::pkg_install()]. Use `NULL`
 #' (the default) to let pak select its worker count automatically.
+#' @param strict Whether to stop with an error naming the packages that are
+#' still unavailable after the check (and installation, when `install = TRUE`).
+#' Use it before code that needs the packages. Default is `FALSE`.
 #' @details GitHub packages are normally installed with `pak`. If `pak` cannot
 #' parse a GitHub package's `DESCRIPTION` file, `check_r()` retries that package
 #' with the optional `remotes` package. This preserves the fast dependency
@@ -42,10 +45,14 @@ check_r <- function(
   timeout = Inf,
   load = FALSE,
   cores = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  strict = FALSE
 ) {
   if (!is.logical(install) || length(install) != 1L || is.na(install)) {
     stop("`install` must be TRUE or FALSE", call. = FALSE)
+  }
+  if (!is.logical(strict) || length(strict) != 1L || is.na(strict)) {
+    stop("`strict` must be TRUE or FALSE", call. = FALSE)
   }
   if (!is.numeric(timeout) || length(timeout) != 1L || is.na(timeout) || timeout <= 0) {
     stop("`timeout` must be one positive number or Inf", call. = FALSE)
@@ -227,6 +234,17 @@ check_r <- function(
 
   success <- sapply(status_list, isTRUE)
   failed <- names(status_list)[!success]
+
+  if (isTRUE(strict) && length(failed) > 0) {
+    requested <- vapply(package_info[failed], `[[`, character(1), "package")
+    log_message(
+      "Required package{?s} {.pkg {failed}} {?is/are} not available",
+      if (isTRUE(install)) " and could not be installed" else "",
+      ". Install with {.code thisutils::check_r(c(",
+      paste0("\"", requested, "\"", collapse = ", "), "))}",
+      message_type = "error"
+    )
+  }
 
   if (length(failed) > 0) {
     for (pkg_name in failed) {

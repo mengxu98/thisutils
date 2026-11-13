@@ -13,7 +13,8 @@ check_r(
   timeout = Inf,
   load = FALSE,
   cores = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  strict = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,10 @@ Default is \code{FALSE}.}
 
 \item{verbose}{Whether to print the message.
 Default is \code{TRUE}.}
+
+\item{strict}{Whether to stop with an error naming the packages that are
+still unavailable after the check (and installation, when \code{install = TRUE}).
+Use it before code that needs the packages. Default is \code{FALSE}.}
 }
 \value{
 Package installation status.

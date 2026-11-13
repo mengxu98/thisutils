@@ -1,7 +1,7 @@
 Type: Package
 Package: thisutils
 Title: Reliable Utilities for Reusable Research Workflows
-Version: 0.5.3
+Version: 0.5.4
 Date: 2026-10-28
 Authors@R:
     c(
