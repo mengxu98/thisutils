@@ -28,12 +28,21 @@ jobs:
 
       - name: Test coverage
         run: |
-          covr::codecov(
+          coverage <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
           )
+          covr::lcov(coverage)
         shell: Rscript {0}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
+        with:
+          files: lcov.info
+          disable_search: true
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Show testthat output
         if: always()
