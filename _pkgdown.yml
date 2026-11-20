@@ -66,6 +66,7 @@ reference:
   - run_sparse_topk
   - run_sparse_topk_stored
   - sparse_cor
+  - sum_columns_by_group
   - table_to_matrix
 
 - subtitle: "Compatibility interfaces"
