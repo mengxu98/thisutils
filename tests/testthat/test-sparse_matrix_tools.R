@@ -119,6 +119,27 @@ test_that("aggregate_matrix and fast_aggregate collapse rows by group", {
   expect_equal(unname(averaged["b", ]), c(5, 6))
 })
 
+test_that("column group sums preserve order, missing values and matrix storage", {
+  x <- matrix(c(1, NA, 0, 4, -2, 5), nrow = 2,
+    dimnames = list(c("first", "second"), c("x", "y", "z"))
+  )
+  groups <- factor(c("b", "a", "b"), levels = c("a", "b", "unused"))
+  expected <- matrix(c(-1, NA, 0, 4), nrow = 2,
+    dimnames = list(rownames(x), c("b", "a"))
+  )
+  dense <- sum_columns_by_group(x, groups)
+  sparse <- sum_columns_by_group(Matrix::Matrix(x, sparse = TRUE), groups)
+  expect_s4_class(dense, "denseMatrix")
+  expect_s4_class(sparse, "sparseMatrix")
+  expect_identical(as.matrix(dense), expected)
+  expect_identical(as.matrix(sparse), expected)
+  expect_identical(as.matrix(sum_columns_by_group(x[, FALSE], character())), x[, FALSE])
+  expect_error(sum_columns_by_group(x, c("a", NA, "b")), "one non-missing")
+  expect_error(sum_columns_by_group(x, c("a", "", "b")), "one non-missing")
+  expect_error(sum_columns_by_group(x, "a"), "one non-missing")
+  expect_error(sum_columns_by_group(1:3, groups), "must be a matrix")
+})
+
 test_that("sparse maxima preserve missing values and structured storage", {
   dense <- matrix(c(NA, 0, -2, -3), 2)
   sparse <- Matrix::Matrix(dense, sparse = TRUE)
