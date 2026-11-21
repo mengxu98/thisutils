@@ -5,6 +5,7 @@
   that needs the package. Installation behaviour and the returned status are
   unchanged.
 * Preserve the positional `verbose` argument when using `check_r()`.
+* Add `sum_columns_by_group()` for grouped column sums in input order.
 
 # thisutils 0.5.3
 

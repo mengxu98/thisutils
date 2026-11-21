@@ -37,6 +37,45 @@ collapse_sparse_rows <- function(matrix, group) {
   )
 }
 
+#' @title Sum matrix columns by group
+#'
+#' @param x A numeric matrix or a two-dimensional matrix object that supports
+#'   multiplication by a sparse Matrix.
+#' @param groups A vector of non-missing, non-empty group labels, one per
+#'   column of `x`. Labels are converted to character.
+#' @return A matrix object with one column per group in first-appearance order.
+#'   Row names are preserved. Sparse Matrix input gives sparse output, and
+#'   missing matrix values propagate within their group.
+#' @md
+#' @export
+#' @examples
+#' x <- matrix(1:6, nrow = 2)
+#' sum_columns_by_group(x, c("b", "a", "b"))
+sum_columns_by_group <- function(x, groups) {
+  if (length(dim(x)) != 2L) {
+    log_message("{.arg x} must be a matrix", message_type = "error")
+  }
+  groups <- as.character(groups)
+  if (length(groups) != ncol(x) || anyNA(groups) || any(!nzchar(groups))) {
+    log_message(
+      "{.arg groups} must contain one non-missing, non-empty label per column of {.arg x}",
+      message_type = "error"
+    )
+  }
+  group_levels <- unique(groups)
+  membership <- Matrix::sparseMatrix(
+    i = seq_along(groups),
+    j = match(groups, group_levels),
+    x = 1,
+    dims = c(ncol(x), length(group_levels)),
+    dimnames = list(colnames(x), group_levels)
+  )
+  out <- x %*% membership
+  rownames(out) <- rownames(x)
+  colnames(out) <- group_levels
+  out
+}
+
 sparse_matrix_maxima <- function(x, margin = 1L, na.rm = TRUE) {
   x <- methods::as(methods::as(x, "dMatrix"), "generalMatrix")
   x <- methods::as(x, "CsparseMatrix")
