@@ -14,7 +14,8 @@ check_r(
   timeout = Inf,
   load = FALSE,
   cores = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  strict = FALSE
 )
 ```
 
@@ -70,6 +71,12 @@ check_r(
 - verbose:
 
   Whether to print the message. Default is `TRUE`.
+
+- strict:
+
+  Whether to stop with an error naming the packages that are still
+  unavailable after the check (and installation, when `install = TRUE`).
+  Use it before code that needs the packages. Default is `FALSE`.
 
 ## Value
 

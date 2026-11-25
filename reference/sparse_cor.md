@@ -133,9 +133,7 @@ c[1:5, 1:5]
 #> col_4 -0.02022058 -0.00276169  0.03481704  1.00000000 -0.05034769
 #> col_5  0.00827069 -0.03594182 -0.03144989 -0.05034769  1.00000000
 all.equal(a, c)
-#> [1] "Attributes: < Component “i”: Numeric: lengths (5046, 5050) differ >"  
-#> [2] "Attributes: < Component “p”: Mean relative difference: 0.0008776063 >"
-#> [3] "Attributes: < Component “x”: Numeric: lengths (5046, 5050) differ >"  
+#> [1] TRUE
 
 b[1:5, 1:5]
 #> 5 x 5 sparse Matrix of class "dgCMatrix"
@@ -154,9 +152,7 @@ d[1:5, 1:5]
 #> col_4  0.045648545  0.009914274  0.01685729  0.03317848 -0.045443563
 #> col_5 -0.048082595 -0.050457664  0.04350114 -0.05551273 -0.051113224
 all.equal(b, d)
-#> [1] "Attributes: < Component “i”: Numeric: lengths (9997, 10000) differ >"
-#> [2] "Attributes: < Component “p”: Mean relative difference: 0.000311165 >"
-#> [3] "Attributes: < Component “x”: Numeric: lengths (9997, 10000) differ >"
+#> [1] TRUE
 
 m1[sample(1:500, 10)] <- NA
 m2[sample(1:500, 10)] <- NA
@@ -174,12 +170,12 @@ system.time(
   sparse_cor(m1)
 )
 #>    user  system elapsed 
-#>   0.003   0.000   0.003 
+#>   0.002   0.000   0.002 
 system.time(
   cor(as_matrix(m1))
 )
 #>    user  system elapsed 
-#>   0.006   0.000   0.005 
+#>   0.006   0.000   0.006 
 
 system.time(
   sparse_cor(m1, m2)
@@ -190,5 +186,5 @@ system.time(
   cor(as_matrix(m1), as_matrix(m2))
 )
 #>    user  system elapsed 
-#>   0.011   0.000   0.011 
+#>   0.013   0.000   0.012 
 ```

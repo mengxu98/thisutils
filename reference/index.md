@@ -55,6 +55,8 @@
   : Stored sparse entries top-k selection
 - [`sparse_cor()`](https://mengxu98.github.io/thisutils/reference/sparse_cor.md)
   : Resource-controlled sparse correlation
+- [`sum_columns_by_group()`](https://mengxu98.github.io/thisutils/reference/sum_columns_by_group.md)
+  : Sum matrix columns by group
 - [`table_to_matrix()`](https://mengxu98.github.io/thisutils/reference/table_to_matrix.md)
   : Switch table to matrix
 

@@ -1,6 +1,20 @@
 # Changelog
 
+## thisutils (development version)
+
+- **feat**: `check_r(strict = TRUE)` stops with an install hint when a
+  package is still unavailable after the check, so callers can rely on
+  it before code that needs the package. Installation behaviour and the
+  returned status are unchanged.
+- Preserve the positional `verbose` argument when using
+  [`check_r()`](https://mengxu98.github.io/thisutils/reference/check_r.md).
+- Add
+  [`sum_columns_by_group()`](https://mengxu98.github.io/thisutils/reference/sum_columns_by_group.md)
+  for grouped column sums in input order.
+
 ## thisutils 0.5.3
+
+CRAN release: 2026-10-28
 
 - **feat**:
   - Add
