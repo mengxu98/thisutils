@@ -42,28 +42,30 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="thisutils-development-version">thisutils (development version)<a class="anchor" aria-label="anchor" href="#thisutils-development-version"></a></h2>
 <ul><li>
-<strong>feat</strong>: <code>check_r(strict = TRUE)</code> stops with an install hint when a package is still unavailable after the check, so callers can rely on it before code that needs the package. Installation behaviour and the returned status are unchanged.</li>
-<li>Preserve the positional <code>verbose</code> argument when using <code><a href="../reference/check_r.html">check_r()</a></code>.</li>
-<li>Add <code><a href="../reference/sum_columns_by_group.html">sum_columns_by_group()</a></code> for grouped column sums in input order.</li>
+<strong>feat</strong>:
+<ul><li>Add <code>check_r(strict = TRUE)</code> to stop with an install hint if a package remains unavailable.</li>
+<li>Add <code><a href="../reference/sum_columns_by_group.html">sum_columns_by_group()</a></code> to sum columns by group in order of first appearance, preserving sparsity for sparse inputs.</li>
+</ul></li>
+<li>
+<strong>compatibility</strong>:
+<ul><li>Preserve the position of the <code>verbose</code> argument in <code><a href="../reference/check_r.html">check_r()</a></code>.</li>
+</ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.3" id="thisutils-053">thisutils 0.5.3<a class="anchor" aria-label="anchor" href="#thisutils-053"></a></h2><p class="text-muted">CRAN release: 2026-10-28</p>
 <ul><li>
 <strong>feat</strong>:
-<ul><li>Add <code><a href="../reference/fit_trends.html">fit_trends()</a></code> for GAM and PreTSA feature trends. Statistics include fit scores, peak and valley times, P-values, and adjusted P-values. <code>fitted</code>, <code>lower</code>, and <code>upper</code> are optional and stay in input order. GAM bounds are +/- 2 standard errors on the link scale. PreTSA bounds equal the fitted values.</li>
-<li>Add <code><a href="../reference/local_verbose.html">local_verbose()</a></code> to set <code>options(log_message.verbose)</code> for the calling frame and restore it on exit. Compiled <code><a href="../reference/log_message.html">log_message()</a></code> reads that option through <code><a href="../reference/get_verbose.html">get_verbose()</a></code>.</li>
-<li>Add <code>--demo</code> to the Python and Shell <code>log_message</code> scripts and remove the standalone example files.</li>
-<li>Move the Python and Shell helpers from <code>inst/python/</code> to <code>inst/scripts/</code>. The old path is removed.</li>
+<ul><li>Add <code><a href="../reference/fit_trends.html">fit_trends()</a></code> for GAM and PreTSA trends, with fit scores, peak and valley times, and raw and adjusted P-values. Optional fitted values and bounds follow input order. GAM bounds use +/- 2 standard errors on the link scale. PreTSA bounds equal the fitted values.</li>
+<li>Add <code><a href="../reference/local_verbose.html">local_verbose()</a></code> to set <code>log_message.verbose</code> for the calling scope and restore it on exit.</li>
+<li>Add <code>--demo</code> to the Python and Shell <code>log_message</code> scripts, replacing the standalone examples.</li>
 </ul></li>
 <li>
 <strong>compatibility</strong>:
-<ul><li>
-<code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> requires a list or pairlist of argument values, or <code>NULL</code>. Calls with arguments still use a temporary child environment: captured expressions use temporary symbols, caller-frame side effects stay in that environment, and captured model calls are not generally replayable.</li>
-<li>R verbosity is unchanged: an explicit call argument wins, then <code>options(log_message.verbose)</code>, otherwise the message stays visible.</li>
-<li>Python and Shell no longer read <code>LOG_MESSAGE_VERBOSE</code>. An omitted <code>verbose</code> stays visible.</li>
+<ul><li>Replace <code>inst/python/</code> with <code>inst/scripts/</code> for Python and Shell helpers. The scripts ignore <code>LOG_MESSAGE_VERBOSE</code>, default to visible output, and honour <code>NO_COLOR</code>.</li>
 <li>
-<code>ask</code> is no longer silenced when <code>verbose = FALSE</code> in R, Python, and Shell. <code>error</code> still signals.</li>
-<li>Honor <code>NO_COLOR</code> in the Python and Shell scripts so terminal styling can be bypassed.</li>
+<code>ask</code> prompts and <code>error</code> signals remain active with <code>verbose = FALSE</code> in R, Python, and Shell. R uses explicit <code>verbose</code>, then <code>options(log_message.verbose)</code>, then visible output.</li>
+<li>
+<code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> builds calls faster and requires a list, pairlist, or <code>NULL</code> for argument values. Calls with arguments use a child environment that contains side effects and temporary symbols. Captured calls leave large objects in that environment and may be unreplayable. String function names and explicit missing arguments retain their behaviour.</li>
 </ul></li>
 <li>
 <strong>fix</strong>:
@@ -72,9 +74,8 @@
 <li>Apply grouped maximum, minimum, and custom summaries separately to each column, preserving dimensions and names for single-row groups.</li>
 <li>Preserve missing values when sparse maxima use <code>na.rm = FALSE</code>, and respect symmetric and triangular sparse matrix storage.</li>
 <li>Recognize pak’s <code>github::</code> prefix in installed repository metadata when checking package sources, avoiding unnecessary reinstallation.</li>
-<li>Reduce <code><a href="../reference/invoke_fun.html">invoke_fun()</a></code> call-construction overhead while keeping large objects outside captured calls. Preserve string function names, use the same function lookup for empty and nonempty calls, avoid temporary-name collisions, and preserve explicit missing arguments and their defaults.</li>
 <li>Keep the original <code><a href="../reference/check_r.html">check_r()</a></code> installation error when the optional <code>remotes</code> package is not installed.</li>
-<li>Report a PSOCK worker that exits during send, or while the scheduler is waiting for a result, as <code>parallelize_worker_error</code>. Classification does not depend on the language of R’s connection messages. A serialization failure, including a warning promoted to an error, is still raised unchanged when the worker is alive.</li>
+<li>Report PSOCK worker exits during send or result collection as <code>parallelize_worker_error</code> across locales. Propagate the original serialization error when the worker is alive.</li>
 </ul></li>
 <li>
 <strong>docs</strong>:
@@ -91,17 +92,13 @@
 </ul></li>
 <li>
 <strong>performance</strong>:
-<ul><li>Evaluate each scheduled task batch behind one message sink instead of opening and closing a connection for every input.</li>
-<li>Set nested-worker state once per scheduled batch, resetting it only after inputs that mutate the internal option, instead of updating options around every input.</li>
-<li>Minimize PSOCK worker closures, remove source references from worker-only function copies, and use native serialization for same-host workers.</li>
-<li>Bundle nested-call helpers into one compact PSOCK export instead of sending each internal function separately.</li>
-<li>Send each PSOCK batch only its assigned input values and random-number streams instead of copying the complete task list to every worker.</li>
-<li>Skip lifecycle logging entirely for <code>verbose = FALSE</code> calls.</li>
-<li>Limit verbose formatting to the first 20 distinct error types while retaining every error object in the returned results.</li>
+<ul><li>Reduce per-task overhead by sharing message capture and nested-worker setup within each scheduled batch.</li>
+<li>Send smaller PSOCK exports and only the assigned inputs and random-number streams per batch. Use native serialization for same-host workers.</li>
+<li>Skip lifecycle logging with <code>verbose = FALSE</code>. Verbose output formats the first 20 distinct error types and results retain every error object.</li>
 </ul></li>
 <li>
 <strong>fix</strong>:
-<ul><li>Collapse multi-element inline expression evaluations to a single string in <code><a href="../reference/parse_inline_expressions.html">parse_inline_expressions()</a></code>. Vector-valued evaluations previously grew the message text beyond length one and crashed the <code>grepl</code>-based replacement loop with <code>'length = N' in coercion to 'logical(1)'</code> before the real error details could be reported.</li>
+<ul><li>Collapse vector results in <code><a href="../reference/parse_inline_expressions.html">parse_inline_expressions()</a></code> to a single string so inline formatting can report the original error.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
@@ -109,7 +106,8 @@
 <ul><li>
 <strong>compatibility</strong>:
 <ul><li>Preserve the historical <code>matrix_to_table(keep_zero = TRUE)</code> default. Compact table output remains an explicit choice.</li>
-<li>Preserve the stored-entry semantics and zero-value padding of <code><a href="../reference/run_sparse_topk_by_column.html">run_sparse_topk_by_column()</a></code>. The new <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> includes implicit sparse zeros by default so it matches ordinary dense-matrix semantics.</li>
+<li>
+<code><a href="../reference/run_sparse_topk_by_column.html">run_sparse_topk_by_column()</a></code> still ranks stored entries and fills missing ranks with <code>NA</code> indices and zero values. <code><a href="../reference/run_sparse_topk_stored.html">run_sparse_topk_stored()</a></code> fills both indices and values with <code>NA</code>. <code><a href="../reference/run_sparse_topk.html">run_sparse_topk()</a></code> includes implicit zeros by default.</li>
 </ul></li>
 <li>
 <strong>feat</strong>:
@@ -122,20 +120,16 @@
 <li>
 <strong>fix</strong>:
 <ul><li>Detect cancellation-prone row variance calculations and recompute only the affected dense or sparse rows with a stable two-pass calculation, preserving the existing fast path for ordinary inputs.</li>
-<li>Pad stored-entry sparse top-k results with <code>NA</code> values instead of zeros.</li>
 <li>Replace infinite correlations with zero when <code>remove_inf = TRUE</code>.</li>
 <li>Summarize failed structured or matrix-valued tasks by their task name or shape, preventing verbose error reporting from masking the original worker error.</li>
 </ul></li>
 <li>
 <strong>docs</strong>:
-<ul><li>Document sparse expansion, implicit-zero, dense-intermediate, and CPU boundaries, and reorganize the package reference around sparse and resource-controlled research workflows.</li>
-<li>Add a full-workflow vignette that connects semantic, numerical, resource, and execution contracts, plus an R Journal-oriented benchmark plan.</li>
-<li>Demonstrate stable verbose lifecycle messages separately from dynamic progress output in report-oriented examples.</li>
-<li>Add a package-wide workflow vignette spanning representation, neighborhood evaluation, execution, messages, and optional dependency diagnostics.</li>
+<ul><li>Document sparse semantics and memory and CPU limits. Add workflow vignettes, reporting examples, and a benchmark plan.</li>
 </ul></li>
 <li>
 <strong>tests</strong>:
-<ul><li>Exercise fork interruption from an external parent process and verify that workers are reaped before a subsequent fork call. Clarify that the in-process interrupt-sender test covers the default PSOCK backend.</li>
+<ul><li>Verify fork worker cleanup after external interruption and cover the default PSOCK backend with an in-process interrupt test.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
@@ -154,9 +148,8 @@
 </ul></li>
 <li>
 <strong>fix</strong>:
-<ul><li>Fix <code><a href="../reference/check_r.html">check_r()</a></code>: change <code>dependencies</code> default from <code>TRUE</code> to <code>NA</code>, so hard dependencies (<code>Depends</code>, <code>Imports</code>, <code>LinkingTo</code>) are installed by default while <code>Suggests</code> are excluded (#XXX).</li>
-<li>Improve <code><a href="../reference/check_r.html">check_r()</a></code> error reporting: traverse the full error chain via <code>rlang::cnd_message(e, inherit = TRUE)</code> instead of only showing the top-level message; strip ANSI escape codes to avoid printing garbage in the log.</li>
-<li>Eliminate duplicate “Failed to install” messages in <code><a href="../reference/check_r.html">check_r()</a></code> by storing error details per-package and reporting them once in the final summary.</li>
+<ul><li>Default <code><a href="../reference/check_r.html">check_r()</a></code> to <code>dependencies = NA</code> to install hard dependencies and skip <code>Suggests</code>.</li>
+<li>Report the full <code><a href="../reference/check_r.html">check_r()</a></code> installation error chain once per package, with ANSI escape codes removed.</li>
 <li>Retry GitHub packages with <code>remotes</code> when <code>pak</code> cannot parse a malformed <code>DESCRIPTION</code> file.</li>
 </ul></li>
 </ul></div>
@@ -191,7 +184,7 @@
 </ul></li>
 <li>
 <strong>tests</strong>:
-<ul><li>Add regression tests for <code><a href="../reference/collapse_sparse_rows.html">collapse_sparse_rows()</a></code> edge cases, <code><a href="../reference/compute_lisi.html">compute_lisi()</a></code> backend consistency, captured <code>cli</code> messages in <code>log_message(expr = ...)</code>, matrix conversion corner cases, <code><a href="../reference/parallelize_fun.html">parallelize_fun()</a></code> ordering/export behavior, normalization on degenerate inputs, and startup suppression when verbose logging is disabled.</li>
+<ul><li>Cover sparse aggregation, LISI backends, matrix conversion, degenerate normalization, parallel execution, and logging in regression tests.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
@@ -260,8 +253,8 @@
 <h2 class="pkg-version" data-toc-text="0.3.7" id="thisutils-037">thisutils 0.3.7<a class="anchor" aria-label="anchor" href="#thisutils-037"></a></h2>
 <ul><li>
 <strong>feat</strong>:
-<ul><li>Optimize <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> C++ implementation: Improved dimnames handling using <code>Rf_getAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility. Enhanced <code>keep_zero = TRUE</code> logic to efficiently include all row/column combinations (including zeros) using <code>unordered_set</code> and <code>unordered_map</code> for optimized lookups.</li>
-<li>Improve <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> C++ implementation: Enhanced sparse matrix construction by ensuring zero values are not added to sparse matrices. Improved dimnames setting using <code>Rf_setAttrib</code> and <code>R_DimNamesSymbol</code> for better compatibility.</li>
+<ul><li>Improve dimension-name handling in <code><a href="../reference/matrix_to_table.html">matrix_to_table()</a></code> and <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code>.</li>
+<li>Speed up <code>matrix_to_table(keep_zero = TRUE)</code> and omit explicit zeros from sparse <code><a href="../reference/table_to_matrix.html">table_to_matrix()</a></code> output.</li>
 </ul></li>
 </ul></div>
     <div class="section level2">
