@@ -1,41 +1,38 @@
 # thisutils (development version)
 
-* **feat**: `check_r(strict = TRUE)` stops with an install hint when a package
-  is still unavailable after the check, so callers can rely on it before code
-  that needs the package. Installation behaviour and the returned status are
-  unchanged.
-* Preserve the positional `verbose` argument when using `check_r()`.
-* Add `sum_columns_by_group()` for grouped column sums in input order.
+* **feat**:
+  * Add `check_r(strict = TRUE)` to stop with an install hint if a package
+    remains unavailable.
+  * Add `sum_columns_by_group()` to sum columns by group in order of first
+    appearance, preserving sparsity for sparse inputs.
+
+* **compatibility**:
+  * Preserve the position of the `verbose` argument in `check_r()`.
 
 # thisutils 0.5.3
 
 * **feat**:
-  * Add `fit_trends()` for GAM and PreTSA feature trends. Statistics include
-    fit scores, peak and valley times, P-values, and adjusted P-values.
-    `fitted`, `lower`, and `upper` are optional and stay in input order.
-    GAM bounds are +/- 2 standard errors on the link scale. PreTSA bounds
-    equal the fitted values.
-  * Add `local_verbose()` to set `options(log_message.verbose)` for the
-    calling frame and restore it on exit. Compiled `log_message()` reads
-    that option through `get_verbose()`.
-  * Add `--demo` to the Python and Shell `log_message` scripts and remove
-    the standalone example files.
-  * Move the Python and Shell helpers from `inst/python/` to
-    `inst/scripts/`. The old path is removed.
+  * Add `fit_trends()` for GAM and PreTSA trends, with fit scores, peak and
+    valley times, and raw and adjusted P-values. Optional fitted values and
+    bounds follow input order. GAM bounds use +/- 2 standard errors on the
+    link scale. PreTSA bounds equal the fitted values.
+  * Add `local_verbose()` to set `log_message.verbose` for the calling scope
+    and restore it on exit.
+  * Add `--demo` to the Python and Shell `log_message` scripts, replacing
+    the standalone examples.
 
 * **compatibility**:
-  * `invoke_fun()` requires a list or pairlist of argument values, or `NULL`.
-    Calls with arguments still use a temporary child environment: captured
-    expressions use temporary symbols, caller-frame side effects stay in that
-    environment, and captured model calls are not generally replayable.
-  * R verbosity is unchanged: an explicit call argument wins, then
-    `options(log_message.verbose)`, otherwise the message stays visible.
-  * Python and Shell no longer read `LOG_MESSAGE_VERBOSE`. An omitted
-    `verbose` stays visible.
-  * `ask` is no longer silenced when `verbose = FALSE` in R, Python, and
-    Shell. `error` still signals.
-  * Honor `NO_COLOR` in the Python and Shell scripts so terminal styling
-    can be bypassed.
+  * Replace `inst/python/` with `inst/scripts/` for Python and Shell helpers.
+    The scripts ignore `LOG_MESSAGE_VERBOSE`, default to visible output,
+    and honour `NO_COLOR`.
+  * `ask` prompts and `error` signals remain active with `verbose = FALSE`
+    in R, Python, and Shell. R uses explicit `verbose`, then
+    `options(log_message.verbose)`, then visible output.
+  * `invoke_fun()` builds calls faster and requires a list, pairlist, or `NULL`
+    for argument values. Calls with arguments use a child environment that
+    contains side effects and temporary symbols. Captured calls leave large
+    objects in that environment and may be unreplayable. String function names
+    and explicit missing arguments retain their behaviour.
 
 * **fix**:
   * Keep nonconstant zero-sum features in PreTSA trend significance tests and
@@ -48,17 +45,11 @@
     respect symmetric and triangular sparse matrix storage.
   * Recognize pak's `github::` prefix in installed repository metadata when
     checking package sources, avoiding unnecessary reinstallation.
-  * Reduce `invoke_fun()` call-construction overhead while keeping large
-    objects outside captured calls. Preserve string function names, use the
-    same function lookup for empty and nonempty calls, avoid temporary-name
-    collisions, and preserve explicit missing arguments and their defaults.
   * Keep the original `check_r()` installation error when the optional
     `remotes` package is not installed.
-  * Report a PSOCK worker that exits during send, or while the scheduler is
-    waiting for a result, as `parallelize_worker_error`. Classification does
-    not depend on the language of R's connection messages. A serialization
-    failure, including a warning promoted to an error, is still raised
-    unchanged when the worker is alive.
+  * Report PSOCK worker exits during send or result collection as
+    `parallelize_worker_error` across locales. Propagate the original
+    serialization error when the worker is alive.
 
 * **docs**:
   * List `local_verbose` in the pkgdown reference index.
@@ -77,35 +68,26 @@
     implicit zeros as zero.
 
 * **performance**:
-  * Evaluate each scheduled task batch behind one message sink instead of
-    opening and closing a connection for every input.
-  * Set nested-worker state once per scheduled batch, resetting it only after
-    inputs that mutate the internal option, instead of updating options around
-    every input.
-  * Minimize PSOCK worker closures, remove source references from worker-only
-    function copies, and use native serialization for same-host workers.
-  * Bundle nested-call helpers into one compact PSOCK export instead of sending
-    each internal function separately.
-  * Send each PSOCK batch only its assigned input values and random-number
-    streams instead of copying the complete task list to every worker.
-  * Skip lifecycle logging entirely for `verbose = FALSE` calls.
-  * Limit verbose formatting to the first 20 distinct error types while
-    retaining every error object in the returned results.
+  * Reduce per-task overhead by sharing message capture and nested-worker
+    setup within each scheduled batch.
+  * Send smaller PSOCK exports and only the assigned inputs and random-number
+    streams per batch. Use native serialization for same-host workers.
+  * Skip lifecycle logging with `verbose = FALSE`. Verbose output formats
+    the first 20 distinct error types and results retain every error object.
+
 * **fix**:
-  * Collapse multi-element inline expression evaluations to a single string in
-    `parse_inline_expressions()`. Vector-valued evaluations previously grew the
-    message text beyond length one and crashed the `grepl`-based replacement
-    loop with `'length = N' in coercion to 'logical(1)'` before the real error
-    details could be reported.
+  * Collapse vector results in `parse_inline_expressions()` to a single
+    string so inline formatting can report the original error.
 
 # thisutils 0.5.0
 
 * **compatibility**:
   * Preserve the historical `matrix_to_table(keep_zero = TRUE)` default.
     Compact table output remains an explicit choice.
-  * Preserve the stored-entry semantics and zero-value padding of
-    `run_sparse_topk_by_column()`. The new `run_sparse_topk()` includes implicit
-    sparse zeros by default so it matches ordinary dense-matrix semantics.
+  * `run_sparse_topk_by_column()` still ranks stored entries and fills missing
+    ranks with `NA` indices and zero values. `run_sparse_topk_stored()` fills
+    both indices and values with `NA`. `run_sparse_topk()` includes implicit
+    zeros by default.
 
 * **feat**:
   * Add `run_dense_topk()` with an explicit `by = "col"` or `by = "row"`
@@ -127,27 +109,18 @@
   * Detect cancellation-prone row variance calculations and recompute only the
     affected dense or sparse rows with a stable two-pass calculation, preserving
     the existing fast path for ordinary inputs.
-  * Pad stored-entry sparse top-k results with `NA` values instead of zeros.
   * Replace infinite correlations with zero when `remove_inf = TRUE`.
   * Summarize failed structured or matrix-valued tasks by their task name or
     shape, preventing verbose error reporting from masking the original worker
     error.
 
 * **docs**:
-  * Document sparse expansion, implicit-zero, dense-intermediate, and CPU
-    boundaries, and reorganize the package reference around sparse and
-    resource-controlled research workflows.
-  * Add a full-workflow vignette that connects semantic, numerical, resource,
-    and execution contracts, plus an R Journal-oriented benchmark plan.
-  * Demonstrate stable verbose lifecycle messages separately from dynamic
-    progress output in report-oriented examples.
-  * Add a package-wide workflow vignette spanning representation, neighborhood
-    evaluation, execution, messages, and optional dependency diagnostics.
+  * Document sparse semantics and memory and CPU limits. Add workflow
+    vignettes, reporting examples, and a benchmark plan.
 
 * **tests**:
-  * Exercise fork interruption from an external parent process and verify that
-    workers are reaped before a subsequent fork call. Clarify that the
-    in-process interrupt-sender test covers the default PSOCK backend.
+  * Verify fork worker cleanup after external interruption and cover the
+    default PSOCK backend with an in-process interrupt test.
 
 # thisutils 0.4.9
 
@@ -161,15 +134,10 @@
     top-k helpers, with native C++ implementations.
 
 * **fix**:
-  * Fix `check_r()`: change `dependencies` default from `TRUE` to `NA`, so
-    hard dependencies (`Depends`, `Imports`, `LinkingTo`) are installed by
-    default while `Suggests` are excluded (#XXX).
-  * Improve `check_r()` error reporting: traverse the full error chain via
-    `rlang::cnd_message(e, inherit = TRUE)` instead of only showing the
-    top-level message; strip ANSI escape codes to avoid printing garbage in
-    the log.
-  * Eliminate duplicate "Failed to install" messages in `check_r()` by storing
-    error details per-package and reporting them once in the final summary.
+  * Default `check_r()` to `dependencies = NA` to install hard dependencies
+    and skip `Suggests`.
+  * Report the full `check_r()` installation error chain once per package,
+    with ANSI escape codes removed.
   * Retry GitHub packages with `remotes` when `pak` cannot parse a malformed
     `DESCRIPTION` file.
 
@@ -198,7 +166,8 @@
   * Refresh `compute_lisi()` and `log_message()` documentation to match the current arguments and defaults.
 
 * **tests**:
-  * Add regression tests for `collapse_sparse_rows()` edge cases, `compute_lisi()` backend consistency, captured `cli` messages in `log_message(expr = ...)`, matrix conversion corner cases, `parallelize_fun()` ordering/export behavior, normalization on degenerate inputs, and startup suppression when verbose logging is disabled.
+  * Cover sparse aggregation, LISI backends, matrix conversion, degenerate
+    normalization, parallel execution, and logging in regression tests.
 
 # thisutils 0.4.4
 
@@ -248,8 +217,10 @@
 # thisutils 0.3.7
 
 * **feat**:
-  * Optimize `matrix_to_table()` C++ implementation: Improved dimnames handling using `Rf_getAttrib` and `R_DimNamesSymbol` for better compatibility. Enhanced `keep_zero = TRUE` logic to efficiently include all row/column combinations (including zeros) using `unordered_set` and `unordered_map` for optimized lookups.
-  * Improve `table_to_matrix()` C++ implementation: Enhanced sparse matrix construction by ensuring zero values are not added to sparse matrices. Improved dimnames setting using `Rf_setAttrib` and `R_DimNamesSymbol` for better compatibility.
+  * Improve dimension-name handling in `matrix_to_table()` and
+    `table_to_matrix()`.
+  * Speed up `matrix_to_table(keep_zero = TRUE)` and omit explicit zeros
+    from sparse `table_to_matrix()` output.
 
 # thisutils 0.3.6
 
